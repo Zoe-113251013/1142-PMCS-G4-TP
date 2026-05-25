@@ -45,6 +45,13 @@
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
         body { margin: 0; padding: 0; overflow: hidden; }
+
+        /* Flip Card Styles */
+        .flip-card { perspective: 1000px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4,0.2,0.2,1); transform-style: preserve-3d; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 0.75rem; }
+        .flip-card-back { transform: rotateY(180deg); }
     </style>
 </head>
 <body>
@@ -139,6 +146,7 @@
                 settings: "Settings",
                 help: "Help & Support",
                 allRightsReserved: "All rights reserved.",
+                academicUseOnly: "For academic purposes only. Not an official H&M website.",
                 privacy: "Privacy Policy",
                 terms: "Terms of Use",
                 contact: "Contact Us",
@@ -150,7 +158,52 @@
                 archive: "Archived Reports",
                 downloadReport: "Download PDF",
                 historyTitle: "Our Heritage",
-                historyDesc: "From a single women's wear store in Sweden to one of the largest fashion retailers worldwide."
+                historyDesc: "From a single women's wear store in Sweden to one of the largest fashion retailers worldwide.",
+                professorName: "Advisor: Professor Shih-Min Lo",
+                orgTitle: "H&M Group Organization",
+                orgDesc: "H&M Group operates through a flat, egalitarian Scandinavian structure, uniting multiple lifestyle brands and global functions under one roof. The core ethos: 'We Are One Team.'",
+                orgBrands: "Our Brands",
+                orgFunctions: "Key Business Functions",
+                orgOffices: "Global Corporate Offices",
+                orgCulture: "Organizational Culture",
+                orgCultureDesc: "Defined by a flat hierarchy, mutual trust, and psychological safety. All employees are encouraged to think like business owners, driving speed, execution, and innovation.",
+                jobsTitle: "H&M: Product Manager",
+                jobsSubtitle: "Digital Tech · H&M Beauty · Global Supply Chain",
+                jobLocation: "Stockholm HQ / New York / Hong Kong",
+                jobType: "Full-time · Hybrid",
+                jobSalary: "Median $90,155 USD / year (Senior: $137,000+)",
+                jobStatus: "Actively Hiring",
+                jobStatusNote: "When no direct listing appears, submit your profile via the H&M Talent Community.",
+                jobDesc: "Own the end-to-end product lifecycle for H&M's global digital platforms (e.g., e-commerce app, retail tech) or specific commercial product lines.",
+                responsibilities: "Key Responsibilities",
+                requirements: "Requirements",
+                mustHave: "Must-Have",
+                niceToHave: "Nice-to-Have",
+                benefitsTitle: "Benefits & Culture",
+                applyProcess: "Application Process",
+                applyNow: "Apply via H&M Careers",
+                termTitle: "Core Domain Terminology",
+                termDesc: "Key concepts, frameworks, and brand vocabulary used across H&M Group's product management and marketing functions.",
+                termCategory1: "Strategy & Marketing",
+                termCategory2: "Product Management",
+                termCategory3: "H&M Brand Concepts",
+                jobCompanyHM: "H&M",
+                jobCompanyUniqlo: "Uniqlo",
+                jobCompare: "Comparison",
+                jobRoleHM: "Product Manager",
+                jobRoleUniqlo: "Product Marketing Manager",
+                jobSubHM: "Digital Tech · H&M Beauty · Global Supply Chain",
+                jobSubUniqlo: "UT & Core LifeWear Campaigns",
+                jobLocationUniqlo: "New York City (Manhattan HQ)",
+                jobTypeUniqlo: "Full-time · On-site / Hybrid",
+                jobSalaryUniqlo: "$110,000 – $135,000 USD / year + annual bonus",
+                jobDescUniqlo: "Lead the planning and execution of comprehensive GTM strategies for core product lines (LifeWear, UT collaborations, AIRism) tailored for the North American market.",
+                jobStatusUniqlo: "Actively Hiring",
+                jobStatusNoteUniqlo: "Process typically runs 4–6 weeks from initial screening to offer.",
+                jobHours: "Working Hours",
+                jobHoursUniqlo: "Standard full-time corporate hours; seasonal flexibility required around major launches.",
+                jobCultureUniqlo: "Rooted in 'Zen-in Keiei' (All-Employee Management) and LifeWear philosophies. Employees are encouraged to think like business owners.",
+                jobBenefitsUniqlo: "Comprehensive medical, dental & vision insurance; 401(k) with company matching; generous employee discount; paid time off; commuter subsidies; corporate wellness programs."
             },
             zh: {
                 appTitle: "H&M 企業入口網站",
@@ -190,6 +243,7 @@
                 settings: "系統設定",
                 help: "說明與支援",
                 allRightsReserved: "保留所有權利。",
+                academicUseOnly: "本網站僅供學術作業使用，非 H&M 官方網站。",
                 privacy: "隱私權政策",
                 terms: "使用條款",
                 contact: "聯絡我們",
@@ -201,7 +255,52 @@
                 archive: "歷年報告存檔",
                 downloadReport: "下載 PDF",
                 historyTitle: "品牌歷史與傳承",
-                historyDesc: "從瑞典的一家女裝店，發展成為全球最大的時尚零售商之一。"
+                historyDesc: "從瑞典的一家女裝店，發展成為全球最大的時尚零售商之一。",
+                professorName: "PMCS G4 指導教授 駱世民",
+                orgTitle: "H&M 集團組織架構",
+                orgDesc: "H&M 集團以扁平化的北歐管理結構運作，將多個生活風格品牌與全球職能整合於同一屋簷下。核心理念：「我們是一個團隊」。",
+                orgBrands: "旗下品牌",
+                orgFunctions: "核心業務職能",
+                orgOffices: "全球企業據點",
+                orgCulture: "組織文化",
+                orgCultureDesc: "以扁平層級、相互信任與心理安全感為特色。所有員工被鼓勵以業主思維運作，追求執行速度、創新與誠信。",
+                jobsTitle: "H&M：產品經理",
+                jobsSubtitle: "數位科技 · H&M Beauty · 全球供應鏈",
+                jobLocation: "斯德哥爾摩總部 / 紐約 / 香港",
+                jobType: "全職 · 混合辦公",
+                jobSalary: "中位數薪酬 $90,155 美元/年（資深職可達 $137,000+）",
+                jobStatus: "積極招募中",
+                jobStatusNote: "若官網暫無直接職缺，建議透過 H&M 人才社群提交履歷以加入候選人才庫。",
+                jobDesc: "全權負責 H&M 全球數位平台（如電子商務 App、零售科技解決方案）或特定商業產品線的端對端產品生命週期管理。",
+                responsibilities: "主要職責",
+                requirements: "職位要求",
+                mustHave: "必備條件",
+                niceToHave: "加分條件",
+                benefitsTitle: "福利與文化",
+                applyProcess: "應徵流程",
+                applyNow: "前往 H&M 官方職缺頁面",
+                termTitle: "核心領域詞彙",
+                termDesc: "H&M 集團在產品管理與行銷職能中廣泛使用的核心概念、框架與品牌詞彙。",
+                termCategory1: "策略與行銷",
+                termCategory2: "產品管理",
+                termCategory3: "H&M 品牌概念",
+                jobCompanyHM: "H&M",
+                jobCompanyUniqlo: "Uniqlo（優衣庫）",
+                jobCompare: "比較表",
+                jobRoleHM: "產品經理",
+                jobRoleUniqlo: "產品行銷經理",
+                jobSubHM: "數位科技 · H&M Beauty · 全球供應鏈",
+                jobSubUniqlo: "UT 聯名系列 & LifeWear 核心行銷活動",
+                jobLocationUniqlo: "紐約市（曼哈頓總部）",
+                jobTypeUniqlo: "全職 · 現場/混合辦公",
+                jobSalaryUniqlo: "$110,000 – $135,000 美元/年 + 年度績效獎金",
+                jobDescUniqlo: "主導針對北美市場量身訂製的核心產品線 GTM 策略（包括 LifeWear、UT 聯名系列、AIRism）的規劃與執行。",
+                jobStatusUniqlo: "積極招募中",
+                jobStatusNoteUniqlo: "整體流程從初步篩選到發出錄取通知約需 4–6 週。",
+                jobHours: "工作時數",
+                jobHoursUniqlo: "標準全職企業工時；主要產品上市與全球活動期間需具備季節性彈性。",
+                jobCultureUniqlo: "根植於「全員經營（Zen-in Keiei）」與 LifeWear 哲學，鼓勵員工以業主思維運作。",
+                jobBenefitsUniqlo: "全方位醫療、牙科與視力保險；401(k) 退休計畫（含公司配對提撥）；豐厚員工折扣；有薪假；通勤補貼；企業健康計畫。"
             }
         };
 
@@ -499,30 +598,92 @@
         const TeamIntroApp = ({ appData, dict, lang }) => {
             // 五位成員的預設資料，您後續可以直接在這裡修改文字
             const teamMembers = [
-                { id: 1, initial: 'M1', name: lang === 'zh' ? '成員姓名 1' : 'Member Name 1', role: lang === 'zh' ? '專案經理 / Project Manager' : 'Project Manager', desc: lang === 'zh' ? '負責統籌專案進度、資源分配與跨部門溝通。這裡可以填寫該成員的詳細介紹與負責項目。' : 'Responsible for overall project schedule, resource allocation, and cross-departmental communication.' },
-                { id: 2, initial: 'M2', name: lang === 'zh' ? '成員姓名 2' : 'Member Name 2', role: lang === 'zh' ? '系統分析師 / System Analyst' : 'System Analyst', desc: lang === 'zh' ? '負責系統需求分析、架構設計與業務邏輯規劃。這裡可以填寫該成員的詳細介紹與負責項目。' : 'Responsible for system requirement analysis, architecture design, and business logic planning.' },
-                { id: 3, initial: 'M3', name: lang === 'zh' ? '成員姓名 3' : 'Member Name 3', role: lang === 'zh' ? '前端工程師 / Frontend Engineer' : 'Frontend Engineer', desc: lang === 'zh' ? '負責網頁 UI/UX 設計與前端互動程式撰寫。這裡可以填寫該成員的詳細介紹與負責項目。' : 'Responsible for web UI/UX design and frontend interactive programming.' },
-                { id: 4, initial: 'M4', name: lang === 'zh' ? '成員姓名 4' : 'Member Name 4', role: lang === 'zh' ? '後端工程師 / Backend Engineer' : 'Backend Engineer', desc: lang === 'zh' ? '負責資料庫建置、API 開發與伺服器架構。這裡可以填寫該成員的詳細介紹與負責項目。' : 'Responsible for database construction, API development, and server architecture.' },
-                { id: 5, initial: 'M5', name: lang === 'zh' ? '成員姓名 5' : 'Member Name 5', role: lang === 'zh' ? '測試工程師 / QA Engineer' : 'QA Engineer', desc: lang === 'zh' ? '負責系統功能測試、效能調校與品質保證。這裡可以填寫該成員的詳細介紹與負責項目。' : 'Responsible for system functional testing, performance tuning, and quality assurance.' },
+                { 
+                    id: 1, 
+                    initial: 'M1', 
+                    avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vT3GowRFbpQUPiAfEfESNVYxIc4VowV3C2anBriUAbb69nVU_G2Z9m6JguwOai16wa6FH7SXicYz2QA/pub?w=960&h=720',
+                    name: 'Zoe', 
+                    role: 'Interdisciplinary Program of College of Management', 
+                    studentId: '113251013',
+                    slogan: '" HA! HA! "',
+                    desc: 'I\'m Zoe. Working with my team to create this TP website not only improved my keyword skills and helped me create beautiful web pages, but also gave me a deeper understanding of the work of a product manager (PM).' 
+                },
+                { 
+                    id: 2, 
+                    initial: 'M2', 
+                    name: 'Jenifer', 
+                    role: 'International Business Studies', 
+                    studentId: '113212044',
+                    slogan: '“Wear what reflects you”',
+                    desc: 'Good day everyone, I am Jenifer one of the H&M website developers. Here we want to provide interesting yet complete information about our company. Our aim is to bring confidence in every designs we pour our heart into.' 
+                },
+                { 
+                    id: 3, 
+                    initial: 'M3', 
+                    name: 'Andy', 
+                    role: 'DCH', 
+                    studentId: '114400003',
+                    slogan: '“Your choice, your responsibility”',
+                    desc: 'While building this website, what I learned most was how to give the correct commands to prevent Gemini from crashing or failing to function. Our goal is to present H&M\'s information and background more comprehensively.' 
+                },
+                { 
+                    id: 4, 
+                    initial: 'M4', 
+                    name: 'Jessica', 
+                    role: 'Chinese literature', 
+                    studentId: '111101002',
+                    slogan: '“Wear the clothes you like, do the things you like.”',
+                    desc: 'I\'m jessica. The member in H&M website developer. The main core we want to provide is about the running of the company and marketing structure of H&M. Our ambition and aim is that people simple and clearly recognize the operating of H&M.' 
+                },
+                { 
+                    id: 5, 
+                    initial: 'M5', 
+                    name: lang === 'zh' ? '成員姓名 5' : 'Member Name 5', 
+                    role: lang === 'zh' ? '測試工程師 / QA Engineer' : 'QA Engineer', 
+                    desc: lang === 'zh' ? '負責系統功能測試、效能調校與品質保證。這裡可以填寫該成員的詳細介紹與負責項目。' : 'Responsible for system functional testing, performance tuning, and quality assurance.' 
+                },
             ];
 
             return (
                 <div className="p-6 md:p-8 max-w-7xl mx-auto animate-in fade-in duration-300 w-full">
                     {/* 頁面標題區 */}
-                    <div className="mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
-                        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">{appData.title}</h2>
-                        <p className="text-gray-500 dark:text-gray-400 mt-2">{appData.subtitle}</p>
+                    <div className="mb-8 border-b border-gray-200 dark:border-gray-700 pb-4 flex justify-between items-end">
+                        <div>
+                            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">{appData.title}</h2>
+                            <p className="text-gray-500 dark:text-gray-400 mt-2">{appData.subtitle}</p>
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-300 font-medium text-sm md:text-base border border-gray-300 dark:border-gray-600 rounded px-3 py-1 bg-white dark:bg-gray-800">
+                            {dict.professorName}
+                        </p>
                     </div>
                     
                     {/* 卡片網格區塊 */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
                         {teamMembers.map(member => (
                             <div key={member.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 flex flex-col items-center text-center hover:shadow-md dark:hover:shadow-gray-900 transition-all group">
-                                <div className="w-24 h-24 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-2xl font-bold text-[#e50010] mb-4 border border-gray-200 dark:border-gray-600 group-hover:border-[#e50010] dark:group-hover:border-red-500 transition-colors shadow-inner">
-                                    {member.initial}
+                                <div className="w-24 h-24 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-2xl font-bold text-[#e50010] mb-4 border border-gray-200 dark:border-gray-600 group-hover:border-[#e50010] dark:group-hover:border-red-500 transition-colors shadow-inner overflow-hidden">
+                                    {member.avatar ? (
+                                        <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        member.initial
+                                    )}
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">{member.name}</h3>
-                                <p className="text-sm text-[#e50010] dark:text-red-400 font-medium mt-2 mb-4">{member.role}</p>
+                                <p className="text-sm text-[#e50010] dark:text-red-400 font-medium mt-2">{member.role}</p>
+                                {/* 顯示學號的區塊 */}
+                                {member.studentId && (
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-2 font-sans tracking-wider">
+                                        ID: {member.studentId}
+                                    </p>
+                                )}
+                                {/* 顯示 Slogan 的區塊 */}
+                                {member.slogan ? (
+                                    <p className="text-gray-700 dark:text-gray-200 text-sm italic font-serif my-4">
+                                        {member.slogan}
+                                    </p>
+                                ) : (
+                                    <div className="my-2"></div>
+                                )}
                                 <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed flex-1">{member.desc}</p>
                                 <div className="mt-6 flex gap-3">
                                     <button className="p-2 text-gray-400 hover:text-[#e50010] dark:hover:text-red-400 transition-colors bg-gray-50 dark:bg-gray-900 rounded-full" title="Contact">
@@ -684,16 +845,605 @@
             );
         };
 
+        // 4.4 Org Structure Application
+        const OrgStructureApp = ({ appData, dict, lang }) => {
+            const brands = [
+                { name: 'H&M', color: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-[#e50010] dark:text-red-400', desc: lang === 'zh' ? '全球最大時尚零售主品牌' : 'The flagship global fashion brand' },
+                { name: 'COS', color: 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100', desc: lang === 'zh' ? '現代設計感高品質服飾' : 'Modern, high-quality fashion' },
+                { name: '& Other Stories', color: 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300', desc: lang === 'zh' ? '精品配件與個性化美妝' : 'Premium accessories & beauty' },
+                { name: 'ARKET', color: 'bg-stone-100 dark:bg-stone-800 border-stone-300 dark:border-stone-600 text-stone-700 dark:text-stone-300', desc: lang === 'zh' ? '北歐簡約生活風格品牌' : 'Nordic minimalist lifestyle' },
+                { name: 'Weekday', color: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-700 dark:text-yellow-400', desc: lang === 'zh' ? '青年文化與街頭時尚' : 'Youth culture & streetwear' },
+                { name: 'Monki', color: 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-400', desc: lang === 'zh' ? '個性鮮明的女性時尚品牌' : 'Bold & playful womenswear' },
+            ];
+            const functions = [
+                { name: lang === 'zh' ? '數位科技' : 'Digital Tech', icon: '💻', desc: lang === 'zh' ? '電商平台、App、零售科技與 IT 基礎建設' : 'E-commerce, apps, retail tech & IT infrastructure' },
+                { name: lang === 'zh' ? '全球供應鏈' : 'Global Supply Chain', icon: '🔗', desc: lang === 'zh' ? '採購、物流、倉儲與永續供應商管理' : 'Procurement, logistics, warehousing & supplier relations' },
+                { name: lang === 'zh' ? '行銷與創意' : 'Marketing & Creative', icon: '🎨', desc: lang === 'zh' ? '品牌敘事、廣告製作、公關與社群媒體' : 'Brand narrative, advertising, PR & social media' },
+                { name: lang === 'zh' ? '商品規劃' : 'Product Merchandising', icon: '👗', desc: lang === 'zh' ? '商品選品、定價策略、買手與視覺陳列' : 'Assortment planning, pricing, buying & visual display' },
+                { name: lang === 'zh' ? '財務與法務' : 'Finance & Legal', icon: '📊', desc: lang === 'zh' ? '財務管控、會計、合規與法律事務' : 'Financial control, accounting, compliance & legal affairs' },
+                { name: lang === 'zh' ? '人力資源' : 'People & HR', icon: '🤝', desc: lang === 'zh' ? '人才招募、培訓、多元共融與企業文化' : 'Talent acquisition, training, D&I & culture' },
+            ];
+            const offices = [
+                { city: lang === 'zh' ? '斯德哥爾摩' : 'Stockholm', role: lang === 'zh' ? '全球總部' : 'Global HQ', flag: '🇸🇪' },
+                { city: lang === 'zh' ? '紐約' : 'New York', role: lang === 'zh' ? '北美區域總部' : 'North America HQ', flag: '🇺🇸' },
+                { city: lang === 'zh' ? '香港' : 'Hong Kong', role: lang === 'zh' ? '亞太區域總部' : 'Asia Pacific HQ', flag: '🇭🇰' },
+            ];
+            return (
+                <div className="p-6 md:p-8 max-w-5xl mx-auto animate-in fade-in duration-300 w-full pb-12">
+                    <div className="mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
+                        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">{dict.orgTitle}</h2>
+                        <p className="text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">{dict.orgDesc}</p>
+                    </div>
+                    {/* Culture Banner */}
+                    <div className="bg-[#e50010] text-white rounded-xl p-6 mb-8 flex items-center gap-4">
+                        <span className="text-4xl">🏢</span>
+                        <div>
+                            <h3 className="font-bold text-lg">{dict.orgCulture}</h3>
+                            <p className="text-white/90 text-sm mt-1 leading-relaxed">{dict.orgCultureDesc}</p>
+                        </div>
+                    </div>
+                    {/* Brands */}
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2"><span className="text-[#e50010]">■</span> {dict.orgBrands}</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-10">
+                        {brands.map(b => (
+                            <div key={b.name} className={`border rounded-lg p-4 ${b.color}`}>
+                                <p className="font-bold text-base">{b.name}</p>
+                                <p className="text-xs mt-1 opacity-80">{b.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Functions */}
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2"><span className="text-[#e50010]">■</span> {dict.orgFunctions}</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+                        {functions.map(f => (
+                            <div key={f.name} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex gap-3 items-start hover:border-[#e50010] transition-colors">
+                                <span className="text-2xl shrink-0">{f.icon}</span>
+                                <div>
+                                    <p className="font-semibold text-gray-800 dark:text-gray-100">{f.name}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{f.desc}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Offices */}
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2"><span className="text-[#e50010]">■</span> {dict.orgOffices}</h3>
+                    <div className="flex flex-wrap gap-4">
+                        {offices.map(o => (
+                            <div key={o.city} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-6 py-4 flex items-center gap-3 hover:border-[#e50010] transition-colors">
+                                <span className="text-3xl">{o.flag}</span>
+                                <div>
+                                    <p className="font-bold text-gray-800 dark:text-gray-100">{o.city}</p>
+                                    <p className="text-xs text-[#e50010] dark:text-red-400 font-medium">{o.role}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // 4.5 Job Openings Application (H&M + Uniqlo)
+        const JobOpeningsApp = ({ appData, dict, lang }) => {
+            const [activeTab, setActiveTab] = useState('hm');
+
+            const hmData = {
+                title: dict.jobRoleHM,
+                subtitle: dict.jobSubHM,
+                location: dict.jobLocation,
+                type: dict.jobType,
+                salary: dict.jobSalary,
+                status: dict.jobStatus,
+                statusNote: dict.jobStatusNote,
+                desc: dict.jobDesc,
+                accentColor: '#e50010',
+                accentBg: 'bg-[#e50010]',
+                accentBorder: 'border-[#e50010]',
+                accentText: 'text-[#e50010]',
+                applyUrl: 'https://career.hmgroup.com',
+                applyLabel: dict.applyNow,
+                responsibilities: lang === 'zh' ? [
+                    '負責 H&M 全球數位平台（電商 App、零售科技）或特定商業產品線的端對端產品生命週期管理',
+                    '整合工程、UX/UI 設計師與業務分析師，制定清晰的產品願景、路線圖，並追蹤 OKR / KPI',
+                    '蒐集全球消費者回饋，執行嚴謹的 A/B 測試，以數據驅動使用者體驗與供應鏈效率的持續優化',
+                ] : [
+                    'Own the end-to-end product lifecycle for H&M\'s global digital platforms (e.g., e-commerce app, retail tech) or specific commercial product lines',
+                    'Align engineering, UX/UI designers, and business analysts to define product visions, establish clear roadmaps, and track OKRs/KPIs',
+                    'Gather international consumer feedback and execute rigorous A/B testing to drive data-backed iterations for user experiences and supply chain efficiencies',
+                ],
+                mustHaves: lang === 'zh' ? [
+                    '2 年以上數位產品經理經驗，或大型時尚零售採購、商品規劃與敏捷運營的紮實背景',
+                    '熟練掌握敏捷 / Scrum 方法論，並具備強大的「無職權領導力」以引導跨職能團隊',
+                    '卓越的數據分析能力與系統性思維',
+                ] : [
+                    '2+ years as a Digital Product Manager, or a solid background in large-scale fashion retail procurement, merchandising, and agile operations',
+                    'Proficiency in Agile/Scrum methodologies with strong "leadership without authority" skills',
+                    'Exceptional data analytical skills and systems-thinking capabilities',
+                ],
+                niceToHaves: lang === 'zh' ? [
+                    '擁有時尚科技（Fashion-Tech）或大型全球電商平台管理背景',
+                    '高度敏捷性、強烈好奇心，並樂於擁抱全球零售市場的快速變革',
+                ] : [
+                    'Background in Fashion-Tech or managing large-scale global e-commerce platforms',
+                    'High agility, curiosity, and willingness to embrace rapid changes in the global retail market',
+                ],
+                benefits: lang === 'zh' ? [
+                    'H&M 集團全球員工折扣卡（適用 COS、& Other Stories、ARKET、Weekday、Monki 等所有品牌）',
+                    'H&M Incentive Program（HIP）—— 全員分紅計畫',
+                    '育嬰假支援與全球內部調動機會',
+                    '彈性全職工時，強調工作生活平衡的北歐企業文化',
+                ] : [
+                    'H&M Global Employee Discount Card across all H&M Group brands (COS, & Other Stories, ARKET, Weekday, Monki)',
+                    'H&M Incentive Program (HIP) – company-wide profit-sharing',
+                    'Parental leave support and global internal mobility opportunities',
+                    'Flexible full-time hours with a strong work-life balance culture',
+                ],
+                steps: lang === 'zh' ? [
+                    '透過 H&M 官方職缺頁面 / LinkedIn 提交線上申請',
+                    '人才招募電話初篩（約 1 週）',
+                    '與招募主管進行職能面試與產品案例研究（約 2 週）',
+                    '文化契合度與價值觀面試（約 1 週）',
+                    '薪酬審查與正式錄取通知',
+                ] : [
+                    'Online Application via Careers Page / LinkedIn',
+                    'Talent Acquisition Screening Call (~1 week)',
+                    'Competency & Product Case Study Interview with Hiring Manager (~2 weeks)',
+                    'Cultural Fit & Values-based Interview (~1 week)',
+                    'Compensation Review & Formal Offer',
+                ],
+            };
+
+            const uniqloData = {
+                title: dict.jobRoleUniqlo,
+                subtitle: dict.jobSubUniqlo,
+                location: dict.jobLocationUniqlo,
+                type: dict.jobTypeUniqlo,
+                salary: dict.jobSalaryUniqlo,
+                status: dict.jobStatusUniqlo,
+                statusNote: dict.jobStatusNoteUniqlo,
+                desc: dict.jobDescUniqlo,
+                accentColor: '#B22222',
+                accentBg: 'bg-[#B22222]',
+                accentBorder: 'border-[#B22222]',
+                accentText: 'text-[#B22222]',
+                applyUrl: 'https://www.uniqlo.com/us/en/contents/employment/',
+                applyLabel: lang === 'zh' ? '前往 Uniqlo 官方職缺頁面' : 'Apply via Uniqlo Careers',
+                responsibilities: lang === 'zh' ? [
+                    '主導針對北美市場的核心產品線（LifeWear、UT 聯名系列、AIRism）GTM 策略規劃與執行',
+                    '作為連結商品規劃、創意、公關與全球行銷團隊的核心樞紐，確保品牌敘事的一致性與在地化',
+                    '管理龐大行銷預算，指導外部創意、公關與媒體採購代理商，以最大化行銷活動 ROI',
+                    '分析美國消費者趨勢、市場洞察與銷售績效數據，持續優化行銷漏斗並向高層匯報可行洞察',
+                ] : [
+                    'Lead GTM strategy planning & execution for core product lines (LifeWear, UT collaborations, AIRism) for North America',
+                    'Serve as the central hub connecting Product Merchandising, Creative, PR, and Global Marketing for a cohesive brand narrative',
+                    'Manage substantial marketing budgets and direct external creative, PR, and media buying agencies to maximize campaign ROI',
+                    'Analyze US consumer trends, market insights, and sales data to optimize the marketing funnel and report to executive leadership',
+                ],
+                mustHaves: lang === 'zh' ? [
+                    '行銷、商業管理、傳播或相關領域的學士學位',
+                    '3–5 年以上在消費品（CPG）或時尚零售業的產品行銷或品牌管理實戰經驗',
+                    '卓越的專案管理能力與強大的商業敏感度',
+                ] : [
+                    'Bachelor\'s degree in Marketing, Business Administration, Communications, or related field',
+                    '3–5+ years of proven experience in product marketing or brand management in CPG or fashion retail',
+                    'Exceptional project management skills and strong commercial acumen',
+                ],
+                niceToHaves: lang === 'zh' ? [
+                    '對全球流行文化、藝術、漫畫、音樂與時尚趨勢有深度熱情（負責 UT 聯名作品集尤為重要）',
+                    '高度的韌性與適應力，能在快節奏、矩陣式跨國企業環境中茁壯成長',
+                ] : [
+                    'Deep passion for global pop culture, art, manga, music, and fashion trends (crucial for UT collaboration portfolios)',
+                    'High resilience and adaptability to thrive in a fast-paced, matrixed multinational environment',
+                ],
+                benefits: lang === 'zh' ? [
+                    '全方位醫療、牙科與視力保險；401(k) 退休計畫（含公司配對提撥）',
+                    '豐厚員工折扣（適用旗下所有品牌）；有薪假與病假',
+                    '通勤補貼與企業健康計畫',
+                    dict.jobCultureUniqlo,
+                ] : [
+                    'Comprehensive medical, dental & vision insurance; 401(k) with company matching',
+                    'Generous employee discount across all brands; paid time off & sick leave',
+                    'Commuter subsidies & corporate wellness programs',
+                    dict.jobCultureUniqlo,
+                ],
+                steps: lang === 'zh' ? [
+                    '線上投遞履歷（初步篩選，約 1–2 週）',
+                    'HR 招募電話面試（約 1–2 週）',
+                    '招募主管 & 跨職能小組面試（含行銷案例研究或簡報，約 2–3 週）',
+                    '最終高層審核與正式錄取通知',
+                ] : [
+                    'Initial Resume Screening Online (~1–2 weeks)',
+                    'HR Recruiter Phone Screen (~1–2 weeks)',
+                    'Hiring Manager & Cross-functional Panel Interview — includes marketing case study or presentation (~2–3 weeks)',
+                    'Final Leadership Review & Official Offer',
+                ],
+            };
+
+            const job = activeTab === 'hm' ? hmData : uniqloData;
+
+            return (
+                <div className="p-6 md:p-8 max-w-4xl mx-auto animate-in fade-in duration-300 w-full pb-12">
+                    {/* Company Tab Switcher */}
+                    <div className="flex gap-2 mb-8 bg-white dark:bg-gray-800 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm w-fit flex-wrap">
+                        {[['hm', dict.jobCompanyHM, '🔴'], ['uniqlo', dict.jobCompanyUniqlo, '🟥'], ['compare', dict.jobCompare, '⚖️']].map(([id, label, icon]) => (
+                            <button key={id} onClick={() => setActiveTab(id)}
+                                className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === id ? (id === 'hm' ? 'bg-[#e50010] text-white shadow' : id === 'uniqlo' ? 'bg-[#B22222] text-white shadow' : 'bg-gray-700 text-white shadow') : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'}`}>
+                                <span>{icon}</span>{label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {activeTab === 'compare' ? (
+                        <ComparisonView dict={dict} lang={lang} />
+                    ) : (
+                    <React.Fragment>
+
+                    {/* Header */}
+                    <div className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-5 flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+                        <div>
+                            <h2 className={`text-3xl font-bold tracking-wide ${job.accentText} dark:${job.accentText}`}>{job.title}</h2>
+                            <p className="text-gray-500 dark:text-gray-400 font-medium mt-1">{job.subtitle}</p>
+                        </div>
+                        <span className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800 text-sm font-semibold px-4 py-1.5 rounded-full self-start md:self-auto">
+                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            {job.status}
+                        </span>
+                    </div>
+
+                    {/* Meta Info */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+                        {[['📍', job.location], ['🏢', job.type], ['💰', job.salary]].map(([icon, val]) => (
+                            <div key={val} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-start gap-3">
+                                <span className="text-xl">{icon}</span>
+                                <p className="text-sm text-gray-700 dark:text-gray-300 font-medium leading-snug">{val}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Job Desc */}
+                    <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg p-5 mb-6 text-gray-700 dark:text-gray-300 text-sm leading-relaxed italic">
+                        {job.desc}
+                    </div>
+
+                    {/* Responsibilities */}
+                    <JobSection title={dict.responsibilities} icon="🎯" accentBorder={job.accentBorder}>
+                        <ul className="space-y-2">{job.responsibilities.map((r,i)=><li key={i} className="flex gap-2 text-sm text-gray-700 dark:text-gray-300"><span className={`${job.accentText} mt-0.5 shrink-0`}>▸</span>{r}</li>)}</ul>
+                    </JobSection>
+
+                    {/* Requirements */}
+                    <JobSection title={dict.requirements} icon="📋" accentBorder={job.accentBorder}>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">{dict.mustHave}</p>
+                        <ul className="space-y-2 mb-4">{job.mustHaves.map((r,i)=><li key={i} className="flex gap-2 text-sm text-gray-700 dark:text-gray-300"><span className="text-green-500 mt-0.5 shrink-0">✓</span>{r}</li>)}</ul>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">{dict.niceToHave}</p>
+                        <ul className="space-y-2">{job.niceToHaves.map((r,i)=><li key={i} className="flex gap-2 text-sm text-gray-700 dark:text-gray-300"><span className="text-blue-400 mt-0.5 shrink-0">⊕</span>{r}</li>)}</ul>
+                    </JobSection>
+
+                    {/* Benefits */}
+                    <JobSection title={dict.benefitsTitle} icon="🎁" accentBorder={job.accentBorder}>
+                        <ul className="space-y-2">{job.benefits.map((b,i)=><li key={i} className="flex gap-2 text-sm text-gray-700 dark:text-gray-300"><span className="text-yellow-500 mt-0.5 shrink-0">★</span>{b}</li>)}</ul>
+                    </JobSection>
+
+                    {/* Apply Process */}
+                    <JobSection title={dict.applyProcess} icon="📬" accentBorder={job.accentBorder}>
+                        <ol className="space-y-3">
+                            {job.steps.map((s,i)=>(
+                                <li key={i} className="flex gap-3 items-start">
+                                    <span className={`w-6 h-6 rounded-full ${job.accentBg} text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5`}>{i+1}</span>
+                                    <p className="text-sm text-gray-700 dark:text-gray-300">{s}</p>
+                                </li>
+                            ))}
+                        </ol>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-4 italic">{job.statusNote}</p>
+                        <a href={job.applyUrl} target="_blank" rel="noopener noreferrer"
+                           className={`mt-5 inline-flex items-center gap-2 ${job.accentBg} hover:opacity-90 text-white font-semibold text-sm px-6 py-2.5 rounded-lg transition-opacity`}>
+                            {job.applyLabel} →
+                        </a>
+                    </JobSection>
+                    </React.Fragment>
+                    )}
+                </div>
+            );
+        };
+
+        // Comparison Table Component
+        const ComparisonView = ({ dict, lang }) => {
+            const rows = [
+                {
+                    category: lang === 'zh' ? '1. 基本資訊' : '1. Core Information',
+                    icon: '📌',
+                    uniqlo: lang === 'zh' ? [
+                        '💰 薪資：$110,000 – $135,000 美元/年底薪 + 年度績效獎金',
+                        '📍 地點：紐約市大都會區（曼哈頓總部）',
+                        '🏢 工作型態：全職，主要現場 / 混合辦公',
+                        '⏰ 工時：標準企業工時；主要發布與全球活動期間需具備季節彈性',
+                    ] : [
+                        '💰 Salary: $110,000 – $135,000 USD/yr base + annual performance bonus',
+                        '📍 Location: New York City Metropolitan Area (Manhattan HQ)',
+                        '🏢 Work Type: Full-time, primarily On-site / Hybrid',
+                        '⏰ Hours: Standard corporate hours; seasonal flexibility around major launches',
+                    ],
+                    hm: lang === 'zh' ? [
+                        '💰 薪資：中位數總薪酬 $90,155 美元/年（資深/技術 PM 可達 $137,000+）',
+                        '📍 地點：主要區域總部（斯德哥爾摩、紐約或香港）',
+                        '🏢 工作型態：全職，高度彈性混合辦公',
+                        '⏰ 工時：彈性工時，強調工作生活平衡',
+                    ] : [
+                        '💰 Salary: Median $90,155 USD/yr (Senior/Tech PM: $137,000+)',
+                        '📍 Location: Major hubs — Stockholm HQ, New York, or Hong Kong',
+                        '🏢 Work Type: Full-time, highly flexible Hybrid',
+                        '⏰ Hours: Flexible hours with strong work-life balance emphasis',
+                    ],
+                },
+                {
+                    category: lang === 'zh' ? '2. 工作內容與職責' : '2. Job Content & Responsibilities',
+                    icon: '🎯',
+                    uniqlo: lang === 'zh' ? [
+                        '主導北美市場核心產品線（LifeWear、UT 聯名）的 GTM 策略',
+                        '連結商品規劃、創意、公關與全球行銷的核心樞紐',
+                        '管理龐大行銷預算並指導外部代理商',
+                        '分析消費者趨勢與銷售數據以優化行銷漏斗',
+                    ] : [
+                        'Lead GTM strategies for core lines (LifeWear, UT) for North America',
+                        'Central hub connecting Merchandising, Creative, PR, and Global Marketing',
+                        'Manage substantial marketing budgets and direct external agencies',
+                        'Analyze consumer trends and sales data to optimize the marketing funnel',
+                    ],
+                    hm: lang === 'zh' ? [
+                        '負責全球數位平台（如電商 App）的端對端產品生命週期',
+                        '整合工程、UX/UI、業務分析師，制定願景、路線圖並追蹤 OKR/KPI',
+                        '蒐集消費者回饋並執行嚴謹的 A/B 測試',
+                    ] : [
+                        'Own end-to-end product lifecycle for global digital platforms (e.g., e-commerce app)',
+                        'Align engineering, UX/UI, and analysts to define roadmaps and track OKRs/KPIs',
+                        'Gather consumer feedback and execute rigorous A/B testing',
+                    ],
+                },
+                {
+                    category: lang === 'zh' ? '3. 資格與要求' : '3. Qualifications & Requirements',
+                    icon: '📋',
+                    uniqlo: lang === 'zh' ? [
+                        '✅ 必備：學士學位；3–5 年以上 CPG 或時尚零售的產品行銷 / 品牌管理經驗；卓越的專案管理能力',
+                        '⊕ 加分：對全球流行文化、藝術、漫畫、音樂的深度熱情（UT 聯名尤為重要）；高韌性與適應力',
+                    ] : [
+                        '✅ Must-have: Bachelor\'s degree; 3–5+ yrs product marketing/brand mgmt (CPG or fashion); exceptional project management',
+                        '⊕ Nice-to-have: Deep passion for global pop culture, art, manga, music (crucial for UT); high resilience in a matrixed environment',
+                    ],
+                    hm: lang === 'zh' ? [
+                        '✅ 必備：2 年以上數位 PM 經驗；熟練 Agile/Scrum；強大的「無職權領導力」與數據分析能力',
+                        '⊕ 加分：時尚科技背景；高度敏捷性、好奇心與擁抱快速變化的意願',
+                    ] : [
+                        '✅ Must-have: 2+ yrs Digital PM experience; proficiency in Agile/Scrum; strong "leadership without authority" and data analytics',
+                        '⊕ Nice-to-have: Fashion-Tech background; high agility and willingness to embrace rapid retail changes',
+                    ],
+                },
+                {
+                    category: lang === 'zh' ? '4. 福利與企業文化' : '4. Benefits & Company Culture',
+                    icon: '🎁',
+                    uniqlo: lang === 'zh' ? [
+                        '🏥 醫療、牙科與視力保險；401(k) 配對提撥',
+                        '🛍️ 豐厚員工折扣；有薪假 (PTO)；通勤補貼',
+                        '🌐 文化：根植於「全員經營」與 LifeWear 哲學，鼓勵以業主思維運作，強調速度、執行與創新',
+                    ] : [
+                        '🏥 Medical, dental & vision; 401(k) with company match',
+                        '🛍️ Generous employee discount; PTO & sick leave; commuter subsidies',
+                        '🌐 Culture: Rooted in "Zen-in Keiei" and LifeWear — think like a business owner, emphasizing speed, execution, and innovation',
+                    ],
+                    hm: lang === 'zh' ? [
+                        '🛍️ H&M 全球員工折扣卡（涵蓋 COS、ARKET、Weekday 等所有旗下品牌）',
+                        '💰 HIP 全員分紅計畫；育嬰假支援；全球內部調動機會',
+                        '🌐 文化：扁平北歐組織結構（「我們是一個團隊」），聚焦互信、心理安全感與全球永續發展',
+                    ] : [
+                        '🛍️ H&M Global Employee Discount Card (COS, ARKET, Weekday, and all group brands)',
+                        '💰 HIP profit-sharing; parental leave support; global internal mobility',
+                        '🌐 Culture: Flat Scandinavian structure ("We Are One Team") — mutual trust, psychological safety, and global sustainability',
+                    ],
+                },
+                {
+                    category: lang === 'zh' ? '5. 應徵流程與後續步驟' : '5. Application Process & Next Steps',
+                    icon: '📬',
+                    uniqlo: lang === 'zh' ? [
+                        '🟢 狀態：積極招募中',
+                        '① 線上投遞履歷（初步篩選）',
+                        '② HR 招募電話面試',
+                        '③ 跨職能小組面試（含行銷案例簡報）',
+                        '④ 最終高層審核與錄取通知',
+                    ] : [
+                        '🟢 Status: Actively Hiring',
+                        '① Online Resume / Initial Screening',
+                        '② HR Recruiter Phone Screen',
+                        '③ Panel Interview (requires marketing case study/presentation)',
+                        '④ Final Leadership Review & Offer',
+                    ],
+                    hm: lang === 'zh' ? [
+                        '🟡 狀態：職缺時有波動，建議加入 H&M 人才社群',
+                        '① 線上申請',
+                        '② 人才招募篩選電話',
+                        '③ 與招募主管的案例研究面試',
+                        '④ 文化契合度與價值觀面試',
+                        '⑤ 薪酬審查與正式錄取通知',
+                    ] : [
+                        '🟡 Status: Listings fluctuate — join the H&M Talent Community',
+                        '① Online Application',
+                        '② Talent Acquisition Screening',
+                        '③ Case Study Interview with Hiring Manager',
+                        '④ Cultural Fit & Values-based Interview',
+                        '⑤ Compensation Review & Offer',
+                    ],
+                },
+            ];
+
+            return (
+                <div className="animate-in fade-in duration-300 pb-4">
+                    <div className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                            {lang === 'zh' ? '職缺比較：Uniqlo vs H&M' : 'Job Comparison: Uniqlo vs H&M'}
+                        </h2>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                            {lang === 'zh' ? '依五大維度並排比較兩間公司的職缺條件' : 'Side-by-side comparison across 5 key dimensions'}
+                        </p>
+                    </div>
+
+                    {/* Sticky column headers */}
+                    <div className="grid grid-cols-[1fr_1fr_1fr] gap-0 mb-2 sticky top-0 z-10">
+                        <div className="bg-gray-100 dark:bg-gray-700 rounded-tl-lg px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            {lang === 'zh' ? '比較維度' : 'Category'}
+                        </div>
+                        <div className="bg-[#B22222] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
+                            🟥 Uniqlo
+                        </div>
+                        <div className="bg-[#e50010] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white rounded-tr-lg flex items-center gap-1.5">
+                            🔴 H&M
+                        </div>
+                    </div>
+
+                    {/* Rows */}
+                    <div className="rounded-b-xl overflow-hidden border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
+                        {rows.map((row, i) => (
+                            <div key={i} className={`grid grid-cols-[1fr_1fr_1fr] gap-0 ${i % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-900/50'}`}>
+                                {/* Category label */}
+                                <div className="px-4 py-4 border-r border-gray-200 dark:border-gray-700 flex items-start gap-2">
+                                    <span className="text-lg shrink-0 mt-0.5">{row.icon}</span>
+                                    <p className="text-xs font-bold text-gray-700 dark:text-gray-200 leading-snug">{row.category}</p>
+                                </div>
+                                {/* Uniqlo */}
+                                <div className="px-4 py-4 border-r border-gray-200 dark:border-gray-700">
+                                    <ul className="space-y-1.5">
+                                        {row.uniqlo.map((item, j) => (
+                                            <li key={j} className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{item}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                {/* H&M */}
+                                <div className="px-4 py-4">
+                                    <ul className="space-y-1.5">
+                                        {row.hm.map((item, j) => (
+                                            <li key={j} className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{item}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Reusable Section block for JobOpeningsApp
+        const JobSection = ({ title, icon, children, accentBorder }) => (
+            <div className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-4 hover:${accentBorder} transition-colors`}>
+                <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base mb-4 flex items-center gap-2">
+                    <span>{icon}</span>{title}
+                </h3>
+                {children}
+            </div>
+        );
+
+        // 4.6 Terminology Application — Flip Cards
+        const TerminologyApp = ({ appData, dict, lang }) => {
+            const [activeCategory, setActiveCategory] = useState('all');
+            const [flipped, setFlipped] = useState({});
+
+            const toggleFlip = (id) => setFlipped(prev => ({ ...prev, [id]: !prev[id] }));
+
+            const terms = [
+                { id: 1, cat: 'strategy', term: 'GTM', full: 'Go-To-Market', zh: 'GTM（進入市場策略）', emoji: '🚀', def_en: 'A strategic plan outlining how a company launches a product to market — covering target audience, channels, messaging, pricing, and competitive positioning.', def_zh: '概述公司如何將產品推向市場的策略計畫，涵蓋目標受眾、通路、訊息傳遞、定價與競爭定位。' },
+                { id: 2, cat: 'strategy', term: 'KPI', full: 'Key Performance Indicator', zh: 'KPI（關鍵績效指標）', emoji: '📊', def_en: 'A measurable value showing how effectively a team achieves key business objectives. Common examples: revenue growth, customer acquisition cost, and conversion rate.', def_zh: '衡量團隊達成業務目標效果的可量化指標，常見範例：營收成長率、客戶獲取成本與轉換率。' },
+                { id: 3, cat: 'strategy', term: 'OKR', full: 'Objectives & Key Results', zh: 'OKR（目標與關鍵結果）', emoji: '🎯', def_en: 'A goal-setting framework for defining ambitious objectives and measurable key results that signal progress. Widely adopted in tech and increasingly in retail.', def_zh: '用於定義具挑戰性目標及衡量進度之關鍵結果的框架，廣泛應用於科技業並逐漸被零售業採用。' },
+                { id: 4, cat: 'strategy', term: 'A/B Test', full: 'A/B Testing', zh: 'A/B 測試', emoji: '🔬', def_en: 'A controlled experiment comparing two versions (A and B) of a product or campaign to determine which performs better on a specific metric like click-through rate or conversion.', def_zh: '比較產品或活動的兩個版本（A 與 B）的對照實驗，以點擊率或轉換率等特定指標判斷哪個版本更佳。' },
+                { id: 5, cat: 'pm', term: 'Agile', full: 'Agile / Scrum', zh: '敏捷 / Scrum', emoji: '🔄', def_en: 'An iterative development methodology (Agile) and its most popular framework (Scrum). Work is broken into short sprints with continuous feedback loops for rapid adaptation.', def_zh: '一種迭代式開發方法論（敏捷）及其最流行的框架（Scrum）。工作拆分成短衝刺，透過持續回饋快速適應變化。' },
+                { id: 6, cat: 'pm', term: 'Roadmap', full: 'Product Roadmap', zh: '產品路線圖', emoji: '🗺️', def_en: 'A high-level strategic document outlining a product\'s vision, direction, priorities, and progress over time. Aligns stakeholders on what the team is building and why.', def_zh: '描述產品願景、方向、優先順序與進度的高層次策略文件，用於對齊利害關係人。' },
+                { id: 7, cat: 'pm', term: 'Lifecycle', full: 'Product Lifecycle', zh: '產品生命週期', emoji: '♻️', def_en: 'The series of stages a product goes through: development → introduction → growth → maturity → decline. Product managers actively manage strategy at each stage.', def_zh: '產品經歷的一系列階段：開發 → 導入 → 成長 → 成熟 → 衰退。產品經理在每個階段積極管理策略。' },
+                { id: 8, cat: 'pm', term: 'L.W.A.', full: 'Leadership Without Authority', zh: '無職權領導力', emoji: '🤝', def_en: 'The ability to influence and motivate cross-functional team members who do not report to you. A critical skill for PMs coordinating engineers, designers, and business stakeholders.', def_zh: '在沒有直接管理權限的情況下，影響並激勵跨職能成員的能力，是 PM 協調各方的關鍵技能。' },
+                { id: 9, cat: 'hm', term: 'LifeWear', full: 'LifeWear Philosophy', zh: 'LifeWear（生活服飾哲學）', emoji: '👕', def_en: 'H&M\'s core design philosophy: clothing designed thoughtfully for everyone, improving daily life through quality, function, and timeless style at accessible prices.', def_zh: 'H&M 的核心設計哲學：為所有人設計服裝，以優質、機能性與永恆風格，透過親民的價格提升日常生活品質。' },
+                { id: 10, cat: 'hm', term: 'HIP', full: 'H&M Incentive Program', zh: 'HIP（H&M 員工分紅計畫）', emoji: '💰', def_en: 'H&M Group\'s profit-sharing program for all employees. When financial targets are met, profits are shared with the workforce, reinforcing the "We Are One Team" ethos.', def_zh: 'H&M 集團的全員利潤分享計畫。達成財務目標時，部分利潤與全體員工共享，強化「我們是一個團隊」精神。' },
+                { id: 11, cat: 'hm', term: 'Flat Org', full: 'Flat Organization', zh: '扁平化組織', emoji: '🏗️', def_en: 'An organizational structure with few/no middle management levels. H&M\'s Scandinavian flat hierarchy promotes direct communication, faster decisions, and psychological safety.', def_zh: '鮮少中階管理層的組織結構。H&M 的北歐扁平層級促進直接溝通、更快決策與心理安全感。' },
+                { id: 12, cat: 'hm', term: 'X-Func', full: 'Cross-functional Team', zh: '跨職能團隊', emoji: '🔀', def_en: 'A group with diverse expertise (engineering, design, marketing, supply chain) working toward a common goal. The standard operating model across H&M Group.', def_zh: '由工程、設計、行銷、供應鏈等不同專長人員組成的團隊，共同致力實現共同目標。H&M 集團的標準運作模式。' },
+            ];
+
+            const categories = [
+                { id: 'all', label: lang === 'zh' ? '全部' : 'All' },
+                { id: 'strategy', label: dict.termCategory1 },
+                { id: 'pm', label: dict.termCategory2 },
+                { id: 'hm', label: dict.termCategory3 },
+            ];
+            const filtered = activeCategory === 'all' ? terms : terms.filter(t => t.cat === activeCategory);
+            const catColors = {
+                strategy: { badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300', front: 'from-blue-600 to-blue-800', back: 'from-blue-700 to-blue-900' },
+                pm:       { badge: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300', front: 'from-purple-600 to-purple-800', back: 'from-purple-700 to-purple-900' },
+                hm:       { badge: 'bg-red-100 text-[#e50010] dark:bg-red-900/40 dark:text-red-400', front: 'from-[#e50010] to-red-800', back: 'from-red-700 to-red-900' },
+            };
+
+            return (
+                <div className="p-6 md:p-8 max-w-5xl mx-auto animate-in fade-in duration-300 w-full pb-12">
+                    <div className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+                        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">{dict.termTitle}</h2>
+                        <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">{dict.termDesc}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                            {lang === 'zh' ? '💡 點擊卡片查看定義' : '💡 Click a card to reveal its definition'}
+                        </p>
+                    </div>
+
+                    {/* Category Filter */}
+                    <div className="flex flex-wrap gap-2 mb-8">
+                        {categories.map(c => (
+                            <button key={c.id} onClick={() => { setActiveCategory(c.id); setFlipped({}); }}
+                                className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-all ${activeCategory === c.id ? 'bg-[#e50010] border-[#e50010] text-white' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-[#e50010]'}`}>
+                                {c.label} ({c.id === 'all' ? terms.length : terms.filter(t=>t.cat===c.id).length})
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Flip Card Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {filtered.map(t => {
+                            const colors = catColors[t.cat];
+                            const isFlipped = !!flipped[t.id];
+                            return (
+                                <div
+                                    key={t.id}
+                                    className={`flip-card ${isFlipped ? 'flipped' : ''}`}
+                                    style={{ height: '180px' }}
+                                    onClick={() => toggleFlip(t.id)}
+                                >
+                                    <div className="flip-card-inner">
+                                        {/* FRONT */}
+                                        <div className={`flip-card-front bg-gradient-to-br ${colors.front} flex flex-col items-center justify-center p-4 select-none`}>
+                                            <span className="text-4xl mb-3">{t.emoji}</span>
+                                            <p className="text-white font-bold text-lg text-center leading-tight">{t.term}</p>
+                                            <p className="text-white/70 text-xs mt-1 text-center">{t.full}</p>
+                                            <span className={`mt-3 text-xs font-semibold px-2 py-0.5 rounded-full ${colors.badge}`}>{categories.find(c=>c.id===t.cat)?.label}</span>
+                                        </div>
+                                        {/* BACK */}
+                                        <div className={`flip-card-back bg-gradient-to-br ${colors.back} flex flex-col p-4 select-none overflow-hidden`}>
+                                            <p className="text-white font-bold text-sm mb-2 leading-tight">{lang === 'zh' ? t.zh : t.full}</p>
+                                            <p className="text-white/85 text-xs leading-relaxed overflow-hidden" style={{display:'-webkit-box',WebkitLineClamp:6,WebkitBoxOrient:'vertical',overflow:'hidden'}}>
+                                                {lang === 'zh' ? t.def_zh : t.def_en}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
         // 4.5 Global Footer (全域資訊欄)
         const Footer = ({ dict }) => {
             const year = new Date().getFullYear();
             return (
                 <footer className="bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 py-4 shrink-0 transition-colors duration-300 z-40 relative">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-3">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-wrap">
                             <span className="font-bold text-xl tracking-widest text-[#e50010]">H&M</span>
                             <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-l pl-3 border-gray-300 dark:border-gray-700">
-                                © {year} H&M Hennes & Mauritz AB. {dict.allRightsReserved}
+                                © {year} G4 TP Final.
+                            </span>
+                            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-l pl-3 border-gray-300 dark:border-gray-700">
+                                {dict.professorName}
+                            </span>
+                            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-l pl-3 border-gray-300 dark:border-gray-700 hidden lg:inline">
+                                {dict.academicUseOnly}
                             </span>
                         </div>
                         <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm">
@@ -798,6 +1548,12 @@
                                     <CompanyHistoryApp appData={selectedApp} dict={dict} lang={lang} />
                                 ) : selectedApp.id === 'finance' ? (
                                     <FinancialInfoApp appData={selectedApp} dict={dict} lang={lang} />
+                                ) : selectedApp.id === 'structure' ? (
+                                    <OrgStructureApp appData={selectedApp} dict={dict} lang={lang} />
+                                ) : selectedApp.id === 'jobs' ? (
+                                    <JobOpeningsApp appData={selectedApp} dict={dict} lang={lang} />
+                                ) : selectedApp.id === 'terminology' ? (
+                                    <TerminologyApp appData={selectedApp} dict={dict} lang={lang} />
                                 ) : selectedApp.type === 'master-detail' ? (
                                     <MasterDetailApp appData={selectedApp} dict={dict} lang={lang} />
                                 ) : (
