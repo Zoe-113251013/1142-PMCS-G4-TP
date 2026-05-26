@@ -105,6 +105,7 @@
         const Mail = (props) => <Icon name="Mail" {...props} />;
         const Download = (props) => <Icon name="Download" {...props} />;
         const FileText = (props) => <Icon name="FileText" {...props} />;
+        const Cpu = (props) => <Icon name="Cpu" {...props} />;
 
         // --- TRANSLATIONS (中英雙語字典) ---
         const translations = {
@@ -187,6 +188,15 @@
                 termCategory1: "Strategy & Marketing",
                 termCategory2: "Product Management",
                 termCategory3: "H&M Brand Concepts",
+                aiUtilization: "AI Utilization",
+                aiUtilizationSub: "Tools & Applications",
+                aiTitle: "AI Utilization in This Project",
+                aiDesc: "A transparent overview of how artificial intelligence tools were used by our team throughout this project — from research and content generation to design and coding.",
+                aiToolsUsed: "Tools Used",
+                aiByMember: "Usage by Member",
+                aiHowWeUsed: "How We Used AI",
+                aiInsights: "Key Insights & Reflections",
+                aiPromptTips: "Prompting Tips We Learned",
                 jobCompanyHM: "H&M",
                 jobCompanyUniqlo: "Uniqlo",
                 jobCompare: "Comparison",
@@ -284,6 +294,15 @@
                 termCategory1: "策略與行銷",
                 termCategory2: "產品管理",
                 termCategory3: "H&M 品牌概念",
+                aiUtilization: "AI 使用紀錄",
+                aiUtilizationSub: "工具與應用",
+                aiTitle: "本專題中的 AI 應用",
+                aiDesc: "透明呈現本組成員在整個專題過程中使用人工智慧工具的方式——涵蓋研究、內容生成、設計與程式開發。",
+                aiToolsUsed: "使用工具",
+                aiByMember: "各組員使用情況",
+                aiHowWeUsed: "我們如何使用 AI",
+                aiInsights: "重要心得與反思",
+                aiPromptTips: "我們學到的提示技巧",
                 jobCompanyHM: "H&M",
                 jobCompanyUniqlo: "Uniqlo（優衣庫）",
                 jobCompare: "比較表",
@@ -611,6 +630,7 @@
                 { 
                     id: 2, 
                     initial: 'M2', 
+                    avatar: 'https://docs.google.com/drawings/d/1RVszW1iDlLvW3ce8XjK1QOQWvAs2_GJsE3cYuILSoJQ/export/png',
                     name: 'Jenifer', 
                     role: 'International Business Studies', 
                     studentId: '113212044',
@@ -620,6 +640,7 @@
                 { 
                     id: 3, 
                     initial: 'M3', 
+                    avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vRCTmMzqtWUwbotOGbnYsXhSzKJ70iUJJZ10qeM4elCTzn5DsVfIK-tcp10nGwn7fvmmw1y9w2GRr0p/pub?w=960&h=720',
                     name: 'Andy', 
                     role: 'DCH', 
                     studentId: '114400003',
@@ -629,6 +650,7 @@
                 { 
                     id: 4, 
                     initial: 'M4', 
+                    avatar: 'https://docs.google.com/drawings/d/15bFTcqPVi7aWEHrkRMttfkMtp3JXgl08VVLDN9PhBvw/export/png',
                     name: 'Jessica', 
                     role: 'Chinese literature', 
                     studentId: '111101002',
@@ -699,89 +721,367 @@
 
         // 4.2 Financial Information Application (財務資訊專屬頁面)
         const FinancialInfoApp = ({ appData, dict, lang }) => {
-            // 加入 PDF 檔案的路徑
+            const [activeTab, setActiveTab] = useState('overview');
+
+            const zh = lang === 'zh';
+
+            // ── Data ──────────────────────────────────────────────
+            const fiveYear = [
+                { year: 2021, sales: 198967, opProfit: 15255, margin: 7.7, stores: 4801 },
+                { year: 2022, sales: 223553, opProfit: 7169,  margin: 3.2, stores: 4465 },
+                { year: 2023, sales: 236035, opProfit: 14537, margin: 6.2, stores: 4369 },
+                { year: 2024, sales: 234478, opProfit: 17306, margin: 7.4, stores: 4253 },
+                { year: 2025, sales: 228285, opProfit: 18395, margin: 8.1, stores: 4101 },
+            ];
+            const regional = [
+                { name: zh ? '西歐' : 'Western Europe',       sales: 79195, prev: 79550, stores: 994 },
+                { name: zh ? '北美與南美' : 'N. & S. America', sales: 48999, prev: 51798, stores: 769  },
+                { name: zh ? '南歐' : 'Southern Europe',       sales: 31281, prev: 31507, stores: 563  },
+                { name: zh ? '亞洲、大洋洲與非洲' : 'Asia, Oceania & Africa', sales: 27729, prev: 29815, stores: 940 },
+                { name: zh ? '東歐' : 'Eastern Europe',        sales: 20934, prev: 21181, stores: 478  },
+                { name: zh ? '北歐' : 'The Nordics',            sales: 20147, prev: 20627, stores: 357  },
+            ];
+            const kpis = [
+                { label: zh ? '淨銷售額' : 'Net Sales', value: 'SEK 228B', sub: zh ? '當地貨幣年增 +2%' : '+2% in local currencies', color: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800', icon: '📈', textColor: 'text-[#e50010]' },
+                { label: zh ? '毛利率' : 'Gross Margin', value: '53.4%', sub: zh ? '與2024年持平' : 'Flat vs 2024', color: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800', icon: '💹', textColor: 'text-green-700 dark:text-green-400' },
+                { label: zh ? '營業利潤' : 'Operating Profit', value: 'SEK 18.4B', sub: zh ? '營業利潤率 8.1%' : '8.1% margin', color: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800', icon: '🏦', textColor: 'text-blue-700 dark:text-blue-400' },
+                { label: zh ? '稅後淨利' : 'Profit After Tax', value: 'SEK 12.1B', sub: zh ? '每股盈餘 SEK 7.58' : 'EPS: SEK 7.58', color: 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800', icon: '💰', textColor: 'text-purple-700 dark:text-purple-400' },
+                { label: zh ? '營運現金流' : 'Operating Cash Flow', value: 'SEK 31.1B', sub: zh ? '維持強勁現金流' : 'Strong liquidity', color: 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800', icon: '💧', textColor: 'text-orange-700 dark:text-orange-400' },
+                { label: zh ? '全球門市數' : 'Global Stores', value: '4,101', sub: zh ? '81個市場' : '81 markets', color: 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700', icon: '🏬', textColor: 'text-gray-700 dark:text-gray-300' },
+                { label: zh ? '線上銷售佔比' : 'Online Sales Share', value: '>30%', sub: zh ? '61個線上市場' : '61 online markets', color: 'bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800', icon: '🌐', textColor: 'text-teal-700 dark:text-teal-400' },
+                { label: zh ? '全職員工數' : 'FTE Employees', value: '94,744', sub: zh ? '遍布全球' : 'Global workforce', color: 'bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800', icon: '👥', textColor: 'text-pink-700 dark:text-pink-400' },
+            ];
+            const esgData = [
+                { label: zh ? '溫室氣體排放（範疇3）較2019年減少' : 'GHG Emissions (Scope 3) vs 2019 baseline', value: '-34.6%', goal: '-56% by 2030', pct: 61, color: 'bg-green-500' },
+                { label: zh ? '溫室氣體排放（範疇1+2）較2019年減少' : 'GHG Emissions (Scope 1+2) vs 2019 baseline', value: '-41.0%', goal: '-56% by 2030', pct: 73, color: 'bg-teal-500' },
+                { label: zh ? '可再生電力使用比例' : 'Renewable Electricity in Own Operations', value: '95%', goal: '100% by 2030', pct: 95, color: 'bg-yellow-500' },
+                { label: zh ? '回收或永續來源原材料占比' : 'Recycled / Sustainably Sourced Materials', value: '91%', goal: '100% by 2030', pct: 91, color: 'bg-blue-500' },
+                { label: zh ? '已回收材料占比' : 'Recycled Materials Share', value: '32%', goal: '30% by 2025 ✓', pct: 100, color: 'bg-orange-400' },
+                { label: zh ? '包裝減少塑料量（較2018年基線）' : 'Plastic Packaging Reduction vs 2018', value: '-54%', goal: '-25% by 2025 ✓', pct: 100, color: 'bg-purple-500' },
+            ];
             const recentReports = [
-                { 
-                    year: '2025', 
-                    title: lang === 'zh' ? '2025 年度與永續發展報告' : 'Annual and sustainability report 2025',
-                    link: 'HM-Group-Annual-and-sustainability-report-2025.pdf' 
-                },
-                { 
-                    year: '2024', 
-                    title: lang === 'zh' ? '2024 年度與永續發展報告' : 'Annual and sustainability report 2024',
-                    link: 'HM-Group-Annual-and-sustainability-report-2024.pdf' 
-                },
-                { 
-                    year: '2023', 
-                    title: lang === 'zh' ? '2023 年度與永續發展報告' : 'Annual and Sustainability Report 2023',
-                    link: 'HM-Group-Annual-and-Sustainability-Report-2023.pdf' 
-                },
+                { year: '2025', title: zh ? '2025 年度與永續發展報告' : 'Annual and Sustainability Report 2025', link: '#' },
+                { year: '2024', title: zh ? '2024 年度與永續發展報告' : 'Annual and Sustainability Report 2024', link: 'HM-Group-Annual-and-sustainability-report-2024.pdf' },
+                { year: '2023', title: zh ? '2023 年度與永續發展報告' : 'Annual and Sustainability Report 2023', link: 'HM-Group-Annual-and-Sustainability-Report-2023.pdf' },
+            ];
+            const archivedReports = ['2022','2021','2020','2019','2018','2017','2016','2015','2014','2013','2012'];
+
+            const analysis = zh ? [
+                { icon: '📈', title: '營收表現韌性', text: '2025年淨銷售額達 SEK 2,282億。儘管受到強勢瑞典克朗匯率轉換影響導致以瑞典克朗計價微幅下滑 3%，但以當地貨幣計算的銷售額年增 2%，展現在充滿挑戰的總體經濟環境下品牌極具韌性。' },
+                { icon: '💰', title: '獲利能力持續提升', text: '2025年營業利潤成長至 SEK 184億，營業利潤率由 2024 年的 7.4% 攀升至 8.1%。主要驅動因素為供應鏈與採購作業的優化，加上嚴格的成本控制，成功抵銷了通膨帶來的壓力。' },
+                { icon: '💧', title: '強勁現金流與流動性', text: '營運現金流表現依然強勁，達 SEK 311億。這為未來繼續投資於數位轉型、提升實體店面體驗及永續發展解決方案提供了充足的資金靈活度。' },
+                { icon: '🌍', title: '通路與店面優化', text: '線上銷售佔比維持在集團總銷售 30% 以上。同時我們持續優化實體店面組合，2025年淨減少 152 家門市（目前總計 4,101 家）。H&M 品牌今年亦成功進軍巴西、薩爾瓦多與委內瑞拉等新市場，為拉丁美洲擴張奠定基礎。' },
+            ] : [
+                { icon: '📈', title: 'Resilient Revenue Performance', text: 'Net sales reached SEK 228 billion in 2025. Despite a negative currency translation effect of around 5% due to a strong Swedish krona, sales in local currencies increased by 2% year-on-year, demonstrating strong brand resilience in a challenging macroeconomic environment.' },
+                { icon: '💰', title: 'Improved Profitability', text: 'Operating profit increased to SEK 18.4B (from SEK 17.3B in 2024), lifting the operating margin to 8.1%. Key drivers included improvements in our purchasing work, a more efficient supply chain, and good cost control, successfully offsetting inflationary pressures.' },
+                { icon: '💧', title: 'Strong Cash Flow & Liquidity', text: 'Cash flow from operating activities remained strong at SEK 31.1 billion. This robust liquidity ensures continued financial flexibility to invest in the customer experience, digital transformation, and sustainable supply chain solutions.' },
+                { icon: '🌍', title: 'Omni-channel & Store Optimization', text: 'Online sales consistently account for more than 30% of total sales. We continue to optimize our store portfolio, with a net reduction of 152 stores in 2025 (total 4,101 stores). The H&M brand also successfully launched in Brazil, El Salvador, and Venezuela, laying the groundwork for continued expansion in Latin America.' },
             ];
 
-            // 模擬舊的年份資料
-            const archivedReports = ['2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012'];
+            // ── SVG Bar Chart ──────────────────────────────────────
+            const BarChart = ({ data, valueKey, color, maxOverride, formatK }) => {
+                const max = maxOverride || Math.max(...data.map(d => d[valueKey])) * 1.1;
+                const W = 480, H = 160, PAD = 8;
+                const barW = Math.floor((W - PAD * (data.length + 1)) / data.length);
+                return (
+                    <svg viewBox={`0 0 ${W} ${H + 28}`} className="w-full" style={{fontFamily:'inherit'}}>
+                        {data.map((d, i) => {
+                            const h = ((d[valueKey] / max) * H);
+                            const x = PAD + i * (barW + PAD);
+                            const y = H - h;
+                            const isLast = i === data.length - 1;
+                            return (
+                                <g key={d.year}>
+                                    <rect x={x} y={y} width={barW} height={h}
+                                        fill={isLast ? '#e50010' : color}
+                                        rx="3" opacity={isLast ? 1 : 0.65} />
+                                    <text x={x + barW/2} y={y - 4} textAnchor="middle" fontSize="9" fill={isLast ? '#e50010' : '#6b7280'} fontWeight={isLast ? 'bold' : 'normal'}>
+                                        {formatK ? (d[valueKey]/1000).toFixed(0)+'B' : d[valueKey]+'%'}
+                                    </text>
+                                    <text x={x + barW/2} y={H + 16} textAnchor="middle" fontSize="9" fill="#9ca3af">{d.year}</text>
+                                </g>
+                            );
+                        })}
+                    </svg>
+                );
+            };
+
+            // ── Margin Line Chart ──────────────────────────────────
+            const LineChart = ({ data }) => {
+                const W = 480, H = 100, PAD = 8;
+                const max = 10, min = 0;
+                const xStep = (W - PAD * 2) / (data.length - 1);
+                const pts = data.map((d, i) => {
+                    const x = PAD + i * xStep;
+                    const y = H - ((d.margin - min) / (max - min)) * H;
+                    return { x, y, ...d };
+                });
+                const polyline = pts.map(p => `${p.x},${p.y}`).join(' ');
+                const area = `${pts[0].x},${H} ` + pts.map(p => `${p.x},${p.y}`).join(' ') + ` ${pts[pts.length-1].x},${H}`;
+                return (
+                    <svg viewBox={`0 0 ${W} ${H + 28}`} className="w-full" style={{fontFamily:'inherit'}}>
+                        <defs>
+                            <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#e50010" stopOpacity="0.3"/>
+                                <stop offset="100%" stopColor="#e50010" stopOpacity="0.02"/>
+                            </linearGradient>
+                        </defs>
+                        <polygon points={area} fill="url(#lineGrad)" />
+                        <polyline points={polyline} fill="none" stroke="#e50010" strokeWidth="2" strokeLinejoin="round" />
+                        {pts.map((p, i) => (
+                            <g key={p.year}>
+                                <circle cx={p.x} cy={p.y} r={i === pts.length-1 ? 5 : 3.5}
+                                    fill={i === pts.length-1 ? '#e50010' : '#fff'} stroke="#e50010" strokeWidth="2"/>
+                                <text x={p.x} y={p.y - 8} textAnchor="middle" fontSize="9"
+                                    fill={i === pts.length-1 ? '#e50010' : '#9ca3af'}
+                                    fontWeight={i === pts.length-1 ? 'bold' : 'normal'}>
+                                    {p.margin}%
+                                </text>
+                                <text x={p.x} y={H + 16} textAnchor="middle" fontSize="9" fill="#9ca3af">{p.year}</text>
+                            </g>
+                        ))}
+                    </svg>
+                );
+            };
+
+            const tabs = [
+                { id: 'overview',  label: zh ? '總覽' : 'Overview' },
+                { id: 'charts',    label: zh ? '財務圖表' : 'Charts' },
+                { id: 'regional',  label: zh ? '區域銷售' : 'Regional' },
+                { id: 'esg',       label: zh ? '永續指標' : 'ESG' },
+                { id: 'analysis',  label: zh ? '財務分析' : 'Analysis' },
+                { id: 'reports',   label: zh ? '年報下載' : 'Reports' },
+            ];
 
             return (
-                <div className="p-6 md:p-8 max-w-7xl mx-auto animate-in fade-in duration-300 w-full">
-                    {/* 頁面標題區 */}
-                    <div className="mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
-                        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">{appData.title}</h2>
-                        <p className="text-gray-500 dark:text-gray-400 mt-2">{appData.subtitle}</p>
+                <div className="p-6 md:p-8 max-w-5xl mx-auto animate-in fade-in duration-300 w-full pb-12">
+                    {/* Header */}
+                    <div className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+                        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">
+                            {zh ? 'H&M 集團財務資訊' : 'H&M Group Financial Overview'}
+                        </h2>
+                        <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
+                            {zh ? '資料來源：H&M Group 2025 年度與永續發展報告（財政年度 2024年12月1日—2025年11月30日）'
+                                : 'Source: H&M Group Annual & Sustainability Report 2025 (FY Dec 1 2024 – Nov 30 2025)'}
+                        </p>
                     </div>
 
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-8">
-                        <div className="flex items-start gap-4 mb-6">
-                            <div className="p-3 bg-red-50 dark:bg-red-900/30 text-[#e50010] dark:text-red-400 rounded-lg shrink-0">
-                                <PieChart size={28} />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">{dict.financialOverview}</h3>
-                                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                                    {dict.reportDesc}
-                                </p>
-                            </div>
-                        </div>
-                        
-                        {/* 最新報告卡片 (加入 href 連結至 PDF 且另開視窗) */}
-                        <h4 className="text-lg font-bold text-gray-800 dark:text-gray-100 mt-10 mb-4">{dict.latestReports}</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-10">
-                            {recentReports.map(report => (
-                                <a 
-                                    href={report.link} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    key={report.year} 
-                                    className="flex flex-col justify-between p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-[#e50010] dark:hover:border-red-500 transition-colors group"
-                                >
-                                    <div>
-                                        <FileText className="text-gray-400 group-hover:text-[#e50010] dark:group-hover:text-red-500 transition-colors mb-4" size={32} />
-                                        <h5 className="font-bold text-gray-800 dark:text-gray-100 text-2xl mb-1">{report.year}</h5>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">{report.title}</p>
-                                    </div>
-                                    <div className="mt-6 flex items-center text-[#e50010] dark:text-red-400 font-semibold text-sm group-hover:underline">
-                                        <Download size={16} className="mr-2" />
-                                        {dict.downloadReport}
-                                    </div>
-                                </a>
-                            ))}
-                        </div>
-
-                        {/* 歷史報告存檔按鈕區塊 (全部連結至 H&M 官網) */}
-                        <h4 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 border-t border-gray-100 dark:border-gray-700 pt-8">{dict.archive}</h4>
-                        <div className="flex flex-wrap gap-3">
-                            {archivedReports.map(year => (
-                                <a 
-                                    href="https://hmgroup.com/about-us/corporate-governance/annual-report/" 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    key={year} 
-                                    className="px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-700 dark:text-gray-300 hover:bg-[#e50010] hover:text-white dark:hover:bg-red-600 transition-colors"
-                                >
-                                    {year} Report
-                                </a>
-                            ))}
-                        </div>
+                    {/* Tab Bar */}
+                    <div className="flex flex-wrap gap-1.5 mb-8 bg-white dark:bg-gray-800 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 w-fit shadow-sm">
+                        {tabs.map(t => (
+                            <button key={t.id} onClick={() => setActiveTab(t.id)}
+                                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === t.id ? 'bg-[#e50010] text-white shadow' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'}`}>
+                                {t.label}
+                            </button>
+                        ))}
                     </div>
+
+                    {/* ── TAB: OVERVIEW ── */}
+                    {activeTab === 'overview' && (
+                        <div>
+                            <div className="bg-[#e50010] text-white rounded-xl p-5 mb-6 flex items-center gap-4">
+                                <span className="text-4xl">📊</span>
+                                <div>
+                                    <h3 className="font-bold text-lg">{zh ? '2025 財務年度亮點' : '2025 Financial Year at a Glance'}</h3>
+                                    <p className="text-white/90 text-sm mt-1">
+                                        {zh ? '財政年度：2024年12月1日 — 2025年11月30日。儘管總體經濟環境與地緣政治充滿不確定性，H&M 集團依然在2025年實現了強勁的獲利成長，並達成了多項關鍵永續發展目標。'
+                                            : 'FY Dec 1 2024 – Nov 30 2025. Despite macroeconomic and geopolitical uncertainties, H&M Group delivered strong profitability growth in 2025 and met several key sustainability milestones.'}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                {kpis.map((k, i) => (
+                                    <div key={i} className={`border rounded-xl p-4 ${k.color}`}>
+                                        <div className="text-2xl mb-1">{k.icon}</div>
+                                        <p className={`text-xl font-bold ${k.textColor}`}>{k.value}</p>
+                                        <p className="text-xs font-semibold text-gray-700 dark:text-gray-200 mt-0.5">{k.label}</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{k.sub}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── TAB: CHARTS ── */}
+                    {activeTab === 'charts' && (
+                        <div className="space-y-6">
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
+                                <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-1">{zh ? '五年淨銷售額趨勢（百萬瑞典克朗）' : '5-Year Net Sales Trend (SEK M)'}</h3>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">{zh ? '2025年受強勢瑞典克朗影響微幅下降，但當地貨幣計價年增2%' : '2025 dipped slightly in SEK due to strong currency, but increased 2% in local currencies'}</p>
+                                <BarChart data={fiveYear} valueKey="sales" color="#f97316" formatK={true} />
+                            </div>
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
+                                <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-1">{zh ? '五年營業利潤率趨勢 (%)' : '5-Year Operating Margin Trend (%)'}</h3>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">{zh ? '透過優化供應鏈與成本控制，利潤率穩步回升至8.1%' : 'Steady margin recovery to 8.1% driven by supply chain optimization and cost control'}</p>
+                                <LineChart data={fiveYear} />
+                            </div>
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
+                                <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-1">{zh ? '五年全球門市數量' : '5-Year Global Store Count'}</h3>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">{zh ? '門市數量持續優化，2025年淨減少約152家門市' : 'Portfolio rationalization ongoing; net reduction of 152 stores in 2025'}</p>
+                                <BarChart data={fiveYear.filter(d=>d.stores)} valueKey="stores" color="#6366f1" maxOverride={5200}
+                                    formatK={false} />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── TAB: REGIONAL ── */}
+                    {activeTab === 'regional' && (
+                        <div>
+                            <div className="mb-4">
+                                <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base">{zh ? '2025年各區域淨銷售額（百萬瑞典克朗）' : '2025 Net Sales by Region (SEK M)'}</h3>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{zh ? '西歐為最大市場，佔總銷售額 35%' : 'Western Europe is the largest market at ~35% of total sales'}</p>
+                            </div>
+                            <div className="space-y-3 mb-6">
+                                {regional.sort((a,b)=>b.sales-a.sales).map(r => {
+                                    const pct = ((r.sales / 228285) * 100).toFixed(1);
+                                    const yoy = (((r.sales - r.prev) / r.prev) * 100).toFixed(1);
+                                    const isPos = parseFloat(yoy) >= 0;
+                                    return (
+                                        <div key={r.name} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-[#e50010] transition-colors">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm">{r.name}</p>
+                                                    <p className="text-xs text-gray-400 dark:text-gray-500">{zh ? `${r.stores} 家門市` : `${r.stores} stores`}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">{(r.sales/1000).toFixed(1)}B SEK</p>
+                                                    <p className={`text-xs font-semibold ${isPos ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}>{isPos ? '▲' : '▼'} {Math.abs(yoy)}% YoY (SEK)</p>
+                                                </div>
+                                            </div>
+                                            <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                <div className="h-full bg-[#e50010] rounded-full transition-all" style={{width:`${pct}%`}}></div>
+                                            </div>
+                                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{pct}% {zh ? '佔總銷售額' : 'of total sales'}</p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-xs text-gray-500 dark:text-gray-400">
+                                {zh ? '⚠ 請注意：各區域的銷售額衰退主要來自匯率轉換影響（強勢瑞典克朗），以當地貨幣計算多數市場皆為正成長。'
+                                    : '⚠ Note: The reported sales decline in SEK is primarily due to currency translation effects from a strong Swedish krona. Sales in local currencies generally increased.'}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── TAB: ESG ── */}
+                    {activeTab === 'esg' && (
+                        <div>
+                            <div className="mb-4">
+                                <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base">{zh ? '2025年永續發展績效' : '2025 Sustainability Performance'}</h3>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{zh ? 'H&M 集團目標：2030年實現銷售翻倍，同時將溫室氣體排放減半（以2019年為基準）' : 'Group goal: double sales by 2030 while halving GHG emissions from 2019 baseline'}</p>
+                            </div>
+                            <div className="space-y-4">
+                                {esgData.map((e, i) => (
+                                    <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <p className="text-sm text-gray-700 dark:text-gray-200 font-medium pr-4">{e.label}</p>
+                                            <div className="text-right shrink-0">
+                                                <p className="font-bold text-lg text-gray-900 dark:text-white">{e.value}</p>
+                                                <p className="text-xs text-gray-400 dark:text-gray-500">{e.goal}</p>
+                                            </div>
+                                        </div>
+                                        <div className="h-2.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div className={`h-full ${e.color} rounded-full transition-all`} style={{width:`${Math.min(e.pct,100)}%`}}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-400 mt-1">{zh ? `目標達成進度：${e.pct}%` : `Progress toward goal: ${e.pct}%`}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="mt-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-sm text-green-700 dark:text-green-300">
+                                🏆 {zh ? 'H&M 集團在 Fashion Revolution 的「What Fuels Fashion」透明度報告中名列 200 家企業之首，並再次獲 CDP 氣候與水資源「A」級評等殊榮。' : 'H&M Group ranked number one among 200 companies in Fashion Revolution’s What Fuels Fashion Transparency Index and was once again A-listed by CDP for both climate and water.'}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── TAB: ANALYSIS ── */}
+                    {activeTab === 'analysis' && (
+                        <div>
+                            <div className="mb-4">
+                                <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base">{zh ? '財務分析與洞察' : 'Financial Analysis & Insights'}</h3>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{zh ? '基於2025年度報告的深度分析' : 'In-depth analysis based on the 2025 Annual Report'}</p>
+                            </div>
+                            <div className="space-y-4 mb-6">
+                                {analysis.map((a, i) => (
+                                    <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-[#e50010] transition-colors">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <span className="text-2xl">{a.icon}</span>
+                                            <h4 className="font-bold text-gray-900 dark:text-white">{a.title}</h4>
+                                        </div>
+                                        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{a.text}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            {/* Key ratios table */}
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                                <div className="px-5 py-3 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+                                    <h4 className="font-bold text-gray-800 dark:text-gray-100 text-sm">{zh ? '關鍵財務指標比較（2023–2025）' : 'Key Financial Ratios (2023–2025)'}</h4>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                                                <th className="text-left px-5 py-2">{zh ? '指標' : 'Metric'}</th>
+                                                <th className="text-right px-4 py-2">2023</th>
+                                                <th className="text-right px-4 py-2">2024</th>
+                                                <th className="text-right px-4 py-2 text-[#e50010] font-bold">2025</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
+                                            {[
+                                                [zh ? '淨銷售額 (SEK B)' : 'Net Sales (SEK B)', '236', '234', '228'],
+                                                [zh ? '毛利率' : 'Gross Margin', '51.2%', '53.4%', '53.4%'],
+                                                [zh ? '營業利潤率' : 'Operating Margin', '6.2%', '7.4%', '8.1%'],
+                                                [zh ? '稅後淨利 (SEK B)' : 'Profit After Tax (SEK B)', '8.7', '11.6', '12.1'],
+                                                [zh ? '每股盈餘 (SEK)' : 'EPS (SEK)', '5.37', '7.21', '7.58'],
+                                                [zh ? '股東權益報酬率' : 'Return on Equity', '17.8%', '24.7%', '27.1%'],
+                                                [zh ? '營運現金流 (SEK B)' : 'Operating Cash Flow (SEK B)', '33.9', '31.8', '31.1'],
+                                                [zh ? '每股股息 (SEK)' : 'Dividend per Share (SEK)', '6.50', '6.50', '6.80'],
+                                            ].map(([label, v1, v2, v3], i) => (
+                                                <tr key={i} className={i%2===0 ? '' : 'bg-gray-50/50 dark:bg-gray-900/20'}>
+                                                    <td className="px-5 py-2.5 text-gray-700 dark:text-gray-300 font-medium text-xs">{label}</td>
+                                                    <td className="px-4 py-2.5 text-right text-gray-500 dark:text-gray-400 text-xs">{v1}</td>
+                                                    <td className="px-4 py-2.5 text-right text-gray-500 dark:text-gray-400 text-xs">{v2}</td>
+                                                    <td className="px-4 py-2.5 text-right text-[#e50010] dark:text-red-400 font-bold text-xs">{v3}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── TAB: REPORTS ── */}
+                    {activeTab === 'reports' && (
+                        <div>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6">{dict.reportDesc}</p>
+                            <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-4">{dict.latestReports}</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                                {recentReports.map(r => (
+                                    <a href={r.link} target="_blank" rel="noopener noreferrer" key={r.year}
+                                        className="flex flex-col justify-between p-5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-[#e50010] transition-colors group">
+                                        <div>
+                                            <FileText className="text-gray-400 group-hover:text-[#e50010] transition-colors mb-3" size={28} />
+                                            <p className="font-bold text-gray-800 dark:text-gray-100 text-xl mb-1">{r.year}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">{r.title}</p>
+                                        </div>
+                                        <div className="mt-5 flex items-center text-[#e50010] dark:text-red-400 font-semibold text-xs group-hover:underline">
+                                            <Download size={14} className="mr-1.5" />{dict.downloadReport}
+                                        </div>
+                                    </a>
+                                ))}
+                            </div>
+                            <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-3 border-t border-gray-100 dark:border-gray-700 pt-6">{dict.archive}</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {archivedReports.map(y => (
+                                    <a href="https://hmgroup.com/about-us/corporate-governance/annual-report/" target="_blank" rel="noopener noreferrer" key={y}
+                                        className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded text-xs text-gray-700 dark:text-gray-300 hover:bg-[#e50010] hover:text-white transition-colors">
+                                        {y}
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
         };
@@ -1428,6 +1728,180 @@
             );
         };
 
+        // 4.7 AI Utilization Application
+        const AIUtilizationApp = ({ appData, dict, lang }) => {
+            const [activeTab, setActiveTab] = useState('overview');
+
+            const tools = [
+                { name: 'ChatGPT', emoji: '🤖', color: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300', desc_en: 'Used for research summarization, content drafting, and brainstorming company background material.', desc_zh: '用於研究摘要、內容草稿撰寫，以及公司背景資料的腦力激盪。' },
+                { name: 'Gemini', emoji: '✨', color: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300', desc_en: 'Used for web page code generation, layout suggestions, and iterative debugging of the HTML/CSS structure.', desc_zh: '用於網頁程式碼生成、版面配置建議，以及 HTML/CSS 結構的迭代除錯。' },
+                { name: 'Claude', emoji: '🧠', color: 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300', desc_en: 'Used for refining long-form content, bilingual translations, structured data formatting, and component logic.', desc_zh: '用於精煉長篇內容、中英雙語翻譯、結構化資料格式化，以及元件邏輯撰寫。' },
+                { name: 'Canva AI', emoji: '🎨', color: 'bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800 text-pink-700 dark:text-pink-300', desc_en: 'Used for generating visual design assets, team member illustrations, and presentation slide layouts.', desc_zh: '用於生成視覺設計素材、組員插圖，以及簡報投影片版面設計。' },
+            ];
+
+            const members = [
+                { name: 'Zoe', role: lang === 'zh' ? '組長' : 'Team Lead', tools: ['ChatGPT', 'Canva AI'], usage_en: 'Led project coordination; used ChatGPT to draft the company overview and Canva AI to design the visual layout of the presentation.', usage_zh: '主導專題協調；使用 ChatGPT 草擬公司概覽，並用 Canva AI 設計簡報的視覺版面。' },
+                { name: 'Jenifer', role: lang === 'zh' ? '內容研究' : 'Content Research', tools: ['ChatGPT', 'Claude'], usage_en: 'Researched H&M brand history and company milestones; used AI to summarize annual reports and generate bilingual content.', usage_zh: '研究 H&M 品牌歷史與公司里程碑；使用 AI 摘要年報並生成中英雙語內容。' },
+                { name: 'Andy', role: lang === 'zh' ? '網站開發' : 'Web Development', tools: ['Gemini', 'Claude'], usage_en: 'Built the web portal structure; used Gemini for initial code generation and Claude to refine component logic and fix layout issues.', usage_zh: '建構網站入口結構；使用 Gemini 進行初步程式碼生成，並用 Claude 精煉元件邏輯和修正版面問題。' },
+                { name: 'Jessica', role: lang === 'zh' ? '職缺分析' : 'Job Analysis', tools: ['ChatGPT', 'Claude'], usage_en: 'Analyzed H&M and Uniqlo job postings; used AI to structure the comparison framework and translate requirements into Chinese.', usage_zh: '分析 H&M 與 Uniqlo 職缺；使用 AI 建構比較框架，並將職位要求翻譯成中文。' },
+            ];
+
+            const usageCases = [
+                { icon: '📝', title_en: 'Research & Summarization', title_zh: '研究與摘要', desc_en: 'Feeding annual reports and job descriptions into AI to extract structured key points, saving hours of manual reading.', desc_zh: '將年報與職缺描述輸入 AI 以提取結構化重點，節省大量手動閱讀時間。' },
+                { icon: '🌐', title_en: 'Bilingual Translation', title_zh: '中英雙語翻譯', desc_en: 'Using AI to produce accurate, natural Traditional Chinese translations of all English content across the portal.', desc_zh: '使用 AI 為入口網站所有英文內容生成準確、自然的繁體中文翻譯。' },
+                { icon: '💻', title_en: 'Code Generation', title_zh: '程式碼生成', desc_en: 'Generating React components, Tailwind CSS layouts, and JavaScript logic through iterative AI-assisted prompting.', desc_zh: '透過迭代式 AI 輔助提示，生成 React 元件、Tailwind CSS 版面與 JavaScript 邏輯。' },
+                { icon: '🎨', title_en: 'Visual Design Assistance', title_zh: '視覺設計輔助', desc_en: 'Using AI image and design tools to create member illustrations, icons, and color palette suggestions.', desc_zh: '使用 AI 圖像與設計工具，製作組員插圖、圖示與色彩搭配建議。' },
+                { icon: '📊', title_en: 'Structured Data Formatting', title_zh: '結構化資料格式化', desc_en: 'Converting raw job posting text and company data into clean JSON-like structures for display in the portal.', desc_zh: '將原始職缺文字與公司資料轉換為整潔的類 JSON 結構，供入口網站顯示。' },
+                { icon: '🔍', title_en: 'Fact Checking & Expansion', title_zh: '事實查核與延伸', desc_en: 'Cross-referencing AI-generated content with official H&M reports and verified sources to ensure accuracy.', desc_zh: '將 AI 生成的內容與 H&M 官方報告及可靠來源進行交叉比對，確保準確性。' },
+            ];
+
+            const insights = lang === 'zh' ? [
+                { icon: '💡', text: 'AI 大幅加速了研究階段，讓我們能在更短的時間內處理更多資料來源。' },
+                { icon: '⚠️', text: 'AI 生成的內容仍需人工審核——我們發現若干事實細節需要與官方資料交叉比對後修正。' },
+                { icon: '🤝', text: '最佳的成果來自於「人機協作」：由人類設定方向與判斷，AI 負責執行與擴展。' },
+                { icon: '🌱', text: '在整個專題過程中，我們的提示技巧顯著進步，學會如何給予更精確的指示以獲得更好的輸出。' },
+            ] : [
+                { icon: '💡', text: 'AI significantly accelerated the research phase, allowing us to process more sources in less time.' },
+                { icon: '⚠️', text: 'AI-generated content still required human review — we found some factual details needed correction after cross-referencing official sources.' },
+                { icon: '🤝', text: 'The best results came from human-AI collaboration: humans setting direction and judgment, AI handling execution and expansion.' },
+                { icon: '🌱', text: 'Our prompting skills improved significantly throughout the project as we learned to give more precise instructions for better outputs.' },
+            ];
+
+            const promptTips = lang === 'zh' ? [
+                { tip: '給予角色與背景', example: '「你是一位熟悉 H&M 集團的商業顧問，請...」', why: '角色設定能讓 AI 給出更聚焦、更具深度的回應。' },
+                { tip: '指定輸出格式', example: '「請以 JSON 格式/條列式/表格回傳結果」', why: '明確的格式指令能直接生成可用的結構化資料。' },
+                { tip: '逐步迭代', example: '先請 AI 給出大綱，確認後再要求展開每個段落', why: '迭代式提示能有效避免一次生成過多而品質不穩的問題。' },
+                { tip: '提供範例', example: '「請仿照以下格式：[你的範例]，為其他項目生成內容」', why: '範例（Few-shot prompting）能大幅提升輸出的一致性。' },
+            ] : [
+                { tip: 'Give a role and context', example: '"You are a business consultant familiar with H&M Group. Please..."', why: 'Role-setting helps AI give more focused and in-depth responses.' },
+                { tip: 'Specify output format', example: '"Return results in JSON / bullet points / table format"', why: 'Clear format instructions produce directly usable structured data.' },
+                { tip: 'Iterate step by step', example: 'Ask for an outline first, confirm it, then ask to expand each section', why: 'Iterative prompting avoids generating too much at once with inconsistent quality.' },
+                { tip: 'Provide examples', example: '"Following this format: [your example], generate content for the other items"', why: 'Few-shot examples greatly improve output consistency.' },
+            ];
+
+            const tabs = [
+                { id: 'overview', label: lang === 'zh' ? '工具總覽' : 'Tools' },
+                { id: 'members', label: lang === 'zh' ? '各組員' : 'By Member' },
+                { id: 'cases', label: lang === 'zh' ? '使用方式' : 'How We Used It' },
+                { id: 'insights', label: lang === 'zh' ? '心得' : 'Insights' },
+            ];
+
+            return (
+                <div className="p-6 md:p-8 max-w-5xl mx-auto animate-in fade-in duration-300 w-full pb-12">
+                    {/* Header */}
+                    <div className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className="text-3xl">🧠</span>
+                            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">{dict.aiTitle}</h2>
+                        </div>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{dict.aiDesc}</p>
+                    </div>
+
+                    {/* Tab Bar */}
+                    <div className="flex flex-wrap gap-2 mb-8 bg-white dark:bg-gray-800 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 w-fit shadow-sm">
+                        {tabs.map(t => (
+                            <button key={t.id} onClick={() => setActiveTab(t.id)}
+                                className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === t.id ? 'bg-purple-600 text-white shadow' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'}`}>
+                                {t.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Tab: Tools Overview */}
+                    {activeTab === 'overview' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            {tools.map(tool => (
+                                <div key={tool.name} className={`border rounded-xl p-5 ${tool.color} flex gap-4 items-start`}>
+                                    <span className="text-4xl shrink-0">{tool.emoji}</span>
+                                    <div>
+                                        <p className="font-bold text-lg">{tool.name}</p>
+                                        <p className="text-sm mt-1 opacity-90 leading-relaxed">{lang === 'zh' ? tool.desc_zh : tool.desc_en}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Tab: By Member */}
+                    {activeTab === 'members' && (
+                        <div className="space-y-4">
+                            {members.map(m => (
+                                <div key={m.name} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-purple-400 dark:hover:border-purple-500 transition-colors">
+                                    <div className="flex items-center justify-between gap-3 mb-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-700 dark:text-purple-300 font-bold text-lg">
+                                                {m.name[0]}
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-gray-900 dark:text-white">{m.name}</p>
+                                                <p className="text-xs text-purple-600 dark:text-purple-400">{m.role}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-wrap gap-1 justify-end">
+                                            {m.tools.map(t => (
+                                                <span key={t} className="text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full font-medium">{t}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-gray-700 pt-3">
+                                        {lang === 'zh' ? m.usage_zh : m.usage_en}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Tab: How We Used It */}
+                    {activeTab === 'cases' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {usageCases.map((c, i) => (
+                                <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-purple-400 dark:hover:border-purple-500 transition-colors flex gap-3">
+                                    <span className="text-3xl shrink-0">{c.icon}</span>
+                                    <div>
+                                        <p className="font-bold text-gray-900 dark:text-white text-sm mb-1">{lang === 'zh' ? c.title_zh : c.title_en}</p>
+                                        <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{lang === 'zh' ? c.desc_zh : c.desc_en}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Tab: Insights */}
+                    {activeTab === 'insights' && (
+                        <div className="space-y-6">
+                            <div>
+                                <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base mb-4 flex items-center gap-2">
+                                    <span>💬</span>{dict.aiInsights}
+                                </h3>
+                                <div className="space-y-3">
+                                    {insights.map((ins, i) => (
+                                        <div key={i} className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 flex gap-3">
+                                            <span className="text-xl shrink-0">{ins.icon}</span>
+                                            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{ins.text}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base mb-4 flex items-center gap-2">
+                                    <span>⚡</span>{dict.aiPromptTips}
+                                </h3>
+                                <div className="space-y-3">
+                                    {promptTips.map((pt, i) => (
+                                        <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-purple-400 transition-colors">
+                                            <p className="font-semibold text-purple-700 dark:text-purple-300 text-sm mb-1">✦ {pt.tip}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 font-mono bg-gray-50 dark:bg-gray-900/50 rounded px-3 py-2 my-2 italic">{pt.example}</p>
+                                            <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">→ {pt.why}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         // 4.5 Global Footer (全域資訊欄)
         const Footer = ({ dict }) => {
             const year = new Date().getFullYear();
@@ -1482,6 +1956,7 @@
                 { id: 'finance', title: dict.financialInfo, subtitle: dict.financialInfoSub, icon: PieChart, info: '', color: 'text-gray-800 dark:text-gray-300', type: 'placeholder' },
                 { id: 'jobs', title: dict.jobOpenings, subtitle: dict.jobOpeningsSub, icon: Briefcase, info: '', color: 'text-[#e50010]', type: 'placeholder' },
                 { id: 'terminology', title: dict.terminology, subtitle: dict.terminologySub, icon: BookOpen, info: '', color: 'text-gray-800 dark:text-gray-300', type: 'placeholder' },
+                { id: 'ai', title: dict.aiUtilization, subtitle: dict.aiUtilizationSub, icon: Cpu, info: '', color: 'text-purple-600 dark:text-purple-400', type: 'placeholder' },
             ];
 
             const navigateTo = (view, appData = null) => {
@@ -1554,6 +2029,8 @@
                                     <JobOpeningsApp appData={selectedApp} dict={dict} lang={lang} />
                                 ) : selectedApp.id === 'terminology' ? (
                                     <TerminologyApp appData={selectedApp} dict={dict} lang={lang} />
+                                ) : selectedApp.id === 'ai' ? (
+                                    <AIUtilizationApp appData={selectedApp} dict={dict} lang={lang} />
                                 ) : selectedApp.type === 'master-detail' ? (
                                     <MasterDetailApp appData={selectedApp} dict={dict} lang={lang} />
                                 ) : (
