@@ -334,7 +334,7 @@
         // --- COMPONENTS ---
 
         // 1. Fiori Shell Bar (Global Header)
-        const ShellBar = ({ navigateTo, currentView, toggleSidebar, lang, setLang, theme, setTheme, announcePage, dict }) => (
+        const ShellBar = ({ navigateTo, currentView, toggleSidebar, lang, setLang, theme, setTheme, announcePage, isSpeaking, stopSpeech, dict }) => (
             <header className="fixed top-0 left-0 right-0 h-12 bg-[#e50010] dark:bg-gray-950 text-white flex items-center justify-between px-3 z-50 shadow-md transition-colors duration-300">
                 <div className="flex items-center gap-2 sm:gap-4">
                     <button onClick={toggleSidebar} className="p-1.5 hover:bg-white/20 rounded transition-colors" aria-label={dict.sidebarMenu}>
@@ -356,9 +356,27 @@
                 </div>
                 
                 <div className="flex items-center gap-1 sm:gap-2">
-                    <button onClick={announcePage} className="p-2 hover:bg-white/20 rounded-full transition-colors" title={dict.voiceGuide}>
-                        <Volume2 size={18} />
+                    {/* Voice Guide: play/pause button */}
+                    <button
+                        onClick={announcePage}
+                        className={`p-2 hover:bg-white/20 rounded-full transition-colors ${isSpeaking ? 'bg-white/20' : ''}`}
+                        title={isSpeaking ? (lang === 'zh' ? '暫停語音' : 'Pause Voice') : dict.voiceGuide}
+                    >
+                        {isSpeaking
+                            ? <Icon name="PauseCircle" size={18} />
+                            : <Volume2 size={18} />
+                        }
                     </button>
+                    {/* Stop button — only shown while speech is active */}
+                    {isSpeaking && (
+                        <button
+                            onClick={stopSpeech}
+                            className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                            title={lang === 'zh' ? '停止語音' : 'Stop Voice'}
+                        >
+                            <Icon name="StopCircle" size={18} />
+                        </button>
+                    )}
                     <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="p-2 hover:bg-white/20 rounded-full transition-colors" title={dict.toggleTheme}>
                         {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
                     </button>
@@ -646,7 +664,7 @@
                     id: 4, initial: 'M4', 
                     avatar: 'https://docs.google.com/drawings/d/15bFTcqPVi7aWEHrkRMttfkMtp3JXgl08VVLDN9PhBvw/export/png',
                     name: 'Jessica', studentId: '111101002', slogan: '"Wear the clothes you like, do the things you like."',
-                    role_en: 'Chinese Literature', role_zh: '中國語文學系',
+                    role_en: 'Team Leader · Chinese Literature', role_zh: '小組組長 · 中國語文學系',
                     desc_en: "I'm Jessica. A member of the H&M website developer team. The main core we want to provide is about the running of the company and marketing structure of H&M. Our ambition and aim is that people simple and clearly recognize the operating of H&M.",
                     desc_zh: '我是 Jessica，H&M 網站開發團隊的成員。我們的核心目標是提供有關公司運營與行銷架構的資訊，希望讓大家能簡單清楚地了解 H&M 的運作方式。'
                 },
@@ -769,9 +787,9 @@
                 { label: zh ? '包裝減少塑料量（較2018年基線）' : 'Plastic Packaging Reduction vs 2018', value: '-54%', goal: '-25% by 2025 ✓', pct: 100, color: 'bg-purple-500' },
             ];
             const recentReports = [
-                { year: '2025', title: zh ? '2025 年度與永續發展報告' : 'Annual and Sustainability Report 2025', link: '#' },
-                { year: '2024', title: zh ? '2024 年度與永續發展報告' : 'Annual and Sustainability Report 2024', link: 'HM-Group-Annual-and-sustainability-report-2024.pdf' },
-                { year: '2023', title: zh ? '2023 年度與永續發展報告' : 'Annual and Sustainability Report 2023', link: 'HM-Group-Annual-and-Sustainability-Report-2023.pdf' },
+                { year: '2025', title: zh ? '2025 年度與永續發展報告' : 'Annual and Sustainability Report 2025', link: '#', disabled: true },
+                { year: '2024', title: zh ? '2024 年度與永續發展報告' : 'Annual and Sustainability Report 2024', link: 'HM-Group-Annual-and-sustainability-report-2024.pdf', download: 'HM-Group-Annual-and-sustainability-report-2024.pdf' },
+                { year: '2023', title: zh ? '2023 年度與永續發展報告' : 'Annual and Sustainability Report 2023', link: 'HM-Group-Annual-and-Sustainability-Report-2023.pdf', download: 'HM-Group-Annual-and-Sustainability-Report-2023.pdf' },
             ];
             const archivedReports = ['2022','2021','2020','2019','2018','2017','2016','2015','2014','2013','2012'];
 
@@ -1067,14 +1085,20 @@
                             <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-4">{dict.latestReports}</h4>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                                 {recentReports.map(r => (
-                                    <a href={r.link} target="_blank" rel="noopener noreferrer" key={r.year}
-                                        className="flex flex-col justify-between p-5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-[#e50010] transition-colors group">
+                                    <a href={r.link}
+                                        key={r.year}
+                                        download={r.download || undefined}
+                                        target={r.disabled ? undefined : '_blank'}
+                                        rel={r.disabled ? undefined : 'noopener noreferrer'}
+                                        onClick={r.disabled ? (e) => e.preventDefault() : undefined}
+                                        className={`flex flex-col justify-between p-5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl transition-colors group ${r.disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-[#e50010]'}`}>
                                         <div>
                                             <FileText className="text-gray-400 group-hover:text-[#e50010] transition-colors mb-3" size={28} />
                                             <p className="font-bold text-gray-800 dark:text-gray-100 text-xl mb-1">{r.year}</p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400">{r.title}</p>
+                                            {r.disabled && <p className="text-xs text-orange-500 dark:text-orange-400 mt-1">{zh ? '即將推出' : 'Coming Soon'}</p>}
                                         </div>
-                                        <div className="mt-5 flex items-center text-[#e50010] dark:text-red-400 font-semibold text-xs group-hover:underline">
+                                        <div className={`mt-5 flex items-center font-semibold text-xs ${r.disabled ? 'text-gray-400' : 'text-[#e50010] dark:text-red-400 group-hover:underline'}`}>
                                             <Download size={14} className="mr-1.5" />{dict.downloadReport}
                                         </div>
                                     </a>
@@ -1154,76 +1178,180 @@
             );
         };
 
-        // 4.4 Org Structure Application
+        // 4.4 Org Structure Application — Centralized Matrix Org Chart
         const OrgStructureApp = ({ appData, dict, lang }) => {
+            const zh = lang === 'zh';
+
+            // ── Node component for the chart ──
+            const OrgNode = ({ label, sub, accent, bg, border, children, isRoot }) => (
+                <div className="flex flex-col items-center">
+                    <div className={`rounded-xl px-4 py-2.5 border-2 text-center shadow-sm ${bg} ${border} ${isRoot ? 'w-56' : 'w-40'}`}>
+                        <p className={`font-bold text-sm leading-tight ${accent}`}>{label}</p>
+                        {sub && <p className="text-xs mt-0.5 opacity-70 text-gray-600 dark:text-gray-300 leading-tight">{sub}</p>}
+                    </div>
+                    {children && (
+                        <div className="flex flex-col items-center">
+                            <div className="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+                            {children}
+                        </div>
+                    )}
+                </div>
+            );
+
+            // ── Horizontal connector between sibling nodes ──
+            const HorzBranch = ({ count }) => (
+                <div className="relative flex items-start justify-center" style={{ width: `${count * 168}px` }}>
+                    <div className="absolute top-0 left-[84px] right-[84px] h-px bg-gray-300 dark:bg-gray-600"></div>
+                </div>
+            );
+
             const brands = [
-                { name: 'H&M', color: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-[#e50010] dark:text-red-400', desc: lang === 'zh' ? '全球最大時尚零售主品牌' : 'The flagship global fashion brand' },
-                { name: 'COS', color: 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100', desc: lang === 'zh' ? '現代設計感高品質服飾' : 'Modern, high-quality fashion' },
-                { name: '& Other Stories', color: 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300', desc: lang === 'zh' ? '精品配件與個性化美妝' : 'Premium accessories & beauty' },
-                { name: 'ARKET', color: 'bg-stone-100 dark:bg-stone-800 border-stone-300 dark:border-stone-600 text-stone-700 dark:text-stone-300', desc: lang === 'zh' ? '北歐簡約生活風格品牌' : 'Nordic minimalist lifestyle' },
-                { name: 'Weekday', color: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-700 dark:text-yellow-400', desc: lang === 'zh' ? '青年文化與街頭時尚' : 'Youth culture & streetwear' },
-                { name: 'Monki', color: 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-400', desc: lang === 'zh' ? '個性鮮明的女性時尚品牌' : 'Bold & playful womenswear' },
+                { name: 'H&M', sub: zh ? '旗艦品牌' : 'Flagship', color: 'bg-red-50 dark:bg-red-900/30 border-red-300 dark:border-red-700 text-[#e50010] dark:text-red-400' },
+                { name: 'COS', sub: zh ? '現代設計' : 'Modern', color: 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100' },
+                { name: '& Other Stories', sub: zh ? '精品美妝' : 'Premium', color: 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-700 text-rose-700 dark:text-rose-300' },
+                { name: 'ARKET', sub: zh ? '北歐簡約' : 'Nordic', color: 'bg-stone-100 dark:bg-stone-800 border-stone-300 dark:border-stone-600 text-stone-700 dark:text-stone-300' },
+                { name: 'Weekday', sub: zh ? '街頭文化' : 'Streetwear', color: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-700 text-yellow-700 dark:text-yellow-400' },
+                { name: 'Monki', sub: zh ? '個性女裝' : 'Bold', color: 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-400' },
             ];
+
             const functions = [
-                { name: lang === 'zh' ? '數位科技' : 'Digital Tech', icon: '💻', desc: lang === 'zh' ? '電商平台、App、零售科技與 IT 基礎建設' : 'E-commerce, apps, retail tech & IT infrastructure' },
-                { name: lang === 'zh' ? '全球供應鏈' : 'Global Supply Chain', icon: '🔗', desc: lang === 'zh' ? '採購、物流、倉儲與永續供應商管理' : 'Procurement, logistics, warehousing & supplier relations' },
-                { name: lang === 'zh' ? '行銷與創意' : 'Marketing & Creative', icon: '🎨', desc: lang === 'zh' ? '品牌敘事、廣告製作、公關與社群媒體' : 'Brand narrative, advertising, PR & social media' },
-                { name: lang === 'zh' ? '商品規劃' : 'Product Merchandising', icon: '👗', desc: lang === 'zh' ? '商品選品、定價策略、買手與視覺陳列' : 'Assortment planning, pricing, buying & visual display' },
-                { name: lang === 'zh' ? '財務與法務' : 'Finance & Legal', icon: '📊', desc: lang === 'zh' ? '財務管控、會計、合規與法律事務' : 'Financial control, accounting, compliance & legal affairs' },
-                { name: lang === 'zh' ? '人力資源' : 'People & HR', icon: '🤝', desc: lang === 'zh' ? '人才招募、培訓、多元共融與企業文化' : 'Talent acquisition, training, D&I & culture' },
+                { icon: '💻', name: zh ? '數位科技' : 'Digital Tech' },
+                { icon: '🔗', name: zh ? '全球供應鏈' : 'Supply Chain' },
+                { icon: '🎨', name: zh ? '行銷與創意' : 'Marketing' },
+                { icon: '👗', name: zh ? '商品規劃' : 'Merchandising' },
+                { icon: '📊', name: zh ? '財務與法務' : 'Finance & Legal' },
+                { icon: '🤝', name: zh ? '人力資源' : 'People & HR' },
             ];
-            const offices = [
-                { city: lang === 'zh' ? '斯德哥爾摩' : 'Stockholm', role: lang === 'zh' ? '全球總部' : 'Global HQ', flag: '🇸🇪' },
-                { city: lang === 'zh' ? '紐約' : 'New York', role: lang === 'zh' ? '北美區域總部' : 'North America HQ', flag: '🇺🇸' },
-                { city: lang === 'zh' ? '香港' : 'Hong Kong', role: lang === 'zh' ? '亞太區域總部' : 'Asia Pacific HQ', flag: '🇭🇰' },
+
+            const regions = [
+                { flag: '🇸🇪', name: zh ? '斯德哥爾摩' : 'Stockholm', role: zh ? '全球總部' : 'Global HQ' },
+                { flag: '🇺🇸', name: zh ? '北美' : 'N. America', role: zh ? '北美總部' : 'Americas HQ' },
+                { flag: '🇭🇰', name: zh ? '香港' : 'Hong Kong', role: zh ? '亞太總部' : 'APAC HQ' },
             ];
+
             return (
-                <div className="p-6 md:p-8 max-w-5xl mx-auto animate-in fade-in duration-300 w-full pb-12">
-                    <div className="mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
+                <div className="p-6 md:p-8 max-w-6xl mx-auto animate-in fade-in duration-300 w-full pb-16">
+                    {/* Header */}
+                    <div className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
                         <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">{dict.orgTitle}</h2>
                         <p className="text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">{dict.orgDesc}</p>
                     </div>
+
                     {/* Culture Banner */}
-                    <div className="bg-[#e50010] text-white rounded-xl p-6 mb-8 flex items-center gap-4">
-                        <span className="text-4xl">🏢</span>
+                    <div className="bg-[#e50010] text-white rounded-xl p-5 mb-8 flex items-center gap-4">
+                        <span className="text-3xl">🏢</span>
                         <div>
-                            <h3 className="font-bold text-lg">{dict.orgCulture}</h3>
-                            <p className="text-white/90 text-sm mt-1 leading-relaxed">{dict.orgCultureDesc}</p>
+                            <h3 className="font-bold text-base">{dict.orgCulture}</h3>
+                            <p className="text-white/90 text-xs mt-1 leading-relaxed">{dict.orgCultureDesc}</p>
                         </div>
                     </div>
-                    {/* Brands */}
-                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2"><span className="text-[#e50010]">■</span> {dict.orgBrands}</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-10">
-                        {brands.map(b => (
-                            <div key={b.name} className={`border rounded-lg p-4 ${b.color}`}>
-                                <p className="font-bold text-base">{b.name}</p>
-                                <p className="text-xs mt-1 opacity-80">{b.desc}</p>
+
+                    {/* ── ORG CHART ── */}
+                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-8 overflow-x-auto">
+                        <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-6 text-center">
+                            {zh ? 'H&M 集團 · 中央矩陣組織架構圖' : 'H&M Group · Centralized Matrix Organizational Chart'}
+                        </h3>
+
+                        {/* Level 1 – Board */}
+                        <div className="flex flex-col items-center">
+                            <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 border-2 border-gray-700 dark:border-gray-300 rounded-xl px-6 py-3 text-center shadow-md w-64">
+                                <p className="font-bold text-sm">{zh ? '董事會' : 'Board of Directors'}</p>
+                                <p className="text-xs opacity-70 mt-0.5">{zh ? '最高治理機構' : 'Highest Governance Body'}</p>
                             </div>
-                        ))}
-                    </div>
-                    {/* Functions */}
-                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2"><span className="text-[#e50010]">■</span> {dict.orgFunctions}</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-                        {functions.map(f => (
-                            <div key={f.name} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex gap-3 items-start hover:border-[#e50010] transition-colors">
-                                <span className="text-2xl shrink-0">{f.icon}</span>
-                                <div>
-                                    <p className="font-semibold text-gray-800 dark:text-gray-100">{f.name}</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{f.desc}</p>
+                            <div className="w-px h-5 bg-gray-300 dark:bg-gray-600"></div>
+
+                            {/* Level 2 – CEO */}
+                            <div className="bg-[#e50010] text-white border-2 border-red-700 rounded-xl px-6 py-3 text-center shadow-md w-64">
+                                <p className="font-bold text-sm">{zh ? '執行長 (CEO)' : 'Group CEO'}</p>
+                                <p className="text-xs opacity-80 mt-0.5">Daniel Ervér</p>
+                            </div>
+                            <div className="w-px h-5 bg-gray-300 dark:bg-gray-600"></div>
+
+                            {/* Level 3 – Two axes side by side */}
+                            <div className="flex gap-8 items-start justify-center w-full flex-wrap">
+
+                                {/* LEFT AXIS: Brand Business Units */}
+                                <div className="flex flex-col items-center min-w-[280px]">
+                                    <div className="bg-blue-600 text-white border-2 border-blue-700 rounded-xl px-5 py-2.5 text-center shadow-sm w-52">
+                                        <p className="font-bold text-xs uppercase tracking-wide">{zh ? '品牌事業單位軸' : 'Brand Business Units'}</p>
+                                        <p className="text-xs opacity-75 mt-0.5">{zh ? '垂直品牌管理' : 'Vertical Brand Mgmt'}</p>
+                                    </div>
+                                    <div className="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+                                    {/* Brand row connector */}
+                                    <div className="relative">
+                                        <div className="flex gap-2 flex-wrap justify-center max-w-xs">
+                                            {brands.map((b, i) => (
+                                                <div key={i} className={`rounded-lg px-3 py-2 border text-center w-[120px] ${b.color}`}>
+                                                    <p className={`font-bold text-xs ${b.color.includes('text-') ? '' : 'text-gray-800 dark:text-gray-100'}`}>{b.name}</p>
+                                                    <p className="text-xs opacity-70 mt-0.5 text-gray-600 dark:text-gray-300">{b.sub}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* Each brand has stores */}
+                                    <div className="w-px h-3 bg-gray-300 dark:bg-gray-600 mt-1"></div>
+                                    <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-center w-52">
+                                        <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">🏬 {zh ? '全球 4,101 家門市' : '4,101 Stores Worldwide'}</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{zh ? '81 個市場' : '81 Markets'}</p>
+                                    </div>
+                                </div>
+
+                                {/* RIGHT AXIS: Shared Functional Centers */}
+                                <div className="flex flex-col items-center min-w-[280px]">
+                                    <div className="bg-emerald-600 text-white border-2 border-emerald-700 rounded-xl px-5 py-2.5 text-center shadow-sm w-52">
+                                        <p className="font-bold text-xs uppercase tracking-wide">{zh ? '共用職能中心軸' : 'Shared Functional Centers'}</p>
+                                        <p className="text-xs opacity-75 mt-0.5">{zh ? '橫向跨品牌支援' : 'Cross-brand Support'}</p>
+                                    </div>
+                                    <div className="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+                                    <div className="flex flex-col gap-2 w-52">
+                                        {functions.map((f, i) => (
+                                            <div key={i} className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg px-3 py-2 flex items-center gap-2">
+                                                <span className="text-base shrink-0">{f.icon}</span>
+                                                <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">{f.name}</p>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        ))}
+
+                            {/* Level 4 – Regional HQs */}
+                            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mt-6"></div>
+                            <div className="bg-orange-50 dark:bg-orange-900/20 border-2 border-orange-300 dark:border-orange-700 rounded-xl px-5 py-2.5 text-center shadow-sm w-52">
+                                <p className="font-bold text-xs text-orange-700 dark:text-orange-300 uppercase tracking-wide">{zh ? '區域總部' : 'Regional HQs'}</p>
+                            </div>
+                            <div className="w-px h-3 bg-gray-300 dark:bg-gray-600"></div>
+                            <div className="flex gap-4 flex-wrap justify-center">
+                                {regions.map((r, i) => (
+                                    <div key={i} className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-lg px-4 py-2.5 text-center">
+                                        <span className="text-xl">{r.flag}</span>
+                                        <p className="font-bold text-xs text-gray-800 dark:text-gray-100 mt-1">{r.name}</p>
+                                        <p className="text-xs text-orange-600 dark:text-orange-400">{r.role}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Matrix intersection note */}
+                        <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 text-center">
+                            <p className="text-xs font-semibold text-blue-700 dark:text-blue-300">
+                                {zh
+                                    ? '⬡ 矩陣交叉點：每個品牌與每個職能中心相互協作，形成集中化的矩陣治理結構'
+                                    : '⬡ Matrix Intersection: Each Brand × Each Functional Center collaborate, forming H&M\'s centralized matrix governance'}
+                            </p>
+                        </div>
                     </div>
-                    {/* Offices */}
-                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2"><span className="text-[#e50010]">■</span> {dict.orgOffices}</h3>
-                    <div className="flex flex-wrap gap-4">
-                        {offices.map(o => (
-                            <div key={o.city} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-6 py-4 flex items-center gap-3 hover:border-[#e50010] transition-colors">
-                                <span className="text-3xl">{o.flag}</span>
-                                <div>
-                                    <p className="font-bold text-gray-800 dark:text-gray-100">{o.city}</p>
-                                    <p className="text-xs text-[#e50010] dark:text-red-400 font-medium">{o.role}</p>
-                                </div>
+
+                    {/* Legend */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                        {[
+                            { color: 'bg-gray-900 dark:bg-gray-100', label: zh ? '治理層' : 'Governance' },
+                            { color: 'bg-[#e50010]', label: zh ? '執行領導' : 'Executive' },
+                            { color: 'bg-blue-600', label: zh ? '品牌事業軸' : 'Brand Axis' },
+                            { color: 'bg-emerald-600', label: zh ? '職能支援軸' : 'Function Axis' },
+                        ].map((l, i) => (
+                            <div key={i} className="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2">
+                                <div className={`w-3 h-3 rounded-sm shrink-0 ${l.color}`}></div>
+                                <span className="text-gray-700 dark:text-gray-300 font-medium">{l.label}</span>
                             </div>
                         ))}
                     </div>
@@ -1753,7 +1881,7 @@
                 { name: 'Zoe', role: lang === 'zh' ? '組長' : 'Team Lead', tools: ['Gemini', 'Claude', 'NotebookLM'], usage_en: 'Used NotebookLM to organize data and Gemini and Claude to create the overall webpage.', usage_zh: '使用 NotebookLM 整理資料，並使用 Gemini 和 Claude 建立整體網頁。' },
                 { name: 'Jenifer', role: lang === 'zh' ? '內容研究' : 'Content Research', tools: ['Claude', 'ChatGPT', 'Gemini'], usage_en: 'Used ChatGPT to organize and generate the overall data analysis, Gemini to create visuals and webpage elements, and Claude to recheck the results and add supporting data. Also experienced creating an overall organizational retail webpage by combining different datasets, visuals, and AI-generated content into one platform.', usage_zh: '使用 ChatGPT 整理並生成整體資料分析，使用 Gemini 製作視覺元素與網頁元素，並使用 Claude 複核結果並補充佐證資料。同時也體驗了將不同資料集、視覺素材與 AI 生成內容整合為一個平台，建立完整組織零售網頁的過程。' },
                 { name: 'Andy', role: lang === 'zh' ? '網站開發' : 'Web Development', tools: ['Gemini', 'ChatGPT'], usage_en: 'I used Gemini and ChatGPT to organize the H&M data, and let Gemini\'s canvas generate preliminary code.', usage_zh: '使用 Gemini 和 ChatGPT 整理 H&M 的資料，並讓 Gemini 的 Canvas 生成初步的程式碼。' },
-                { name: 'Jessica', role: lang === 'zh' ? '職缺分析' : 'Job Analysis', tools: ['Gemini', 'ChatGPT'], usage_en: 'Used Gemini and ChatGPT to support finding and searching for information in this program.', usage_zh: '在本專案中使用 Gemini 和 ChatGPT 協助查找與搜尋資訊。' },
+                { name: 'Jessica', role: lang === 'zh' ? '小組組長 · 職缺分析' : 'Team Leader · Job Analysis', tools: ['Gemini', 'ChatGPT'], usage_en: 'Used Gemini and ChatGPT to support finding and searching for information in this program.', usage_zh: '在本專案中使用 Gemini 和 ChatGPT 協助查找與搜尋資訊。' },
                 { name: 'Diana', role: lang === 'zh' ? '網站開發' : 'Web Development', tools: ['Gemini', 'Claude', 'NotebookLM'], usage_en: 'I used NotebookLM to organize company information and used Gemini and Claude to build websites.', usage_zh: '使用 NotebookLM 整理公司資訊，並使用 Gemini 和 Claude 建立網站。' },
             ];
 
@@ -1928,6 +2056,7 @@
             const [lang, setLang] = useState('zh');
             const [theme, setTheme] = useState('light');
             const [isSidebarOpen, setSidebarOpen] = useState(false);
+            const [isSpeaking, setIsSpeaking] = useState(false);
 
             // 處理深淺色模式的切換 (注入到 HTML 標籤上以便 Tailwind 識別)
             useEffect(() => {
@@ -1960,7 +2089,17 @@
                     alert(lang === 'zh' ? '您的瀏覽器不支援語音導覽功能。' : 'Your browser does not support text-to-speech.');
                     return;
                 }
-                window.speechSynthesis.cancel();
+                // If currently speaking, toggle pause/resume
+                if (window.speechSynthesis.speaking) {
+                    if (window.speechSynthesis.paused) {
+                        window.speechSynthesis.resume();
+                        setIsSpeaking(true);
+                    } else {
+                        window.speechSynthesis.pause();
+                        setIsSpeaking(false);
+                    }
+                    return;
+                }
                 const zh = lang === 'zh';
                 let textToRead = '';
 
@@ -2215,6 +2354,11 @@
                 const utterance = new SpeechSynthesisUtterance(textToRead);
                 utterance.lang = zh ? 'zh-TW' : 'en-US';
                 utterance.rate = 0.95;
+                utterance.onstart = () => setIsSpeaking(true);
+                utterance.onend = () => setIsSpeaking(false);
+                utterance.onpause = () => setIsSpeaking(false);
+                utterance.onresume = () => setIsSpeaking(true);
+                window.speechSynthesis.cancel();
                 window.speechSynthesis.speak(utterance);
             };
 
@@ -2229,6 +2373,8 @@
                         lang={lang} setLang={setLang}
                         theme={theme} setTheme={setTheme}
                         announcePage={announcePage}
+                        isSpeaking={isSpeaking}
+                        stopSpeech={() => { window.speechSynthesis.cancel(); setIsSpeaking(false); }}
                         dict={dict}
                     />
                     
