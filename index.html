@@ -615,64 +615,73 @@
 
         // 4.1 Team Introduction Application (小組成員介紹專屬頁面)
         const TeamIntroApp = ({ appData, dict, lang }) => {
-            // 五位成員的預設資料，您後續可以直接在這裡修改文字
-            const teamMembers = [
+            const zh = lang === 'zh';
+            // 成員資料（中英雙語）
+            const teamMembersData = [
                 { 
-                    id: 1, 
-                    initial: 'M1', 
+                    id: 1, initial: 'M1', 
                     avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vT3GowRFbpQUPiAfEfESNVYxIc4VowV3C2anBriUAbb69nVU_G2Z9m6JguwOai16wa6FH7SXicYz2QA/pub?w=960&h=720',
-                    name: 'Zoe', 
-                    role: 'Interdisciplinary Program of College of Management', 
-                    studentId: '113251013',
-                    slogan: '" HA! HA! "',
-                    desc: 'I\'m Zoe. Working with my team to create this TP website not only improved my keyword skills and helped me create beautiful web pages, but also gave me a deeper understanding of the work of a product manager (PM).' 
+                    name: 'Zoe', studentId: '113251013', slogan: '" HA! HA! "',
+                    role_en: 'Interdisciplinary Program of College of Management', role_zh: '管理學院學士班',
+                    desc_en: "I'm Zoe. Working with my team to create this TP website not only improved my keyword skills and helped me create beautiful web pages, but also gave me a deeper understanding of the work of a product manager (PM).",
+                    desc_zh: '我是 Zoe。與團隊合作建立這個 TP 網站，不僅提升了我的關鍵字技巧，幫助我製作出美觀的網頁，也讓我對產品經理（PM）的工作有了更深入的了解。'
                 },
                 { 
-                    id: 2, 
-                    initial: 'M2', 
+                    id: 2, initial: 'M2', 
                     avatar: 'https://docs.google.com/drawings/d/1RVszW1iDlLvW3ce8XjK1QOQWvAs2_GJsE3cYuILSoJQ/export/png',
-                    name: 'Jenifer', 
-                    role: 'International Business Studies', 
-                    studentId: '113212044',
-                    slogan: '“Wear what reflects you”',
-                    desc: 'Good day everyone, I am Jenifer one of the H&M website developers. Here we want to provide interesting yet complete information about our company. Our aim is to bring confidence in every designs we pour our heart into.' 
+                    name: 'Jenifer', studentId: '113212044', slogan: '"Wear what reflects you"',
+                    role_en: 'International Business Studies', role_zh: '國際企業學系',
+                    desc_en: 'Good day everyone, I am Jenifer one of the H&M website developers. Here we want to provide interesting yet complete information about our company. Our aim is to bring confidence in every designs we pour our heart into.',
+                    desc_zh: '大家好，我是 Jenifer，H&M 網站開發團隊的成員之一。我們希望提供有趣且完整的公司資訊，目標是在每一個用心設計中帶給大家自信。'
                 },
                 { 
-                    id: 3, 
-                    initial: 'M3', 
+                    id: 3, initial: 'M3', 
                     avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vRCTmMzqtWUwbotOGbnYsXhSzKJ70iUJJZ10qeM4elCTzn5DsVfIK-tcp10nGwn7fvmmw1y9w2GRr0p/pub?w=960&h=720',
-                    name: 'Andy', 
-                    role: 'DCH', 
-                    studentId: '114400003',
-                    slogan: '“Your choice, your responsibility”',
-                    desc: 'While building this website, what I learned most was how to give the correct commands to prevent Gemini from crashing or failing to function. Our goal is to present H&M\'s information and background more comprehensively.' 
+                    name: 'Andy', studentId: '114400003', slogan: '"Your choice, your responsibility"',
+                    role_en: 'Department of Counseling Psychology and Human Resource Development', role_zh: '諮商心理與人力資源發展學系',
+                    desc_en: "While building this website, what I learned most was how to give the correct commands to prevent Gemini from crashing or failing to function. Our goal is to present H&M's information and background more comprehensively.",
+                    desc_zh: '在建立這個網站的過程中，我學到最多的是如何下達正確的指令，以防止 Gemini 崩潰或無法正常運作。我們的目標是更完整地呈現 H&M 的資訊與背景。'
                 },
                 { 
-                    id: 4, 
-                    initial: 'M4', 
+                    id: 4, initial: 'M4', 
                     avatar: 'https://docs.google.com/drawings/d/15bFTcqPVi7aWEHrkRMttfkMtp3JXgl08VVLDN9PhBvw/export/png',
-                    name: 'Jessica', 
-                    role: 'Chinese literature', 
-                    studentId: '111101002',
-                    slogan: '“Wear the clothes you like, do the things you like.”',
-                    desc: 'I\'m jessica. The member in H&M website developer. The main core we want to provide is about the running of the company and marketing structure of H&M. Our ambition and aim is that people simple and clearly recognize the operating of H&M.' 
+                    name: 'Jessica', studentId: '111101002', slogan: '"Wear the clothes you like, do the things you like."',
+                    role_en: 'Chinese Literature', role_zh: '中國語文學系',
+                    desc_en: "I'm Jessica. A member of the H&M website developer team. The main core we want to provide is about the running of the company and marketing structure of H&M. Our ambition and aim is that people simple and clearly recognize the operating of H&M.",
+                    desc_zh: '我是 Jessica，H&M 網站開發團隊的成員。我們的核心目標是提供有關公司運營與行銷架構的資訊，希望讓大家能簡單清楚地了解 H&M 的運作方式。'
                 },
                 { 
-                    id: 5, 
-                    initial: 'M5', 
-                    name: lang === 'zh' ? '成員姓名 5' : 'Member Name 5', 
-                    role: lang === 'zh' ? '測試工程師 / QA Engineer' : 'QA Engineer', 
-                    desc: lang === 'zh' ? '負責系統功能測試、效能調校與品質保證。這裡可以填寫該成員的詳細介紹與負責項目。' : 'Responsible for system functional testing, performance tuning, and quality assurance.' 
+                    id: 5, initial: 'M5', 
+                    avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vTWNLvcq8mhr9lEH3ER1aAkRSslXv7wbELrTuTeJbB_eOALJDGKyZ1_G9K2cQgAnaM_G5ZxBTcIx9W0/pub?w=960&h=720',
+                    name: 'Diana', studentId: '111212029', slogan: '"Surface for breath, dive for truth. A frequency for no one."',
+                    role_en: 'International Business Studies 4', role_zh: '國際企業學系四年級',
+                    desc_en: 'As a member of the development team, I learned to prioritize user-centric functional design and create engaging interactive elements to enhance the overall user experience. We hope this website will help you learn more about us！',
+                    desc_zh: '作為開發團隊的一員，我學會了以使用者為中心進行功能設計，並創造引人入勝的互動元素以提升整體使用者體驗。希望這個網站能幫助您更了解我們！'
+                },
+                { 
+                    id: 6, initial: 'Prof.', 
+                    avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vTqwyFT7oLgPTSI9cBSOxmxfquRweIMarYkMjolusIb8MvzNJrx2UGXkNeDm5QTs8dt7JXagQuzHMjm/pub?w=960&h=720',
+                    name_en: 'Shih-Min Lo, Ph.D.', name_zh: '駱世民 博士 (Shih-Min Lo, Ph.D.)',
+                    studentId: '', slogan: '"Learning by doing."',
+                    role_en: 'Project Advisor', role_zh: '專題指導教授',
+                    desc_en: 'Professor at NCNU Dept. of International Business Studies. Expertise in strategy, platform business models, and entrepreneurship. Special thanks to Prof. Lo for guiding the PMCS G4 team! (Email: smlo@ncnu.edu.tw)',
+                    desc_zh: '國立暨南國際大學國際企業學系專任教授。研究領域涵蓋國際企業經營策略、產業與競爭分析、創新與創業管理及平台商業模式。感謝駱教授帶領 PMCS G4 團隊順利完成本次專題開發！(Email: smlo@ncnu.edu.tw)'
                 },
             ];
+            const teamMembers = teamMembersData.map(m => ({
+                ...m,
+                name: m.name || (zh ? m.name_zh : m.name_en),
+                role: zh ? m.role_zh : m.role_en,
+                desc: zh ? m.desc_zh : m.desc_en,
+            }));
 
             return (
                 <div className="p-6 md:p-8 max-w-7xl mx-auto animate-in fade-in duration-300 w-full">
                     {/* 頁面標題區 */}
                     <div className="mb-8 border-b border-gray-200 dark:border-gray-700 pb-4 flex justify-between items-end">
                         <div>
-                            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">{appData.title}</h2>
-                            <p className="text-gray-500 dark:text-gray-400 mt-2">{appData.subtitle}</p>
+                            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">{dict.teamIntro}</h2>
+                            <p className="text-gray-500 dark:text-gray-400 mt-2">{dict.teamIntroSub}</p>
                         </div>
                         <p className="text-gray-600 dark:text-gray-300 font-medium text-sm md:text-base border border-gray-300 dark:border-gray-600 rounded px-3 py-1 bg-white dark:bg-gray-800">
                             {dict.professorName}
@@ -796,7 +805,7 @@
                                         fill={isLast ? '#e50010' : color}
                                         rx="3" opacity={isLast ? 1 : 0.65} />
                                     <text x={x + barW/2} y={y - 4} textAnchor="middle" fontSize="9" fill={isLast ? '#e50010' : '#6b7280'} fontWeight={isLast ? 'bold' : 'normal'}>
-                                        {formatK ? (d[valueKey]/1000).toFixed(0)+'B' : d[valueKey]+'%'}
+                                        {formatK ? (d[valueKey]/1000).toFixed(0)+'B' : d[valueKey]}
                                     </text>
                                     <text x={x + barW/2} y={H + 16} textAnchor="middle" fontSize="9" fill="#9ca3af">{d.year}</text>
                                 </g>
@@ -1737,13 +1746,15 @@
                 { name: 'Gemini', emoji: '✨', color: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300', desc_en: 'Used for web page code generation, layout suggestions, and iterative debugging of the HTML/CSS structure.', desc_zh: '用於網頁程式碼生成、版面配置建議，以及 HTML/CSS 結構的迭代除錯。' },
                 { name: 'Claude', emoji: '🧠', color: 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300', desc_en: 'Used for refining long-form content, bilingual translations, structured data formatting, and component logic.', desc_zh: '用於精煉長篇內容、中英雙語翻譯、結構化資料格式化，以及元件邏輯撰寫。' },
                 { name: 'Canva AI', emoji: '🎨', color: 'bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800 text-pink-700 dark:text-pink-300', desc_en: 'Used for generating visual design assets, team member illustrations, and presentation slide layouts.', desc_zh: '用於生成視覺設計素材、組員插圖，以及簡報投影片版面設計。' },
+                { name: 'NotebookLM', emoji: '📓', color: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-700 dark:text-yellow-300', desc_en: 'Used for organizing complex data, parsing documents, and structuring company information.', desc_zh: '用於整理複雜資料、解析文件，以及結構化公司資訊。' },
             ];
 
             const members = [
-                { name: 'Zoe', role: lang === 'zh' ? '組長' : 'Team Lead', tools: ['ChatGPT', 'Canva AI'], usage_en: 'Led project coordination; used ChatGPT to draft the company overview and Canva AI to design the visual layout of the presentation.', usage_zh: '主導專題協調；使用 ChatGPT 草擬公司概覽，並用 Canva AI 設計簡報的視覺版面。' },
-                { name: 'Jenifer', role: lang === 'zh' ? '內容研究' : 'Content Research', tools: ['ChatGPT', 'Claude'], usage_en: 'Researched H&M brand history and company milestones; used AI to summarize annual reports and generate bilingual content.', usage_zh: '研究 H&M 品牌歷史與公司里程碑；使用 AI 摘要年報並生成中英雙語內容。' },
-                { name: 'Andy', role: lang === 'zh' ? '網站開發' : 'Web Development', tools: ['Gemini', 'Claude'], usage_en: 'Built the web portal structure; used Gemini for initial code generation and Claude to refine component logic and fix layout issues.', usage_zh: '建構網站入口結構；使用 Gemini 進行初步程式碼生成，並用 Claude 精煉元件邏輯和修正版面問題。' },
-                { name: 'Jessica', role: lang === 'zh' ? '職缺分析' : 'Job Analysis', tools: ['ChatGPT', 'Claude'], usage_en: 'Analyzed H&M and Uniqlo job postings; used AI to structure the comparison framework and translate requirements into Chinese.', usage_zh: '分析 H&M 與 Uniqlo 職缺；使用 AI 建構比較框架，並將職位要求翻譯成中文。' },
+                { name: 'Zoe', role: lang === 'zh' ? '組長' : 'Team Lead', tools: ['Gemini', 'Claude', 'NotebookLM'], usage_en: 'Used NotebookLM to organize data and Gemini and Claude to create the overall webpage.', usage_zh: '使用 NotebookLM 整理資料，並使用 Gemini 和 Claude 建立整體網頁。' },
+                { name: 'Jenifer', role: lang === 'zh' ? '內容研究' : 'Content Research', tools: ['Claude', 'ChatGPT', 'Gemini'], usage_en: 'Used ChatGPT to organize and generate the overall data analysis, Gemini to create visuals and webpage elements, and Claude to recheck the results and add supporting data. Also experienced creating an overall organizational retail webpage by combining different datasets, visuals, and AI-generated content into one platform.', usage_zh: '使用 ChatGPT 整理並生成整體資料分析，使用 Gemini 製作視覺元素與網頁元素，並使用 Claude 複核結果並補充佐證資料。同時也體驗了將不同資料集、視覺素材與 AI 生成內容整合為一個平台，建立完整組織零售網頁的過程。' },
+                { name: 'Andy', role: lang === 'zh' ? '網站開發' : 'Web Development', tools: ['Gemini', 'ChatGPT'], usage_en: 'I used Gemini and ChatGPT to organize the H&M data, and let Gemini\'s canvas generate preliminary code.', usage_zh: '使用 Gemini 和 ChatGPT 整理 H&M 的資料，並讓 Gemini 的 Canvas 生成初步的程式碼。' },
+                { name: 'Jessica', role: lang === 'zh' ? '職缺分析' : 'Job Analysis', tools: ['Gemini', 'ChatGPT'], usage_en: 'Used Gemini and ChatGPT to support finding and searching for information in this program.', usage_zh: '在本專案中使用 Gemini 和 ChatGPT 協助查找與搜尋資訊。' },
+                { name: 'Diana', role: lang === 'zh' ? '網站開發' : 'Web Development', tools: ['Gemini', 'Claude', 'NotebookLM'], usage_en: 'I used NotebookLM to organize company information and used Gemini and Claude to build websites.', usage_zh: '使用 NotebookLM 整理公司資訊，並使用 Gemini 和 Claude 建立網站。' },
             ];
 
             const usageCases = [
@@ -1756,27 +1767,21 @@
             ];
 
             const insights = lang === 'zh' ? [
+                { icon: '👩‍💻', text: 'Zoe：學習到如何與 AI 協作來建立網頁，並透過提示詞了解了網頁的不同功能。' },
+                { icon: '👨‍💻', text: 'Andy：在與 AI 的協作中，讓 Gemini 理解需求既是一件容易的事，也是一項複雜的任務。' },
+                { icon: '👩‍💻', text: 'Diana：學會了與 AI 協作建立網站，並從使用者的角度出發，讓介面變得更加清晰。' },
+                { icon: '👩‍💻', text: 'Jenifer：學會了如何協作不同的 AI 工具來整理資料集、製作視覺素材，並使用 Google Gemini Canvas 將它們整合成一個完整的組織零售網頁。' },
+                { icon: '👩‍💻', text: 'Jessica：與 AI 協作並不像想像中那麼簡單。AI 有時會提供錯誤的資訊，必須自己找到正確的資料，並告知 AI 其錯誤所在。' },
                 { icon: '💡', text: 'AI 大幅加速了研究階段，讓我們能在更短的時間內處理更多資料來源。' },
-                { icon: '⚠️', text: 'AI 生成的內容仍需人工審核——我們發現若干事實細節需要與官方資料交叉比對後修正。' },
                 { icon: '🤝', text: '最佳的成果來自於「人機協作」：由人類設定方向與判斷，AI 負責執行與擴展。' },
-                { icon: '🌱', text: '在整個專題過程中，我們的提示技巧顯著進步，學會如何給予更精確的指示以獲得更好的輸出。' },
             ] : [
+                { icon: '👩‍💻', text: 'Zoe: Learned how to collaborate with AI to create webpages and understood the different functionalities of a webpage through prompts.' },
+                { icon: '👨‍💻', text: 'Andy: In AI collaboration, making Gemini understand is both an easy and complex task.' },
+                { icon: '👩‍💻', text: 'Diana: I learned to collaborate with AI to build websites and to make interfaces clearer from the user\'s perspective.' },
+                { icon: '👩‍💻', text: 'Jenifer: Learned how to collaborate with different AI tools to organize datasets, create visuals, and compile them into a complete organizational retail webpage using Google Gemini Canvas.' },
+                { icon: '👩‍💻', text: 'Jessica: Collaboration with AI is not as easy as I thought before I actually used it. AI will sometimes give mistaken information — I need to find the right information and tell AI its mistake.' },
                 { icon: '💡', text: 'AI significantly accelerated the research phase, allowing us to process more sources in less time.' },
-                { icon: '⚠️', text: 'AI-generated content still required human review — we found some factual details needed correction after cross-referencing official sources.' },
                 { icon: '🤝', text: 'The best results came from human-AI collaboration: humans setting direction and judgment, AI handling execution and expansion.' },
-                { icon: '🌱', text: 'Our prompting skills improved significantly throughout the project as we learned to give more precise instructions for better outputs.' },
-            ];
-
-            const promptTips = lang === 'zh' ? [
-                { tip: '給予角色與背景', example: '「你是一位熟悉 H&M 集團的商業顧問，請...」', why: '角色設定能讓 AI 給出更聚焦、更具深度的回應。' },
-                { tip: '指定輸出格式', example: '「請以 JSON 格式/條列式/表格回傳結果」', why: '明確的格式指令能直接生成可用的結構化資料。' },
-                { tip: '逐步迭代', example: '先請 AI 給出大綱，確認後再要求展開每個段落', why: '迭代式提示能有效避免一次生成過多而品質不穩的問題。' },
-                { tip: '提供範例', example: '「請仿照以下格式：[你的範例]，為其他項目生成內容」', why: '範例（Few-shot prompting）能大幅提升輸出的一致性。' },
-            ] : [
-                { tip: 'Give a role and context', example: '"You are a business consultant familiar with H&M Group. Please..."', why: 'Role-setting helps AI give more focused and in-depth responses.' },
-                { tip: 'Specify output format', example: '"Return results in JSON / bullet points / table format"', why: 'Clear format instructions produce directly usable structured data.' },
-                { tip: 'Iterate step by step', example: 'Ask for an outline first, confirm it, then ask to expand each section', why: 'Iterative prompting avoids generating too much at once with inconsistent quality.' },
-                { tip: 'Provide examples', example: '"Following this format: [your example], generate content for the other items"', why: 'Few-shot examples greatly improve output consistency.' },
             ];
 
             const tabs = [
@@ -1882,20 +1887,6 @@
                                     ))}
                                 </div>
                             </div>
-                            <div>
-                                <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base mb-4 flex items-center gap-2">
-                                    <span>⚡</span>{dict.aiPromptTips}
-                                </h3>
-                                <div className="space-y-3">
-                                    {promptTips.map((pt, i) => (
-                                        <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-purple-400 transition-colors">
-                                            <p className="font-semibold text-purple-700 dark:text-purple-300 text-sm mb-1">✦ {pt.tip}</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 font-mono bg-gray-50 dark:bg-gray-900/50 rounded px-3 py-2 my-2 italic">{pt.example}</p>
-                                            <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">→ {pt.why}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
                         </div>
                     )}
                 </div>
@@ -1965,19 +1956,266 @@
             };
 
             const announcePage = () => {
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel();
-                    const textToRead = currentView === 'launchpad' 
-                        ? (lang === 'zh' ? `目前在首頁。您可以選擇：${getLaunchpadTiles().map(t => t.title).join('、')}` : `Currently on Home. You can select: ${getLaunchpadTiles().map(t => t.title).join(', ')}`)
-                        : (lang === 'zh' ? `目前開啟的是 ${selectedApp.title} 應用程式` : `Currently open ${selectedApp.title} application`);
-
-                    const utterance = new SpeechSynthesisUtterance(textToRead);
-                    utterance.lang = lang === 'zh' ? 'zh-TW' : 'en-US';
-                    utterance.rate = 1.1;
-                    window.speechSynthesis.speak(utterance);
-                } else {
+                if (!('speechSynthesis' in window)) {
                     alert(lang === 'zh' ? '您的瀏覽器不支援語音導覽功能。' : 'Your browser does not support text-to-speech.');
+                    return;
                 }
+                window.speechSynthesis.cancel();
+                const zh = lang === 'zh';
+                let textToRead = '';
+
+                if (currentView === 'launchpad') {
+                    textToRead = zh
+                        ? `歡迎來到 H&M 企業入口網站，本網站由 PMCS G4 小組製作，指導教授為駱世民博士。` +
+                          `本網站共有七個功能區塊，分別是：` +
+                          `第一，小組成員介紹，介紹五位組員與指導教授的基本資料；` +
+                          `第二，公司歷史，帶您了解 H&M 從 1947 年創立至今的發展歷程；` +
+                          `第三，組織架構，說明 H&M 集團旗下各品牌與核心業務職能；` +
+                          `第四，財務資訊，提供年度報告與永續發展報告的下載資源；` +
+                          `第五，職缺資料，比較 H&M 與 Uniqlo 產品經理的職位內容；` +
+                          `第六，核心領域詞彙，收錄策略行銷、產品管理與 H&M 品牌專有名詞共 12 個術語；` +
+                          `第七，AI 使用紀錄，透明呈現本組在專題中使用 AI 工具的方式與心得。` +
+                          `請點選任一功能方塊即可進入該頁面。`
+                        : `Welcome to the H&M Enterprise Portal, created by PMCS Group 4 under the guidance of Professor Shih-Min Lo. ` +
+                          `This portal contains seven sections. ` +
+                          `First, Team Introduction — introducing all five members and the faculty advisor. ` +
+                          `Second, Company History — tracing H&M's journey from its founding in 1947 to a global fashion leader. ` +
+                          `Third, Org Structure — explaining H&M Group's brands, business functions, and global offices. ` +
+                          `Fourth, Financial Info — providing access to annual and sustainability reports. ` +
+                          `Fifth, Job Openings — comparing Product Manager roles at H&M and Uniqlo. ` +
+                          `Sixth, Terminology — a glossary of 12 key terms across strategy, product management, and H&M brand concepts. ` +
+                          `Seventh, AI Utilization — a transparent record of how the team used AI tools throughout this project. ` +
+                          `Click any tile to open that section.`;
+
+                } else if (currentView === 'app' && selectedApp) {
+                    const id = selectedApp.id;
+
+                    if (id === 'team') {
+                        textToRead = zh
+                            ? `歡迎來到小組成員介紹頁面。本專題由五位組員共同完成，指導教授為國立暨南國際大學國際企業學系的駱世民博士。` +
+                              `以下依序介紹五位組員：` +
+                              `組員一：Zoe，管理學院學士班，學號 113251013。個人座右銘：哈哈。` +
+                              `她表示：與團隊合作建立這個 TP 網站，不僅提升了關鍵字技巧，幫助製作出美觀的網頁，也讓她對產品經理的工作有了更深入的了解。` +
+                              `組員二：Jenifer，國際企業學系，學號 113212044。個人座右銘：穿出真實的自己。` +
+                              `她表示：我們希望提供有趣且完整的公司資訊，目標是在每一個用心設計中帶給大家自信。` +
+                              `組員三：Andy，諮商心理與人力資源發展學系，學號 114400003。個人座右銘：你的選擇，你的責任。` +
+                              `他表示：在建立這個網站的過程中，學到最多的是如何下達正確的指令，以防止 Gemini 崩潰或無法正常運作。` +
+                              `組員四：Jessica，中國語文學系，學號 111101002。個人座右銘：穿你喜歡的衣服，做你喜歡的事。` +
+                              `她表示：我們的核心目標是提供有關 H&M 公司運營與行銷架構的資訊，希望讓大家能簡單清楚地了解 H&M 的運作方式。` +
+                              `組員五：Diana，國際企業學系四年級，學號 111212029。個人座右銘：浮出水面是為了呼吸，潛入水中是為了真相。` +
+                              `她表示：作為開發團隊的一員，她學會了以使用者為中心進行功能設計，並創造引人入勝的互動元素以提升整體使用者體驗。` +
+                              `指導教授駱世民博士任教於國立暨南國際大學國際企業學系，研究領域涵蓋國際企業經營策略、產業與競爭分析、創新與創業管理及平台商業模式。感謝駱教授帶領 PMCS G4 團隊順利完成本次專題開發。`
+                            : `Welcome to the Team Introduction page. This project was completed by five members, advised by Professor Shih-Min Lo, Ph.D., of the Department of International Business Studies at National Chi Nan University. ` +
+                              `Member one: Zoe, Interdisciplinary Program of College of Management, Student ID 113251013. Personal motto: Ha Ha. ` +
+                              `She shares: Working with the team to create this TP website not only improved her keyword skills and helped create beautiful web pages, but also gave her a deeper understanding of what a product manager does. ` +
+                              `Member two: Jenifer, International Business Studies, Student ID 113212044. Personal motto: Wear what reflects you. ` +
+                              `She shares: The team wants to provide interesting yet complete information about H&M, aiming to bring confidence through every heartfelt design. ` +
+                              `Member three: Andy, Department of Counseling Psychology and Human Resource Development, Student ID 114400003. Personal motto: Your choice, your responsibility. ` +
+                              `He shares: The most valuable lesson while building this website was learning how to give correct commands to prevent Gemini from crashing or failing to function. ` +
+                              `Member four: Jessica, Chinese Literature, Student ID 111101002. Personal motto: Wear the clothes you like, do the things you like. ` +
+                              `She shares: The team's core goal is to help people simply and clearly understand how H&M operates, focusing on company operations and marketing structure. ` +
+                              `Member five: Diana, International Business Studies Year 4, Student ID 111212029. Personal motto: Surface for breath, dive for truth. A frequency for no one. ` +
+                              `She shares: As a developer, she learned to prioritize user-centric design and create engaging interactive elements to enhance the overall user experience. ` +
+                              `Faculty advisor Professor Shih-Min Lo specializes in international business strategy, industry and competitive analysis, innovation and entrepreneurship management, and platform business models. Special thanks to Professor Lo for guiding the PMCS Group 4 team to successfully complete this project.`;
+
+                    } else if (id === 'history') {
+                        textToRead = zh
+                            ? `歡迎來到公司歷史頁面。H&M 的品牌歷史與傳承，從瑞典的一家女裝店，發展成為全球最大的時尚零售商之一。` +
+                              `第一個里程碑：1947 年，Hennes 創立。` +
+                              `Erling Persson 在瑞典的韋斯特羅斯開設了第一家店鋪。這家店最初名為 Hennes，瑞典語意為「她的」，當時只專門提供女裝。這也是 H&M 致力於以永續方式提供最棒的產品與體驗的起點。` +
+                              `第二個里程碑：1968 年，收購 Mauritz Widforss 並更名。` +
+                              `公司收購了狩獵服飾品牌 Mauritz Widforss，這次的收購促使品牌開始提供男裝系列，並正式將公司名稱更改為我們現今熟知的 H&M，也就是 Hennes & Mauritz。` +
+                              `第三個里程碑：時至今日，H&M 已成為全球頂尖時尚零售商。` +
+                              `H&M 已成為全球最大的時尚零售商之一。H&M 經常與高端知名設計師合作推出聯名系列，並與名人攜手進行引領潮流的行銷活動，持續讓顧客能夠展現獨特的個人風格。`
+                            : `Welcome to the Company History page. H&M's heritage spans from a single women's wear store in Sweden to one of the largest fashion retailers worldwide. ` +
+                              `Milestone one: 1947 — The Founding of Hennes. ` +
+                              `Erling Persson opened the first store in 1947 in Västerås, Sweden. The store was originally called Hennes, meaning "hers" in Swedish, and only offered women's wear. This was the beginning of H&M's commitment to offering the best products and experiences in a sustainable way. ` +
+                              `Milestone two: 1968 — Acquisition of Mauritz Widforss. ` +
+                              `The company acquired Mauritz Widforss, a hunting apparel brand. This led to the store offering men's apparel and the official name change to Hennes and Mauritz, now known as H&M. ` +
+                              `Milestone three: Present day — Global Fashion Retailer. ` +
+                              `H&M is now among the largest fashion retailers worldwide. The company collaborates with high-end designers on special collections and runs marketing campaigns with celebrities, continuously helping customers express their unique personal style.`;
+
+                    } else if (id === 'structure') {
+                        textToRead = zh
+                            ? `歡迎來到組織架構頁面。H&M 集團組織架構。H&M 集團以扁平化的北歐管理結構運作，將多個生活風格品牌與全球職能整合於同一屋簷下。核心理念：我們是一個團隊。` +
+                              `組織文化：以扁平層級、相互信任與心理安全感為特色。所有員工被鼓勵以業主思維運作，追求執行速度、創新與誠信。` +
+                              `旗下品牌共六個：` +
+                              `H&M，全球最大時尚零售主品牌；` +
+                              `COS，現代設計感高品質服飾；` +
+                              `& Other Stories，精品配件與個性化美妝；` +
+                              `ARKET，北歐簡約生活風格品牌；` +
+                              `Weekday，青年文化與街頭時尚；` +
+                              `Monki，個性鮮明的女性時尚品牌。` +
+                              `核心業務職能共六項：` +
+                              `數位科技，負責電商平台、App、零售科技與 IT 基礎建設；` +
+                              `全球供應鏈，負責採購、物流、倉儲與永續供應商管理；` +
+                              `行銷與創意，負責品牌敘事、廣告製作、公關與社群媒體；` +
+                              `商品規劃，負責商品選品、定價策略、買手與視覺陳列；` +
+                              `財務與法務，負責財務管控、會計、合規與法律事務；` +
+                              `人力資源，負責人才招募、培訓、多元共融與企業文化。` +
+                              `全球企業據點共三處：瑞典斯德哥爾摩為全球總部；美國紐約為北美區域總部；香港為亞太區域總部。`
+                            : `Welcome to the Organization Structure page. H&M Group operates through a flat, Scandinavian management structure, uniting multiple lifestyle brands and global functions under one roof. The core ethos: We Are One Team. ` +
+                              `Organizational culture: Defined by a flat hierarchy, mutual trust, and psychological safety. All employees are encouraged to think like business owners, driving speed, execution, and innovation. ` +
+                              `The Group includes six brands: ` +
+                              `H&M — the flagship global fashion brand; ` +
+                              `COS — modern, high-quality fashion; ` +
+                              `and Other Stories — premium accessories and beauty; ` +
+                              `ARKET — Nordic minimalist lifestyle; ` +
+                              `Weekday — youth culture and streetwear; ` +
+                              `Monki — bold and playful womenswear. ` +
+                              `Six key business functions: ` +
+                              `Digital Tech — covering e-commerce, apps, retail tech, and IT infrastructure; ` +
+                              `Global Supply Chain — covering procurement, logistics, warehousing, and supplier relations; ` +
+                              `Marketing and Creative — covering brand narrative, advertising, PR, and social media; ` +
+                              `Product Merchandising — covering assortment planning, pricing, buying, and visual display; ` +
+                              `Finance and Legal — covering financial control, accounting, compliance, and legal affairs; ` +
+                              `People and HR — covering talent acquisition, training, diversity and inclusion, and culture. ` +
+                              `Global corporate offices: Stockholm, Sweden — Global Headquarters; New York, USA — North America HQ; Hong Kong — Asia Pacific HQ.`;
+
+                    } else if (id === 'finance') {
+                        textToRead = zh
+                            ? `歡迎來到財務資訊頁面。年度報告與永續發展。` +
+                              `我們的年度與永續發展報告提供了 H&M 集團財務績效、公司治理，以及我們為實現永續時尚未來所作努力的全面性概述。您可以於此下載近期的完整報告。` +
+                              `最新報告包含：2023 年度報告（Annual Report 2023）、2023 年永續發展報告（Sustainability Report 2023），以及 2023 年公司治理報告（Corporate Governance Report 2023）。` +
+                              `歷年報告存檔則涵蓋 2018 年至 2022 年間的年度報告與永續報告。` +
+                              `所有報告均提供 PDF 格式下載，點選頁面上的下載按鈕即可取得。`
+                            : `Welcome to the Financial Info page. Annual Reports and Sustainability. ` +
+                              `Our annual and sustainability reports provide a comprehensive overview of H&M Group's financial performance, corporate governance, and continuous efforts towards a sustainable fashion future. You can download the latest complete reports here. ` +
+                              `The latest reports include: the 2023 Annual Report, the 2023 Sustainability Report, and the 2023 Corporate Governance Report. ` +
+                              `The archive section covers annual and sustainability reports from 2018 through 2022. ` +
+                              `All reports are available as PDF downloads. Click the download button on the page to access them.`;
+
+                    } else if (id === 'jobs') {
+                        textToRead = zh
+                            ? `歡迎來到職缺資料頁面。本頁面比較 H&M 與 Uniqlo 的產品經理相關職位。` +
+                              `首先介紹 H&M 產品經理職位。` +
+                              `職位名稱：產品經理，負責數位科技、H&M Beauty 及全球供應鏈。` +
+                              `工作地點：斯德哥爾摩總部，紐約，或香港，提供混合辦公模式。` +
+                              `薪酬：中位數薪酬每年 90,155 美元，資深職可達 137,000 美元以上。` +
+                              `招募狀態：積極招募中。` +
+                              `工作描述：負責 H&M 全球數位平台（電商 App、零售科技）或特定商業產品線的端對端產品生命週期管理。` +
+                              `三項主要職責：第一，整合工程、UX/UI 設計師與業務分析師，制定清晰的產品願景、路線圖，並追蹤 OKR 與 KPI；第二，蒐集全球消費者回饋，執行嚴謹的 A/B 測試，以數據驅動使用者體驗與供應鏈效率的持續優化；第三，負責端對端產品生命週期管理。` +
+                              `必要條件：兩年以上數位產品經理經驗，或大型時尚零售採購背景；熟練掌握敏捷或 Scrum 方法論；以及卓越的數據分析能力。` +
+                              `福利包含：H&M 集團全球員工折扣卡、全員分紅計畫 HIP、育嬰假支援、以及全球內部調動機會。` +
+                              `申請流程共五個步驟：線上申請、招募電話初篩、職能面試與案例研究、文化契合度面試，最後薪酬審查與正式錄取通知。` +
+                              `接下來介紹 Uniqlo 產品行銷經理職位。` +
+                              `職位名稱：Product Marketing Manager，負責 UT 聯名系列及 LifeWear 核心系列。` +
+                              `工作地點：紐約曼哈頓總部，提供全職或混合辦公模式。` +
+                              `薪酬：每年 110,000 至 135,000 美元，另加年度獎金。` +
+                              `招募狀態：積極招募中，流程通常為四至六週。` +
+                              `工作描述：主導針對北美市場的核心產品線 GTM 策略規劃與執行，包含 LifeWear、UT 聯名系列與 AIRism。` +
+                              `必要條件：相關領域學士學位；三至五年以上產品行銷或品牌管理實戰經驗；以及卓越的專案管理能力。` +
+                              `福利包含：全方位醫療、牙科與視力保險；401k 退休計畫；豐厚員工折扣；以及通勤補貼與企業健康計畫。`
+                            : `Welcome to the Job Openings page. This page compares Product Manager related roles at H&M and Uniqlo. ` +
+                              `First, the H&M Product Manager role. ` +
+                              `Title: Product Manager, covering Digital Tech, H&M Beauty, and Global Supply Chain. ` +
+                              `Location: Stockholm HQ, New York, or Hong Kong, with a hybrid work model. ` +
+                              `Salary: Median $90,155 USD per year; Senior roles reach $137,000 or above. ` +
+                              `Status: Actively Hiring. ` +
+                              `Job description: Own the end-to-end product lifecycle for H&M's global digital platforms, including the e-commerce app and retail tech, or specific commercial product lines. ` +
+                              `Three key responsibilities: First, align engineering, UX and UI designers, and business analysts to define product visions, establish clear roadmaps, and track OKRs and KPIs. Second, gather international consumer feedback and execute rigorous A/B testing to drive data-backed iterations. Third, manage the full product lifecycle from discovery to launch. ` +
+                              `Must-have requirements: 2 or more years as a Digital Product Manager or solid background in large-scale fashion retail; proficiency in Agile and Scrum; exceptional data analytical skills. ` +
+                              `Benefits include: H&M Global Employee Discount Card across all group brands, the H&M Incentive Program profit-sharing scheme, parental leave support, and global internal mobility opportunities. ` +
+                              `Application process: five steps — online application, talent acquisition screening call, competency and product case study interview, cultural fit and values interview, then compensation review and formal offer. ` +
+                              `Next, the Uniqlo Product Marketing Manager role. ` +
+                              `Title: Product Marketing Manager, covering UT collaborations and core LifeWear campaigns. ` +
+                              `Location: New York City Manhattan HQ, full-time or hybrid. ` +
+                              `Salary: $110,000 to $135,000 USD per year plus annual bonus. ` +
+                              `Status: Actively Hiring, with a process typically running 4 to 6 weeks. ` +
+                              `Job description: Lead Go-To-Market strategy planning and execution for core product lines including LifeWear, UT collaborations, and AIRism, tailored for the North American market. ` +
+                              `Must-have requirements: Bachelor's degree in a relevant field; 3 to 5 or more years of product marketing or brand management experience in consumer goods or fashion retail; exceptional project management skills. ` +
+                              `Benefits include: comprehensive medical, dental, and vision insurance; 401k with company matching; generous employee discount; commuter subsidies and corporate wellness programs.`;
+
+                    } else if (id === 'terminology') {
+                        textToRead = zh
+                            ? `歡迎來到核心領域詞彙頁面。本頁收錄 12 個核心術語，分為三大類別，您可以翻轉卡片查看每個詞彙的定義。` +
+                              `第一類：策略與行銷，共四個術語。` +
+                              `一、GTM，進入市場策略：概述公司如何將產品推向市場的策略計畫，涵蓋目標受眾、通路、訊息傳遞、定價與競爭定位。` +
+                              `二、KPI，關鍵績效指標：衡量團隊達成業務目標效果的可量化指標，常見範例包含營收成長率、客戶獲取成本與轉換率。` +
+                              `三、OKR，目標與關鍵結果：用於定義具挑戰性目標及衡量進度之關鍵結果的框架，廣泛應用於科技業並逐漸被零售業採用。` +
+                              `四、A/B 測試：比較產品或活動的兩個版本的對照實驗，以點擊率或轉換率等特定指標判斷哪個版本更佳。` +
+                              `第二類：產品管理，共四個術語。` +
+                              `五、敏捷與 Scrum：一種迭代式開發方法論及其最流行的框架，工作拆分成短衝刺，透過持續回饋快速適應變化。` +
+                              `六、產品路線圖：描述產品願景、方向、優先順序與進度的高層次策略文件，用於對齊利害關係人。` +
+                              `七、產品生命週期：產品經歷的一系列階段，包含開發、導入、成長、成熟與衰退，產品經理在每個階段積極管理策略。` +
+                              `八、無職權領導力：在沒有直接管理權限的情況下，影響並激勵跨職能成員的能力，是產品經理協調各方的關鍵技能。` +
+                              `第三類：H&M 品牌概念，共四個術語。` +
+                              `九、LifeWear，生活服飾哲學：H&M 的核心設計哲學，為所有人設計服裝，以優質、機能性與永恆風格，透過親民的價格提升日常生活品質。` +
+                              `十、HIP，H&M 員工分紅計畫：H&M 集團的全員利潤分享計畫。達成財務目標時，部分利潤與全體員工共享，強化我們是一個團隊的精神。` +
+                              `十一、扁平化組織：鮮少中階管理層的組織結構。H&M 的北歐扁平層級促進直接溝通、更快決策與心理安全感。` +
+                              `十二、跨職能團隊：由工程、設計、行銷、供應鏈等不同專長人員組成的團隊，共同致力實現共同目標，是 H&M 集團的標準運作模式。`
+                            : `Welcome to the Terminology page. This section contains 12 core terms organized into three categories. You can flip each card to see its definition. ` +
+                              `Category one: Strategy and Marketing — four terms. ` +
+                              `One: GTM, or Go-To-Market. A strategic plan outlining how a company launches a product to market, covering target audience, channels, messaging, pricing, and competitive positioning. ` +
+                              `Two: KPI, or Key Performance Indicator. A measurable value showing how effectively a team achieves key business objectives. Common examples include revenue growth, customer acquisition cost, and conversion rate. ` +
+                              `Three: OKR, or Objectives and Key Results. A goal-setting framework for defining ambitious objectives and measurable key results that signal progress. Widely adopted in tech and increasingly in retail. ` +
+                              `Four: A/B Testing. A controlled experiment comparing two versions of a product or campaign to determine which performs better on a specific metric like click-through rate or conversion. ` +
+                              `Category two: Product Management — four terms. ` +
+                              `Five: Agile and Scrum. An iterative development methodology and its most popular framework. Work is broken into short sprints with continuous feedback loops for rapid adaptation. ` +
+                              `Six: Product Roadmap. A high-level strategic document outlining a product's vision, direction, priorities, and progress over time, aligning stakeholders on what the team is building and why. ` +
+                              `Seven: Product Lifecycle. The series of stages a product goes through — development, introduction, growth, maturity, and decline. Product managers actively manage strategy at each stage. ` +
+                              `Eight: Leadership Without Authority, or L-W-A. The ability to influence and motivate cross-functional team members who do not report to you. A critical skill for Product Managers coordinating engineers, designers, and business stakeholders. ` +
+                              `Category three: H&M Brand Concepts — four terms. ` +
+                              `Nine: LifeWear Philosophy. H&M's core design philosophy — clothing designed thoughtfully for everyone, improving daily life through quality, function, and timeless style at accessible prices. ` +
+                              `Ten: HIP, or H&M Incentive Program. H&M Group's profit-sharing program for all employees. When financial targets are met, profits are shared with the workforce, reinforcing the "We Are One Team" ethos. ` +
+                              `Eleven: Flat Organization. An organizational structure with few or no middle management levels. H&M's Scandinavian flat hierarchy promotes direct communication, faster decisions, and psychological safety. ` +
+                              `Twelve: Cross-functional Team. A group with diverse expertise across engineering, design, marketing, and supply chain working toward a common goal. This is the standard operating model across H&M Group.`;
+
+                    } else if (id === 'ai') {
+                        textToRead = zh
+                            ? `歡迎來到 AI 使用紀錄頁面。本頁透明呈現本組在整個專題過程中使用人工智慧工具的方式，涵蓋研究、內容生成、設計與程式開發等面向。` +
+                              `本組共使用五款 AI 工具：` +
+                              `第一，ChatGPT：用於研究摘要、內容草稿撰寫，以及公司背景資料的腦力激盪。` +
+                              `第二，Gemini：用於網頁程式碼生成、版面配置建議，以及 HTML 與 CSS 結構的迭代除錯。` +
+                              `第三，Claude：用於精煉長篇內容、中英雙語翻譯、結構化資料格式化，以及元件邏輯撰寫。` +
+                              `第四，Canva AI：用於生成視覺設計素材、組員插圖，以及簡報投影片版面設計。` +
+                              `第五，NotebookLM：用於整理複雜資料、解析文件，以及結構化公司資訊。` +
+                              `各組員的 AI 使用方式如下：` +
+                              `Zoe 擔任組長，使用 NotebookLM 整理資料，並使用 Gemini 和 Claude 建立整體網頁。` +
+                              `Jenifer 負責內容研究，使用 ChatGPT 整理並生成整體資料分析，Gemini 製作視覺元素與網頁元素，Claude 複核結果並補充佐證資料。她也體驗了將不同資料集、視覺素材與 AI 生成內容整合為一個完整組織零售網頁的過程。` +
+                              `Andy 負責網站開發，使用 Gemini 和 ChatGPT 整理 H&M 的資料，並讓 Gemini Canvas 生成初步的程式碼。` +
+                              `Jessica 負責職缺分析，使用 Gemini 和 ChatGPT 協助查找與搜尋資訊。` +
+                              `Diana 負責網站開發，使用 NotebookLM 整理公司資訊，並使用 Gemini 和 Claude 建立網站。` +
+                              `AI 在本專題中的六大應用場景：研究與摘要；中英雙語翻譯；程式碼生成；視覺設計輔助；結構化資料格式化；以及事實查核與延伸。` +
+                              `五位組員的心得分享：` +
+                              `Zoe：學習到如何與 AI 協作來建立網頁，並透過提示詞了解了網頁的不同功能。` +
+                              `Andy：在與 AI 的協作中，讓 Gemini 理解需求既是一件容易的事，也是一項複雜的任務。` +
+                              `Diana：學會了與 AI 協作建立網站，並從使用者的角度出發，讓介面變得更加清晰。` +
+                              `Jenifer：學會了如何協作不同的 AI 工具來整理資料集、製作視覺素材，並使用 Google Gemini Canvas 將它們整合成一個完整的組織零售網頁。` +
+                              `Jessica：與 AI 協作並不像想像中那麼簡單。AI 有時會提供錯誤的資訊，必須自己找到正確的資料，並告知 AI 其錯誤所在。` +
+                              `整體而言，AI 大幅加速了研究階段，讓本組能在更短的時間內處理更多資料來源。最佳的成果來自於人機協作：由人類設定方向與判斷，AI 負責執行與擴展。`
+                            : `Welcome to the AI Utilization page. This section transparently presents how the team used artificial intelligence tools throughout this project, spanning research, content generation, design, and coding. ` +
+                              `The team used five AI tools: ` +
+                              `First, ChatGPT — used for research summarization, content drafting, and brainstorming company background material. ` +
+                              `Second, Gemini — used for web page code generation, layout suggestions, and iterative debugging of the HTML and CSS structure. ` +
+                              `Third, Claude — used for refining long-form content, bilingual translations, structured data formatting, and component logic. ` +
+                              `Fourth, Canva AI — used for generating visual design assets, team member illustrations, and presentation slide layouts. ` +
+                              `Fifth, NotebookLM — used for organizing complex data, parsing documents, and structuring company information. ` +
+                              `Individual member AI usage: ` +
+                              `Zoe, Team Lead — used NotebookLM to organize data and Gemini and Claude to create the overall webpage. ` +
+                              `Jenifer, Content Research — used ChatGPT to organize and generate overall data analysis, Gemini to create visuals and webpage elements, and Claude to recheck results and add supporting data. She also experienced building a complete organizational retail webpage by combining different datasets, visuals, and AI-generated content into one platform. ` +
+                              `Andy, Web Development — used Gemini and ChatGPT to organize H&M data, and let Gemini Canvas generate preliminary code. ` +
+                              `Jessica, Job Analysis — used Gemini and ChatGPT to support finding and searching for information in this project. ` +
+                              `Diana, Web Development — used NotebookLM to organize company information and used Gemini and Claude to build the website. ` +
+                              `The team applied AI across six key use cases: research and summarization; bilingual translation; code generation; visual design assistance; structured data formatting; and fact-checking and content expansion. ` +
+                              `Key reflections from each member: ` +
+                              `Zoe: Learned how to collaborate with AI to create webpages and understood the different functionalities of a webpage through prompts. ` +
+                              `Andy: Making Gemini understand the requirements was both an easy and a surprisingly complex task. ` +
+                              `Diana: Learned to collaborate with AI to build websites and to make interfaces clearer from the user's perspective. ` +
+                              `Jenifer: Learned how to collaborate with different AI tools to organize datasets, create visuals, and compile them into a complete organizational retail webpage using Google Gemini Canvas. ` +
+                              `Jessica: Collaboration with AI is not as easy as expected. AI sometimes gives mistaken information, requiring her to find correct data and point out the AI's mistakes. ` +
+                              `Overall, AI significantly accelerated the research phase, allowing the team to process more sources in less time. The best results came from human-AI collaboration — humans setting direction and making judgments, AI handling execution and expansion.`;
+                    } else {
+                        textToRead = zh
+                            ? `目前開啟的是 ${selectedApp.title || ''} 頁面。`
+                            : `Currently viewing the ${selectedApp.title || ''} page.`;
+                    }
+                }
+
+                const utterance = new SpeechSynthesisUtterance(textToRead);
+                utterance.lang = zh ? 'zh-TW' : 'en-US';
+                utterance.rate = 0.95;
+                window.speechSynthesis.speak(utterance);
             };
 
             return (
