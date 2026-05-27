@@ -162,7 +162,7 @@
                 historyDesc: "From a single women's wear store in Sweden to one of the largest fashion retailers worldwide.",
                 professorName: "Advisor: Professor Shih-Min Lo",
                 orgTitle: "H&M Group Organization",
-                orgDesc: "H&M Group operates through a flat, egalitarian Scandinavian structure, uniting multiple lifestyle brands and global functions under one roof. The core ethos: 'We Are One Team.'",
+                orgDesc: "H&M Group operates through a flat, egalitarian Scandinavian structure, uniting multiple lifestyle brands and global functions under one roof. Its centralized matrix organizational structure integrates brand business units vertically with shared functional centers horizontally, enabling cross-brand collaboration and unified governance. The core ethos: 'We Are One Team.'",
                 orgBrands: "Our Brands",
                 orgFunctions: "Key Business Functions",
                 orgOffices: "Global Corporate Offices",
@@ -268,7 +268,7 @@
                 historyDesc: "從瑞典的一家女裝店，發展成為全球最大的時尚零售商之一。",
                 professorName: "PMCS G4 指導教授 駱世民",
                 orgTitle: "H&M 集團組織架構",
-                orgDesc: "H&M 集團以扁平化的北歐管理結構運作，將多個生活風格品牌與全球職能整合於同一屋簷下。核心理念：「我們是一個團隊」。",
+                orgDesc: "H&M 集團以扁平化的北歐管理結構運作，將多個生活風格品牌與全球職能整合於同一屋簷下。集團採用集中化矩陣組織架構，垂直整合各品牌事業單位，水平連結共用職能中心，實現跨品牌協作與統一治理。核心理念：「我們是一個團隊」。",
                 orgBrands: "旗下品牌",
                 orgFunctions: "核心業務職能",
                 orgOffices: "全球企業據點",
@@ -334,7 +334,15 @@
         // --- COMPONENTS ---
 
         // 1. Fiori Shell Bar (Global Header)
-        const ShellBar = ({ navigateTo, currentView, toggleSidebar, lang, setLang, theme, setTheme, announcePage, isSpeaking, stopSpeech, dict }) => (
+        const ShellBar = ({ navigateTo, currentView, toggleSidebar, lang, setLang, theme, setTheme, announcePage, isSpeaking, stopSpeech, dict, username, onLogout }) => {
+            const [showUserMenu, setShowUserMenu] = useState(false);
+            const userMenuRef = useRef();
+            useEffect(() => {
+                const handler = (e) => { if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setShowUserMenu(false); };
+                document.addEventListener('mousedown', handler);
+                return () => document.removeEventListener('mousedown', handler);
+            }, []);
+            return (
             <header className="fixed top-0 left-0 right-0 h-12 bg-[#e50010] dark:bg-gray-950 text-white flex items-center justify-between px-3 z-50 shadow-md transition-colors duration-300">
                 <div className="flex items-center gap-2 sm:gap-4">
                     <button onClick={toggleSidebar} className="p-1.5 hover:bg-white/20 rounded transition-colors" aria-label={dict.sidebarMenu}>
@@ -391,15 +399,50 @@
                         <Bell size={18} />
                         <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-yellow-400 rounded-full border border-[#e50010]"></span>
                     </button>
-                    <button className="p-2 hover:bg-white/20 rounded-full transition-colors">
-                        <User size={18} />
-                    </button>
+                    {/* User profile button with dropdown */}
+                    <div className="relative" ref={userMenuRef}>
+                        <button
+                            onClick={() => setShowUserMenu(v => !v)}
+                            className="flex items-center gap-1.5 p-1.5 hover:bg-white/20 rounded-full transition-colors"
+                            title={lang === 'zh' ? '使用者資訊' : 'User Profile'}
+                        >
+                            <div className="w-7 h-7 rounded-full bg-white/30 flex items-center justify-center text-white font-bold text-xs select-none">
+                                {username ? username[0].toUpperCase() : <User size={16} />}
+                            </div>
+                            <span className="text-xs font-medium hidden sm:block max-w-[80px] truncate">{username}</span>
+                        </button>
+                        {showUserMenu && (
+                            <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
+                                <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-[#e50010] flex items-center justify-center text-white font-bold text-base select-none shrink-0">
+                                            {username ? username[0].toUpperCase() : '?'}
+                                        </div>
+                                        <div className="overflow-hidden">
+                                            <p className="font-bold text-gray-900 dark:text-white text-sm truncate">{username}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{username ? `${username.toLowerCase()}@hmgroup.com` : ''}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="py-1">
+                                    <button
+                                        onClick={() => { setShowUserMenu(false); onLogout(); }}
+                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-sm"
+                                    >
+                                        <Icon name="LogOut" size={16} className="text-red-500" />
+                                        <span>{lang === 'zh' ? '登出' : 'Sign Out'}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </header>
-        );
+            );
+        };
 
         // 2. Sidebar / Hamburger Menu
-        const Sidebar = ({ isOpen, toggleSidebar, dict, navigateTo, apps }) => (
+        const Sidebar = ({ isOpen, toggleSidebar, dict, navigateTo, apps, username, onLogout, lang }) => (
             <React.Fragment>
                 {isOpen && (
                     <div className="fixed inset-0 bg-black/50 z-50 transition-opacity" onClick={toggleSidebar} />
@@ -410,6 +453,18 @@
                         <button onClick={toggleSidebar} className="p-1 hover:bg-white/20 rounded">
                             <X size={20} />
                         </button>
+                    </div>
+                    {/* User info section */}
+                    <div className="px-4 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 shrink-0">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-[#e50010] flex items-center justify-center text-white font-bold text-base select-none shrink-0">
+                                {username ? username[0].toUpperCase() : '?'}
+                            </div>
+                            <div className="overflow-hidden">
+                                <p className="font-bold text-gray-900 dark:text-white text-sm truncate">{username}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{username ? `${username.toLowerCase()}@hmgroup.com` : ''}</p>
+                            </div>
+                        </div>
                     </div>
                     <div className="flex-1 overflow-y-auto py-2">
                         <button onClick={() => { navigateTo('launchpad'); toggleSidebar(); }} className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -448,6 +503,16 @@
                         <button className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                             <HelpCircle size={18} className="text-gray-500 dark:text-gray-400" />
                             <span>{dict.help}</span>
+                        </button>
+                    </div>
+                    {/* Logout button at bottom of sidebar */}
+                    <div className="shrink-0 border-t border-gray-100 dark:border-gray-700 p-2">
+                        <button
+                            onClick={() => { toggleSidebar(); onLogout(); }}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        >
+                            <Icon name="LogOut" size={18} className="text-red-500" />
+                            <span className="text-sm font-medium">{lang === 'zh' ? '登出' : 'Sign Out'}</span>
                         </button>
                     </div>
                 </div>
@@ -787,7 +852,7 @@
                 { label: zh ? '包裝減少塑料量（較2018年基線）' : 'Plastic Packaging Reduction vs 2018', value: '-54%', goal: '-25% by 2025 ✓', pct: 100, color: 'bg-purple-500' },
             ];
             const recentReports = [
-                { year: '2025', title: zh ? '2025 年度與永續發展報告' : 'Annual and Sustainability Report 2025', link: '#', disabled: true },
+                { year: '2025', title: zh ? '2025 年度與永續發展報告' : 'Annual and Sustainability Report 2025', link: 'HM-Group-Annual-and-sustainability-report-2025.pdf', download: 'HM-Group-Annual-and-sustainability-report-2025.pdf' },
                 { year: '2024', title: zh ? '2024 年度與永續發展報告' : 'Annual and Sustainability Report 2024', link: 'HM-Group-Annual-and-sustainability-report-2024.pdf', download: 'HM-Group-Annual-and-sustainability-report-2024.pdf' },
                 { year: '2023', title: zh ? '2023 年度與永續發展報告' : 'Annual and Sustainability Report 2023', link: 'HM-Group-Annual-and-Sustainability-Report-2023.pdf', download: 'HM-Group-Annual-and-Sustainability-Report-2023.pdf' },
             ];
@@ -1878,11 +1943,11 @@
             ];
 
             const members = [
-                { name: 'Zoe', role: lang === 'zh' ? '組長' : 'Team Lead', tools: ['Gemini', 'Claude', 'NotebookLM'], usage_en: 'Used NotebookLM to organize data and Gemini and Claude to create the overall webpage.', usage_zh: '使用 NotebookLM 整理資料，並使用 Gemini 和 Claude 建立整體網頁。' },
-                { name: 'Jenifer', role: lang === 'zh' ? '內容研究' : 'Content Research', tools: ['Claude', 'ChatGPT', 'Gemini'], usage_en: 'Used ChatGPT to organize and generate the overall data analysis, Gemini to create visuals and webpage elements, and Claude to recheck the results and add supporting data. Also experienced creating an overall organizational retail webpage by combining different datasets, visuals, and AI-generated content into one platform.', usage_zh: '使用 ChatGPT 整理並生成整體資料分析，使用 Gemini 製作視覺元素與網頁元素，並使用 Claude 複核結果並補充佐證資料。同時也體驗了將不同資料集、視覺素材與 AI 生成內容整合為一個平台，建立完整組織零售網頁的過程。' },
-                { name: 'Andy', role: lang === 'zh' ? '網站開發' : 'Web Development', tools: ['Gemini', 'ChatGPT'], usage_en: 'I used Gemini and ChatGPT to organize the H&M data, and let Gemini\'s canvas generate preliminary code.', usage_zh: '使用 Gemini 和 ChatGPT 整理 H&M 的資料，並讓 Gemini 的 Canvas 生成初步的程式碼。' },
-                { name: 'Jessica', role: lang === 'zh' ? '小組組長 · 職缺分析' : 'Team Leader · Job Analysis', tools: ['Gemini', 'ChatGPT'], usage_en: 'Used Gemini and ChatGPT to support finding and searching for information in this program.', usage_zh: '在本專案中使用 Gemini 和 ChatGPT 協助查找與搜尋資訊。' },
-                { name: 'Diana', role: lang === 'zh' ? '網站開發' : 'Web Development', tools: ['Gemini', 'Claude', 'NotebookLM'], usage_en: 'I used NotebookLM to organize company information and used Gemini and Claude to build websites.', usage_zh: '使用 NotebookLM 整理公司資訊，並使用 Gemini 和 Claude 建立網站。' },
+                { name: 'Zoe', role: '', tools: ['Gemini', 'Claude', 'NotebookLM'], usage_en: 'Used NotebookLM to organize data and Gemini and Claude to create the overall webpage.', usage_zh: '使用 NotebookLM 整理資料，並使用 Gemini 和 Claude 建立整體網頁。' },
+                { name: 'Jenifer', role: '', tools: ['Claude', 'ChatGPT', 'Gemini'], usage_en: 'Used ChatGPT to organize and generate the overall data analysis, Gemini to create visuals and webpage elements, and Claude to recheck the results and add supporting data. Also experienced creating an overall organizational retail webpage by combining different datasets, visuals, and AI-generated content into one platform.', usage_zh: '使用 ChatGPT 整理並生成整體資料分析，使用 Gemini 製作視覺元素與網頁元素，並使用 Claude 複核結果並補充佐證資料。同時也體驗了將不同資料集、視覺素材與 AI 生成內容整合為一個平台，建立完整組織零售網頁的過程。' },
+                { name: 'Andy', role: '', tools: ['Gemini', 'ChatGPT'], usage_en: 'I used Gemini and ChatGPT to organize the H&M data, and let Gemini\'s canvas generate preliminary code.', usage_zh: '使用 Gemini 和 ChatGPT 整理 H&M 的資料，並讓 Gemini 的 Canvas 生成初步的程式碼。' },
+                { name: 'Jessica', role: '', tools: ['Gemini', 'ChatGPT'], usage_en: 'Used Gemini and ChatGPT to support finding and searching for information in this program.', usage_zh: '在本專案中使用 Gemini 和 ChatGPT 協助查找與搜尋資訊。' },
+                { name: 'Diana', role: '', tools: ['Gemini', 'Claude', 'NotebookLM'], usage_en: 'I used NotebookLM to organize company information and used Gemini and Claude to build websites.', usage_zh: '使用 NotebookLM 整理公司資訊，並使用 Gemini 和 Claude 建立網站。' },
             ];
 
             const usageCases = [
@@ -1967,7 +2032,7 @@
                                             </div>
                                             <div>
                                                 <p className="font-bold text-gray-900 dark:text-white">{m.name}</p>
-                                                <p className="text-xs text-purple-600 dark:text-purple-400">{m.role}</p>
+                                                {m.role && <p className="text-xs text-purple-600 dark:text-purple-400">{m.role}</p>}
                                             </div>
                                         </div>
                                         <div className="flex flex-wrap gap-1 justify-end">
@@ -2057,6 +2122,19 @@
             const [theme, setTheme] = useState('light');
             const [isSidebarOpen, setSidebarOpen] = useState(false);
             const [isSpeaking, setIsSpeaking] = useState(false);
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+            const [loginError, setLoginError] = useState('');
+
+            const handleLogin = (e) => {
+                e && e.preventDefault && e.preventDefault();
+                if (loginForm.username.trim() && loginForm.password.trim()) {
+                    setIsLoggedIn(true);
+                    setLoginError('');
+                } else {
+                    setLoginError(lang === 'zh' ? '請輸入帳號與密碼' : 'Please enter username and password');
+                }
+            };
 
             // 處理深淺色模式的切換 (注入到 HTML 標籤上以便 Tailwind 識別)
             useEffect(() => {
@@ -2068,6 +2146,80 @@
             }, [theme]);
 
             const dict = translations[lang];
+
+            if (!isLoggedIn) {
+                return (
+                    <div className={`h-screen flex items-center justify-center bg-[#f4f4f5] dark:bg-gray-900 font-sans antialiased transition-colors duration-300 ${theme === 'dark' ? 'dark' : ''}`}
+                        style={{fontFamily:'"Lora","Noto Serif TC",ui-serif,Georgia,serif'}}>
+                        <div className="w-full max-w-sm mx-4">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                {/* Login header */}
+                                <div className="bg-[#e50010] px-8 py-8 text-center">
+                                    <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-3">
+                                        <span className="text-white font-bold text-2xl tracking-widest">H&M</span>
+                                    </div>
+                                    <h1 className="text-white font-bold text-xl tracking-wide">
+                                        {lang === 'zh' ? 'H&M 企業入口網站' : 'H&M Enterprise Portal'}
+                                    </h1>
+                                    <p className="text-white/80 text-xs mt-1">
+                                        {lang === 'zh' ? '請登入以繼續' : 'Please sign in to continue'}
+                                    </p>
+                                </div>
+                                {/* Login form */}
+                                <div className="px-8 py-8">
+                                    <div className="mb-5">
+                                        <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1.5 uppercase tracking-wider">
+                                            {lang === 'zh' ? '帳號' : 'Username'}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={loginForm.username}
+                                            onChange={e => setLoginForm(f => ({ ...f, username: e.target.value }))}
+                                            onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                                            className="w-full bg-gray-100 dark:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg py-2.5 px-4 text-sm focus:bg-white dark:focus:bg-gray-600 focus:border-[#e50010] focus:ring-1 focus:ring-[#e50010] outline-none transition-all"
+                                            placeholder={lang === 'zh' ? '請輸入帳號' : 'Enter username'}
+                                        />
+                                    </div>
+                                    <div className="mb-6">
+                                        <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1.5 uppercase tracking-wider">
+                                            {lang === 'zh' ? '密碼' : 'Password'}
+                                        </label>
+                                        <input
+                                            type="password"
+                                            value={loginForm.password}
+                                            onChange={e => setLoginForm(f => ({ ...f, password: e.target.value }))}
+                                            onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                                            className="w-full bg-gray-100 dark:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg py-2.5 px-4 text-sm focus:bg-white dark:focus:bg-gray-600 focus:border-[#e50010] focus:ring-1 focus:ring-[#e50010] outline-none transition-all"
+                                            placeholder={lang === 'zh' ? '請輸入密碼' : 'Enter password'}
+                                        />
+                                    </div>
+                                    {loginError && (
+                                        <p className="text-[#e50010] text-xs mb-4 text-center">{loginError}</p>
+                                    )}
+                                    <button
+                                        onClick={handleLogin}
+                                        className="w-full bg-[#e50010] hover:bg-red-700 text-white font-semibold py-2.5 rounded-lg transition-colors text-sm tracking-wide"
+                                    >
+                                        {lang === 'zh' ? '登入' : 'Sign In'}
+                                    </button>
+                                    <div className="mt-4 flex justify-center">
+                                        <button
+                                            onClick={() => setLang(lang === 'en' ? 'zh' : 'en')}
+                                            className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors flex items-center gap-1"
+                                        >
+                                            <Globe size={14} />
+                                            {lang === 'zh' ? 'English' : '繁體中文'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
+                                {lang === 'zh' ? '僅供學術用途。非 H&M 官方網站。' : 'For academic purposes only. Not an official H&M website.'}
+                            </p>
+                        </div>
+                    </div>
+                );
+            }
 
             const getLaunchpadTiles = () => [
                 { id: 'team', title: dict.teamIntro, subtitle: dict.teamIntroSub, icon: Users, info: '', color: 'text-[#e50010]', type: 'placeholder' },
@@ -2364,7 +2516,7 @@
 
             return (
                 <div className="h-screen flex flex-col bg-[#f4f4f5] dark:bg-gray-900 font-sans antialiased selection:bg-red-200 dark:selection:bg-red-900 transition-colors duration-300 overflow-hidden">
-                    <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} dict={dict} navigateTo={navigateTo} apps={getLaunchpadTiles()} />
+                    <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} dict={dict} navigateTo={navigateTo} apps={getLaunchpadTiles()} username={loginForm.username} onLogout={() => { setIsLoggedIn(false); setLoginForm({ username: '', password: '' }); }} lang={lang} />
                     
                     <ShellBar 
                         navigateTo={navigateTo} 
@@ -2376,6 +2528,8 @@
                         isSpeaking={isSpeaking}
                         stopSpeech={() => { window.speechSynthesis.cancel(); setIsSpeaking(false); }}
                         dict={dict}
+                        username={loginForm.username}
+                        onLogout={() => { setIsLoggedIn(false); setLoginForm({ username: '', password: '' }); }}
                     />
                     
                     <main className="mt-12 flex-1 overflow-y-auto flex flex-col relative">
