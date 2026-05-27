@@ -105,7 +105,8 @@
         const Mail = (props) => <Icon name="Mail" {...props} />;
         const Download = (props) => <Icon name="Download" {...props} />;
         const FileText = (props) => <Icon name="FileText" {...props} />;
-        const Cpu = (props) => <Icon name="Cpu" {...props} />;
+        const LogIn = (props) => <Icon name="LogIn" {...props} />;
+        const LogOut = (props) => <Icon name="LogOut" {...props} />;
 
         // --- TRANSLATIONS (中英雙語字典) ---
         const translations = {
@@ -333,8 +334,106 @@
 
         // --- COMPONENTS ---
 
+        // 0. Login Screen
+        const LoginScreen = ({ onLogin, lang }) => {
+            const zh = lang === 'zh';
+            const [username, setUsername] = useState('');
+            const [password, setPassword] = useState('');
+            const [error, setError] = useState('');
+            const [showPw, setShowPw] = useState(false);
+
+            const DEMO_USERS = [
+                { username: 'jessica', password: '1234', displayName: 'Jessica', role: zh ? '小組組長' : 'Team Leader', avatar: 'https://docs.google.com/drawings/d/15bFTcqPVi7aWEHrkRMttfkMtp3JXgl08VVLDN9PhBvw/export/png' },
+                { username: 'zoe', password: '1234', displayName: 'Zoe', role: zh ? '組員' : 'Member', avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vT3GowRFbpQUPiAfEfESNVYxIc4VowV3C2anBriUAbb69nVU_G2Z9m6JguwOai16wa6FH7SXicYz2QA/pub?w=960&h=720' },
+                { username: 'jenifer', password: '1234', displayName: 'Jenifer', role: zh ? '組員' : 'Member', avatar: 'https://docs.google.com/drawings/d/1RVszW1iDlLvW3ce8XjK1QOQWvAs2_GJsE3cYuILSoJQ/export/png' },
+                { username: 'andy', password: '1234', displayName: 'Andy', role: zh ? '組員' : 'Member', avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vRCTmMzqtWUwbotOGbnYsXhSzKJ70iUJJZ10qeM4elCTzn5DsVfIK-tcp10nGwn7fvmmw1y9w2GRr0p/pub?w=960&h=720' },
+                { username: 'diana', password: '1234', displayName: 'Diana', role: zh ? '組員' : 'Member', avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vTWNLvcq8mhr9lEH3ER1aAkRSslXv7wbELrTuTeJbB_eOALJDGKyZ1_G9K2cQgAnaM_G5ZxBTcIx9W0/pub?w=960&h=720' },
+                { username: 'guest', password: 'guest', displayName: zh ? '訪客' : 'Guest', role: zh ? '訪客' : 'Guest', avatar: null },
+            ];
+
+            const handleLogin = () => {
+                const u = DEMO_USERS.find(u => u.username === username.toLowerCase().trim() && u.password === password);
+                if (u) {
+                    onLogin({ displayName: u.displayName, role: u.role, avatar: u.avatar, username: u.username });
+                } else {
+                    setError(zh ? '帳號或密碼錯誤，請再試一次。' : 'Incorrect username or password. Please try again.');
+                }
+            };
+
+            return (
+                <div className="fixed inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center z-[100] p-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+                        {/* Header */}
+                        <div className="bg-[#e50010] px-8 py-8 text-white text-center">
+                            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <span className="text-3xl font-black text-white tracking-tighter">H&M</span>
+                            </div>
+                            <h1 className="text-xl font-bold tracking-wide">{zh ? 'H&M 企業入口網站' : 'H&M Enterprise Portal'}</h1>
+                            <p className="text-white/75 text-xs mt-1">PMCS G4 · {zh ? '請登入以繼續' : 'Sign in to continue'}</p>
+                        </div>
+
+                        {/* Form */}
+                        <div className="px-8 py-7">
+                            <div className="mb-4">
+                                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
+                                    {zh ? '帳號' : 'Username'}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={username}
+                                    onChange={e => { setUsername(e.target.value); setError(''); }}
+                                    onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                                    placeholder={zh ? '輸入帳號（如 jessica）' : 'Enter username (e.g. jessica)'}
+                                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#e50010] focus:border-transparent transition"
+                                />
+                            </div>
+                            <div className="mb-5 relative">
+                                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
+                                    {zh ? '密碼' : 'Password'}
+                                </label>
+                                <input
+                                    type={showPw ? 'text' : 'password'}
+                                    value={password}
+                                    onChange={e => { setPassword(e.target.value); setError(''); }}
+                                    onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                                    placeholder={zh ? '輸入密碼' : 'Enter password'}
+                                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#e50010] focus:border-transparent transition pr-10"
+                                />
+                                <button type="button" onClick={() => setShowPw(v => !v)}
+                                    className="absolute right-3 bottom-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                                    <Icon name={showPw ? 'EyeOff' : 'Eye'} size={16} />
+                                </button>
+                            </div>
+
+                            {error && (
+                                <div className="mb-4 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2">
+                                    {error}
+                                </div>
+                            )}
+
+                            <button onClick={handleLogin}
+                                className="w-full bg-[#e50010] hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition-colors text-sm flex items-center justify-center gap-2">
+                                <LogIn size={16} />
+                                {zh ? '登入' : 'Sign In'}
+                            </button>
+
+                            <div className="mt-5 bg-gray-50 dark:bg-gray-700/50 rounded-lg px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
+                                <p className="font-semibold mb-1 text-gray-600 dark:text-gray-300">{zh ? '示範帳號：' : 'Demo accounts:'}</p>
+                                <p>{zh ? '成員帳號：' : 'Members: '}<span className="font-mono text-gray-700 dark:text-gray-200">jessica / zoe / jenifer / andy / diana</span></p>
+                                <p className="mt-0.5">{zh ? '訪客：' : 'Guest: '}<span className="font-mono text-gray-700 dark:text-gray-200">guest</span></p>
+                                <p className="mt-0.5">{zh ? '密碼：' : 'Password: '}<span className="font-mono text-gray-700 dark:text-gray-200">1234</span>{zh ? '（訪客請使用 guest）' : ' (guest: guest)'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         // 1. Fiori Shell Bar (Global Header)
-        const ShellBar = ({ navigateTo, currentView, toggleSidebar, lang, setLang, theme, setTheme, announcePage, isSpeaking, stopSpeech, dict }) => (
+        const ShellBar = ({ navigateTo, currentView, toggleSidebar, lang, setLang, theme, setTheme, announcePage, isSpeaking, stopSpeech, dict, user, onLogout }) => {
+            const [showUserMenu, setShowUserMenu] = useState(false);
+            const zh = lang === 'zh';
+            return (
             <header className="fixed top-0 left-0 right-0 h-12 bg-[#e50010] dark:bg-gray-950 text-white flex items-center justify-between px-3 z-50 shadow-md transition-colors duration-300">
                 <div className="flex items-center gap-2 sm:gap-4">
                     <button onClick={toggleSidebar} className="p-1.5 hover:bg-white/20 rounded transition-colors" aria-label={dict.sidebarMenu}>
@@ -360,20 +459,12 @@
                     <button
                         onClick={announcePage}
                         className={`p-2 hover:bg-white/20 rounded-full transition-colors ${isSpeaking ? 'bg-white/20' : ''}`}
-                        title={isSpeaking ? (lang === 'zh' ? '暫停語音' : 'Pause Voice') : dict.voiceGuide}
+                        title={isSpeaking ? (zh ? '暫停語音' : 'Pause Voice') : dict.voiceGuide}
                     >
-                        {isSpeaking
-                            ? <Icon name="PauseCircle" size={18} />
-                            : <Volume2 size={18} />
-                        }
+                        {isSpeaking ? <Icon name="PauseCircle" size={18} /> : <Volume2 size={18} />}
                     </button>
-                    {/* Stop button — only shown while speech is active */}
                     {isSpeaking && (
-                        <button
-                            onClick={stopSpeech}
-                            className="p-2 hover:bg-white/20 rounded-full transition-colors"
-                            title={lang === 'zh' ? '停止語音' : 'Stop Voice'}
-                        >
+                        <button onClick={stopSpeech} className="p-2 hover:bg-white/20 rounded-full transition-colors" title={zh ? '停止語音' : 'Stop Voice'}>
                             <Icon name="StopCircle" size={18} />
                         </button>
                     )}
@@ -391,15 +482,57 @@
                         <Bell size={18} />
                         <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-yellow-400 rounded-full border border-[#e50010]"></span>
                     </button>
-                    <button className="p-2 hover:bg-white/20 rounded-full transition-colors">
-                        <User size={18} />
-                    </button>
+
+                    {/* User Avatar Button */}
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowUserMenu(v => !v)}
+                            className="p-1 hover:bg-white/20 rounded-full transition-colors flex items-center gap-1.5"
+                            title={user ? user.displayName : 'User'}
+                        >
+                            {user?.avatar
+                                ? <img src={user.avatar} alt={user.displayName} className="w-7 h-7 rounded-full object-cover border-2 border-white/50" />
+                                : <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold border-2 border-white/50">
+                                    {user ? user.displayName[0].toUpperCase() : <User size={16} />}
+                                  </div>
+                            }
+                        </button>
+                        {showUserMenu && (
+                            <div className="absolute right-0 top-10 w-52 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-[200] overflow-hidden">
+                                {/* Profile header */}
+                                <div className="px-4 py-4 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3">
+                                    {user?.avatar
+                                        ? <img src={user.avatar} alt={user.displayName} className="w-10 h-10 rounded-full object-cover border-2 border-[#e50010]" />
+                                        : <div className="w-10 h-10 rounded-full bg-[#e50010] flex items-center justify-center text-white font-bold text-base">
+                                            {user ? user.displayName[0].toUpperCase() : '?'}
+                                          </div>
+                                    }
+                                    <div className="overflow-hidden">
+                                        <p className="font-bold text-gray-900 dark:text-white text-sm truncate">{user?.displayName}</p>
+                                        <p className="text-xs text-[#e50010] dark:text-red-400 font-medium truncate">{user?.role}</p>
+                                    </div>
+                                </div>
+                                {/* Menu items */}
+                                <button
+                                    onClick={() => { setShowUserMenu(false); onLogout(); }}
+                                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium"
+                                >
+                                    <LogOut size={16} />
+                                    {zh ? '登出' : 'Sign Out'}
+                                </button>
+                            </div>
+                        )}
+                        {showUserMenu && <div className="fixed inset-0 z-[199]" onClick={() => setShowUserMenu(false)} />}
+                    </div>
                 </div>
             </header>
-        );
+            );
+        };
 
         // 2. Sidebar / Hamburger Menu
-        const Sidebar = ({ isOpen, toggleSidebar, dict, navigateTo, apps }) => (
+        const Sidebar = ({ isOpen, toggleSidebar, dict, navigateTo, apps, user, onLogout, lang }) => {
+            const zh = lang === 'zh';
+            return (
             <React.Fragment>
                 {isOpen && (
                     <div className="fixed inset-0 bg-black/50 z-50 transition-opacity" onClick={toggleSidebar} />
@@ -411,6 +544,23 @@
                             <X size={20} />
                         </button>
                     </div>
+
+                    {/* User Profile Block */}
+                    {user && (
+                        <div className="px-4 py-4 bg-gray-50 dark:bg-gray-700/40 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3">
+                            {user.avatar
+                                ? <img src={user.avatar} alt={user.displayName} className="w-10 h-10 rounded-full object-cover border-2 border-[#e50010] shrink-0" />
+                                : <div className="w-10 h-10 rounded-full bg-[#e50010] flex items-center justify-center text-white font-bold text-base shrink-0">
+                                    {user.displayName[0].toUpperCase()}
+                                  </div>
+                            }
+                            <div className="overflow-hidden">
+                                <p className="font-bold text-gray-900 dark:text-white text-sm truncate">{user.displayName}</p>
+                                <p className="text-xs text-[#e50010] dark:text-red-400 font-medium truncate">{user.role}</p>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="flex-1 overflow-y-auto py-2">
                         <button onClick={() => { navigateTo('launchpad'); toggleSidebar(); }} className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                             <Home size={18} className="text-gray-500 dark:text-gray-400" />
@@ -450,9 +600,21 @@
                             <span>{dict.help}</span>
                         </button>
                     </div>
+
+                    {/* Logout at bottom */}
+                    <div className="border-t border-gray-200 dark:border-gray-700 p-3 shrink-0">
+                        <button
+                            onClick={() => { toggleSidebar(); onLogout(); }}
+                            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium text-sm"
+                        >
+                            <LogOut size={18} />
+                            {zh ? '登出' : 'Sign Out'}
+                        </button>
+                    </div>
                 </div>
             </React.Fragment>
-        );
+            );
+        };
 
         // 3. Fiori Tile Component
         const FioriTile = ({ app, onClick, dict }) => {
@@ -787,7 +949,7 @@
                 { label: zh ? '包裝減少塑料量（較2018年基線）' : 'Plastic Packaging Reduction vs 2018', value: '-54%', goal: '-25% by 2025 ✓', pct: 100, color: 'bg-purple-500' },
             ];
             const recentReports = [
-                { year: '2025', title: zh ? '2025 年度與永續發展報告' : 'Annual and Sustainability Report 2025', link: '#', disabled: true },
+                { year: '2025', title: zh ? '2025 年度與永續發展報告' : 'Annual and Sustainability Report 2025', link: 'HM-Group-Annual-and-sustainability-report-2025.pdf', download: 'HM-Group-Annual-and-sustainability-report-2025.pdf' },
                 { year: '2024', title: zh ? '2024 年度與永續發展報告' : 'Annual and Sustainability Report 2024', link: 'HM-Group-Annual-and-sustainability-report-2024.pdf', download: 'HM-Group-Annual-and-sustainability-report-2024.pdf' },
                 { year: '2023', title: zh ? '2023 年度與永續發展報告' : 'Annual and Sustainability Report 2023', link: 'HM-Group-Annual-and-Sustainability-Report-2023.pdf', download: 'HM-Group-Annual-and-Sustainability-Report-2023.pdf' },
             ];
@@ -1088,17 +1250,13 @@
                                     <a href={r.link}
                                         key={r.year}
                                         download={r.download || undefined}
-                                        target={r.disabled ? undefined : '_blank'}
-                                        rel={r.disabled ? undefined : 'noopener noreferrer'}
-                                        onClick={r.disabled ? (e) => e.preventDefault() : undefined}
-                                        className={`flex flex-col justify-between p-5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl transition-colors group ${r.disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-[#e50010]'}`}>
+                                        className="flex flex-col justify-between p-5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-[#e50010] transition-colors group">
                                         <div>
                                             <FileText className="text-gray-400 group-hover:text-[#e50010] transition-colors mb-3" size={28} />
                                             <p className="font-bold text-gray-800 dark:text-gray-100 text-xl mb-1">{r.year}</p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400">{r.title}</p>
-                                            {r.disabled && <p className="text-xs text-orange-500 dark:text-orange-400 mt-1">{zh ? '即將推出' : 'Coming Soon'}</p>}
                                         </div>
-                                        <div className={`mt-5 flex items-center font-semibold text-xs ${r.disabled ? 'text-gray-400' : 'text-[#e50010] dark:text-red-400 group-hover:underline'}`}>
+                                        <div className="mt-5 flex items-center text-[#e50010] dark:text-red-400 font-semibold text-xs group-hover:underline">
                                             <Download size={14} className="mr-1.5" />{dict.downloadReport}
                                         </div>
                                     </a>
@@ -1244,6 +1402,19 @@
                             <h3 className="font-bold text-base">{dict.orgCulture}</h3>
                             <p className="text-white/90 text-xs mt-1 leading-relaxed">{dict.orgCultureDesc}</p>
                         </div>
+                    </div>
+
+                    {/* Matrix Structure Explanation */}
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-5 mb-6">
+                        <h3 className="font-bold text-blue-800 dark:text-blue-200 text-sm mb-2 flex items-center gap-2">
+                            <span>⬡</span>
+                            {zh ? 'H&M 集中化矩陣組織結構' : 'H&M Centralized Matrix Organizational Structure'}
+                        </h3>
+                        <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
+                            {zh
+                                ? 'H&M 集團採用集中化矩陣組織結構（Centralized Matrix Structure）：以斯德哥爾摩全球總部為核心，統一掌握戰略方向與企業治理。組織由兩條主軸構成——縱向的品牌事業單位軸（H&M、COS、ARKET 等各品牌）與橫向的共用職能中心軸（數位科技、供應鏈、行銷等）。每個品牌在中央統一的政策與流程框架下獨立運作，同時共享職能資源，以實現規模經濟並維持全球一致性。此結構確保各品牌在全球標準下靈活運作，同時避免資源重複投入。'
+                                : 'H&M Group operates under a Centralized Matrix Organizational Structure: its Stockholm Global HQ acts as the central nerve center, setting unified strategic direction and corporate governance. The structure is built on two intersecting axes — vertical Brand Business Units (H&M, COS, ARKET, etc.) and horizontal Shared Functional Centers (Digital Tech, Supply Chain, Marketing, etc.). Each brand operates with autonomy within a centrally defined policy and process framework, while sharing functional resources to achieve economies of scale and maintain global consistency. This ensures each brand can act with agility under a unified global standard, without duplicating resources.'}
+                        </p>
                     </div>
 
                     {/* ── ORG CHART ── */}
@@ -1878,11 +2049,11 @@
             ];
 
             const members = [
-                { name: 'Zoe', role: lang === 'zh' ? '組長' : 'Team Lead', tools: ['Gemini', 'Claude', 'NotebookLM'], usage_en: 'Used NotebookLM to organize data and Gemini and Claude to create the overall webpage.', usage_zh: '使用 NotebookLM 整理資料，並使用 Gemini 和 Claude 建立整體網頁。' },
-                { name: 'Jenifer', role: lang === 'zh' ? '內容研究' : 'Content Research', tools: ['Claude', 'ChatGPT', 'Gemini'], usage_en: 'Used ChatGPT to organize and generate the overall data analysis, Gemini to create visuals and webpage elements, and Claude to recheck the results and add supporting data. Also experienced creating an overall organizational retail webpage by combining different datasets, visuals, and AI-generated content into one platform.', usage_zh: '使用 ChatGPT 整理並生成整體資料分析，使用 Gemini 製作視覺元素與網頁元素，並使用 Claude 複核結果並補充佐證資料。同時也體驗了將不同資料集、視覺素材與 AI 生成內容整合為一個平台，建立完整組織零售網頁的過程。' },
-                { name: 'Andy', role: lang === 'zh' ? '網站開發' : 'Web Development', tools: ['Gemini', 'ChatGPT'], usage_en: 'I used Gemini and ChatGPT to organize the H&M data, and let Gemini\'s canvas generate preliminary code.', usage_zh: '使用 Gemini 和 ChatGPT 整理 H&M 的資料，並讓 Gemini 的 Canvas 生成初步的程式碼。' },
-                { name: 'Jessica', role: lang === 'zh' ? '小組組長 · 職缺分析' : 'Team Leader · Job Analysis', tools: ['Gemini', 'ChatGPT'], usage_en: 'Used Gemini and ChatGPT to support finding and searching for information in this program.', usage_zh: '在本專案中使用 Gemini 和 ChatGPT 協助查找與搜尋資訊。' },
-                { name: 'Diana', role: lang === 'zh' ? '網站開發' : 'Web Development', tools: ['Gemini', 'Claude', 'NotebookLM'], usage_en: 'I used NotebookLM to organize company information and used Gemini and Claude to build websites.', usage_zh: '使用 NotebookLM 整理公司資訊，並使用 Gemini 和 Claude 建立網站。' },
+                { name: 'Zoe', tools: ['Gemini', 'Claude', 'NotebookLM'], usage_en: 'Used NotebookLM to organize data and Gemini and Claude to create the overall webpage.', usage_zh: '使用 NotebookLM 整理資料，並使用 Gemini 和 Claude 建立整體網頁。' },
+                { name: 'Jenifer', tools: ['Claude', 'ChatGPT', 'Gemini'], usage_en: 'Used ChatGPT to organize and generate the overall data analysis, Gemini to create visuals and webpage elements, and Claude to recheck the results and add supporting data. Also experienced creating an overall organizational retail webpage by combining different datasets, visuals, and AI-generated content into one platform.', usage_zh: '使用 ChatGPT 整理並生成整體資料分析，使用 Gemini 製作視覺元素與網頁元素，並使用 Claude 複核結果並補充佐證資料。同時也體驗了將不同資料集、視覺素材與 AI 生成內容整合為一個平台，建立完整組織零售網頁的過程。' },
+                { name: 'Andy', tools: ['Gemini', 'ChatGPT'], usage_en: 'I used Gemini and ChatGPT to organize the H&M data, and let Gemini\'s canvas generate preliminary code.', usage_zh: '使用 Gemini 和 ChatGPT 整理 H&M 的資料，並讓 Gemini 的 Canvas 生成初步的程式碼。' },
+                { name: 'Jessica', tools: ['Gemini', 'ChatGPT'], usage_en: 'Used Gemini and ChatGPT to support finding and searching for information in this program.', usage_zh: '在本專案中使用 Gemini 和 ChatGPT 協助查找與搜尋資訊。' },
+                { name: 'Diana', tools: ['Gemini', 'Claude', 'NotebookLM'], usage_en: 'I used NotebookLM to organize company information and used Gemini and Claude to build websites.', usage_zh: '使用 NotebookLM 整理公司資訊，並使用 Gemini 和 Claude 建立網站。' },
             ];
 
             const usageCases = [
@@ -1965,10 +2136,7 @@
                                             <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-700 dark:text-purple-300 font-bold text-lg">
                                                 {m.name[0]}
                                             </div>
-                                            <div>
-                                                <p className="font-bold text-gray-900 dark:text-white">{m.name}</p>
-                                                <p className="text-xs text-purple-600 dark:text-purple-400">{m.role}</p>
-                                            </div>
+                                            <p className="font-bold text-gray-900 dark:text-white">{m.name}</p>
                                         </div>
                                         <div className="flex flex-wrap gap-1 justify-end">
                                             {m.tools.map(t => (
@@ -2057,6 +2225,7 @@
             const [theme, setTheme] = useState('light');
             const [isSidebarOpen, setSidebarOpen] = useState(false);
             const [isSpeaking, setIsSpeaking] = useState(false);
+            const [user, setUser] = useState(null);
 
             // 處理深淺色模式的切換 (注入到 HTML 標籤上以便 Tailwind 識別)
             useEffect(() => {
@@ -2083,6 +2252,9 @@
                 setCurrentView(view);
                 setSelectedApp(appData);
             };
+
+            const handleLogin = (userData) => setUser(userData);
+            const handleLogout = () => { setUser(null); setCurrentView('launchpad'); setSelectedApp(null); window.speechSynthesis && window.speechSynthesis.cancel(); setIsSpeaking(false); };
 
             const announcePage = () => {
                 if (!('speechSynthesis' in window)) {
@@ -2364,7 +2536,8 @@
 
             return (
                 <div className="h-screen flex flex-col bg-[#f4f4f5] dark:bg-gray-900 font-sans antialiased selection:bg-red-200 dark:selection:bg-red-900 transition-colors duration-300 overflow-hidden">
-                    <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} dict={dict} navigateTo={navigateTo} apps={getLaunchpadTiles()} />
+                    {!user && <LoginScreen onLogin={handleLogin} lang={lang} />}
+                    <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} dict={dict} navigateTo={navigateTo} apps={getLaunchpadTiles()} user={user} onLogout={handleLogout} lang={lang} />
                     
                     <ShellBar 
                         navigateTo={navigateTo} 
@@ -2376,6 +2549,8 @@
                         isSpeaking={isSpeaking}
                         stopSpeech={() => { window.speechSynthesis.cancel(); setIsSpeaking(false); }}
                         dict={dict}
+                        user={user}
+                        onLogout={handleLogout}
                     />
                     
                     <main className="mt-12 flex-1 overflow-y-auto flex flex-col relative">
