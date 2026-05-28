@@ -59,7 +59,24 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect, useRef, useCallback } = React;
+
+        // Chrome speechSynthesis bug fix: long utterances silently pause after ~15s.
+        // We keep a ref to the resume interval so we can clear it when speech ends.
+        const _speechResumeInterval = { current: null };
+        function startSpeechResumeTimer() {
+            clearInterval(_speechResumeInterval.current);
+            _speechResumeInterval.current = setInterval(() => {
+                if (window.speechSynthesis && window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                    window.speechSynthesis.pause();
+                    window.speechSynthesis.resume();
+                }
+            }, 10000);
+        }
+        function stopSpeechResumeTimer() {
+            clearInterval(_speechResumeInterval.current);
+            _speechResumeInterval.current = null;
+        }
 
         // --- 圖示包裝器 (Icon Wrapper) ---
         // 這個元件用來將 Lucide 圖示動態生成並整合進 React 中
@@ -106,6 +123,10 @@
         const Download = (props) => <Icon name="Download" {...props} />;
         const FileText = (props) => <Icon name="FileText" {...props} />;
         const Cpu = (props) => <Icon name="Cpu" {...props} />;
+        const Sparkles = (props) => <Icon name="Sparkles" {...props} />;
+        const ChevronRight = (props) => <Icon name="ChevronRight" {...props} />;
+        const ChevronLeft = (props) => <Icon name="ChevronLeft" {...props} />;
+        const Wand2 = (props) => <Icon name="Wand2" {...props} />;
 
         // --- TRANSLATIONS (中英雙語字典) ---
         const translations = {
@@ -143,7 +164,9 @@
                 quantity: "Qty",
                 unitPrice: "Unit Price",
                 total: "Total",
-                sidebarMenu: "Main Menu",
+                sidebarMenu: "職涯發展小精靈 ✨",
+                careerWizard: "Career Development Wizard",
+                careerWizardSub: "Find Your Perfect Role",
                 settings: "Settings",
                 help: "Help & Support",
                 allRightsReserved: "All rights reserved.",
@@ -249,7 +272,9 @@
                 quantity: "數量",
                 unitPrice: "單價",
                 total: "總計",
-                sidebarMenu: "主選單",
+                sidebarMenu: "職涯發展小精靈 ✨",
+                careerWizard: "職涯發展嚮導",
+                careerWizardSub: "找到最適合的職缺",
                 settings: "系統設定",
                 help: "說明與支援",
                 allRightsReserved: "保留所有權利。",
@@ -442,7 +467,7 @@
         };
 
         // 2. Sidebar / Hamburger Menu
-        const Sidebar = ({ isOpen, toggleSidebar, dict, navigateTo, apps, username, onLogout, lang }) => (
+        const Sidebar = ({ isOpen, toggleSidebar, dict, navigateTo, apps, username, onLogout, lang, setLang, theme, setTheme }) => (
             <React.Fragment>
                 {isOpen && (
                     <div className="fixed inset-0 bg-black/50 z-50 transition-opacity" onClick={toggleSidebar} />
@@ -492,15 +517,19 @@
                                         </button>
                                     );
                                 })}
+                                <button className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" onClick={() => { navigateTo('career-wizard'); toggleSidebar(); }}>
+                                    <Sparkles size={18} className="text-purple-500 dark:text-purple-400" />
+                                    <span className="text-sm font-medium">{dict.careerWizard}</span>
+                                </button>
                                 <div className="my-2 border-t border-gray-100 dark:border-gray-700"></div>
                             </React.Fragment>
                         )}
 
-                        <button className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <button className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" onClick={() => { navigateTo('settings'); toggleSidebar(); }}>
                             <Settings size={18} className="text-gray-500 dark:text-gray-400" />
                             <span>{dict.settings}</span>
                         </button>
-                        <button className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <button className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" onClick={() => { navigateTo('help'); toggleSidebar(); }}>
                             <HelpCircle size={18} className="text-gray-500 dark:text-gray-400" />
                             <span>{dict.help}</span>
                         </button>
@@ -520,11 +549,11 @@
         );
 
         // 3. Fiori Tile Component
-        const FioriTile = ({ app, onClick, dict }) => {
+        const FioriTile = ({ app, onClick, onCareerWizard, dict }) => {
             const AppIcon = app.icon;
             return (
                 <button 
-                    onClick={() => onClick(app)}
+                    onClick={() => app.type === 'career-wizard' ? onCareerWizard() : onClick(app)}
                     className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 w-full h-44 flex flex-col justify-between text-left shadow-sm hover:shadow-md dark:hover:shadow-gray-900 transition-all group focus:outline-none focus:ring-2 focus:ring-[#e50010] active:scale-95"
                 >
                     <div>
@@ -704,7 +733,7 @@
                 { 
                     id: 1, initial: 'M1', 
                     avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vT3GowRFbpQUPiAfEfESNVYxIc4VowV3C2anBriUAbb69nVU_G2Z9m6JguwOai16wa6FH7SXicYz2QA/pub?w=960&h=720',
-                    name: 'Zoe', studentId: '113251013', slogan: '" HA! HA! "',
+                    name: 'Zoe', studentId: '113251013', slogan: '" HA! HA! "', email: 's113251013@mail1.ncnu.edu.tw',
                     role_en: 'Interdisciplinary Program of College of Management', role_zh: '管理學院學士班',
                     desc_en: "I'm Zoe. Working with my team to create this TP website not only improved my keyword skills and helped me create beautiful web pages, but also gave me a deeper understanding of the work of a product manager (PM).",
                     desc_zh: '我是 Zoe。與團隊合作建立這個 TP 網站，不僅提升了我的關鍵字技巧，幫助我製作出美觀的網頁，也讓我對產品經理（PM）的工作有了更深入的了解。'
@@ -712,7 +741,7 @@
                 { 
                     id: 2, initial: 'M2', 
                     avatar: 'https://docs.google.com/drawings/d/1RVszW1iDlLvW3ce8XjK1QOQWvAs2_GJsE3cYuILSoJQ/export/png',
-                    name: 'Jenifer', studentId: '113212044', slogan: '"Wear what reflects you"',
+                    name: 'Jenifer', studentId: '113212044', slogan: '"Wear what reflects you"', email: 's113212044@mail1.ncnu.edu.tw',
                     role_en: 'International Business Studies', role_zh: '國際企業學系',
                     desc_en: 'Good day everyone, I am Jenifer one of the H&M website developers. Here we want to provide interesting yet complete information about our company. Our aim is to bring confidence in every designs we pour our heart into.',
                     desc_zh: '大家好，我是 Jenifer，H&M 網站開發團隊的成員之一。我們希望提供有趣且完整的公司資訊，目標是在每一個用心設計中帶給大家自信。'
@@ -720,7 +749,7 @@
                 { 
                     id: 3, initial: 'M3', 
                     avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vRCTmMzqtWUwbotOGbnYsXhSzKJ70iUJJZ10qeM4elCTzn5DsVfIK-tcp10nGwn7fvmmw1y9w2GRr0p/pub?w=960&h=720',
-                    name: 'Andy', studentId: '114400003', slogan: '"Your choice, your responsibility"',
+                    name: 'Andy', studentId: '114400003', slogan: '"Your choice, your responsibility"', email: 's114400003@mail1.ncnu.edu.tw',
                     role_en: 'Department of Counseling Psychology and Human Resource Development', role_zh: '諮商心理與人力資源發展學系',
                     desc_en: "While building this website, what I learned most was how to give the correct commands to prevent Gemini from crashing or failing to function. Our goal is to present H&M's information and background more comprehensively.",
                     desc_zh: '在建立這個網站的過程中，我學到最多的是如何下達正確的指令，以防止 Gemini 崩潰或無法正常運作。我們的目標是更完整地呈現 H&M 的資訊與背景。'
@@ -728,7 +757,7 @@
                 { 
                     id: 4, initial: 'M4', 
                     avatar: 'https://docs.google.com/drawings/d/15bFTcqPVi7aWEHrkRMttfkMtp3JXgl08VVLDN9PhBvw/export/png',
-                    name: 'Jessica', studentId: '111101002', slogan: '"Wear the clothes you like, do the things you like."',
+                    name: 'Jessica', studentId: '111101002', slogan: '"Wear the clothes you like, do the things you like."', email: 's111101002@mail1.ncnu.edu.tw',
                     role_en: 'Team Leader · Chinese Literature', role_zh: '小組組長 · 中國語文學系',
                     desc_en: "I'm Jessica. A member of the H&M website developer team. The main core we want to provide is about the running of the company and marketing structure of H&M. Our ambition and aim is that people simple and clearly recognize the operating of H&M.",
                     desc_zh: '我是 Jessica，H&M 網站開發團隊的成員。我們的核心目標是提供有關公司運營與行銷架構的資訊，希望讓大家能簡單清楚地了解 H&M 的運作方式。'
@@ -736,7 +765,7 @@
                 { 
                     id: 5, initial: 'M5', 
                     avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vTWNLvcq8mhr9lEH3ER1aAkRSslXv7wbELrTuTeJbB_eOALJDGKyZ1_G9K2cQgAnaM_G5ZxBTcIx9W0/pub?w=960&h=720',
-                    name: 'Diana', studentId: '111212029', slogan: '"Surface for breath, dive for truth. A frequency for no one."',
+                    name: 'Diana', studentId: '111212029', slogan: '"Surface for breath, dive for truth. A frequency for no one."', email: 's111212029@mail1.ncnu.edu.tw',
                     role_en: 'International Business Studies 4', role_zh: '國際企業學系四年級',
                     desc_en: 'As a member of the development team, I learned to prioritize user-centric functional design and create engaging interactive elements to enhance the overall user experience. We hope this website will help you learn more about us！',
                     desc_zh: '作為開發團隊的一員，我學會了以使用者為中心進行功能設計，並創造引人入勝的互動元素以提升整體使用者體驗。希望這個網站能幫助您更了解我們！'
@@ -745,10 +774,10 @@
                     id: 6, initial: 'Prof.', 
                     avatar: 'https://docs.google.com/drawings/d/e/2PACX-1vTqwyFT7oLgPTSI9cBSOxmxfquRweIMarYkMjolusIb8MvzNJrx2UGXkNeDm5QTs8dt7JXagQuzHMjm/pub?w=960&h=720',
                     name_en: 'Shih-Min Lo, Ph.D.', name_zh: '駱世民 博士 (Shih-Min Lo, Ph.D.)',
-                    studentId: '', slogan: '"Learning by doing."',
+                    studentId: '', slogan: '"Learning by doing."',email: 'smlo@ncnu.edu.tw',
                     role_en: 'Project Advisor', role_zh: '專題指導教授',
                     desc_en: 'Professor at NCNU Dept. of International Business Studies. Expertise in strategy, platform business models, and entrepreneurship. Special thanks to Prof. Lo for guiding the PMCS G4 team! (Email: smlo@ncnu.edu.tw)',
-                    desc_zh: '國立暨南國際大學國際企業學系專任教授。研究領域涵蓋國際企業經營策略、產業與競爭分析、創新與創業管理及平台商業模式。感謝駱教授帶領 PMCS G4 團隊順利完成本次專題開發！(Email: smlo@ncnu.edu.tw)'
+                    desc_zh: '國立暨南國際大學國際企業學系專任教授。研究領域涵蓋國際企業經營策略、產業與競爭分析、創新與創業管理及平台商業模式。感謝駱教授帶領 PMCS G4 團隊順利完成本次專題開發！'
                 },
             ];
             const teamMembers = teamMembersData.map(m => ({
@@ -800,9 +829,16 @@
                                 )}
                                 <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed flex-1">{member.desc}</p>
                                 <div className="mt-6 flex gap-3">
-                                    <button className="p-2 text-gray-400 hover:text-[#e50010] dark:hover:text-red-400 transition-colors bg-gray-50 dark:bg-gray-900 rounded-full" title="Contact">
-                                        <Mail size={18} />
-                                    </button>
+                                    {member.email ? (
+                                        <a href={`mailto:${member.email}`} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-[#e50010] dark:hover:text-red-400 transition-colors bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#e50010] dark:hover:border-red-500" title={member.email}>
+                                            <Mail size={15} />
+                                            <span className="text-xs truncate max-w-[160px]">{member.email}</span>
+                                        </a>
+                                    ) : (
+                                        <button className="p-2 text-gray-400 hover:text-[#e50010] dark:hover:text-red-400 transition-colors bg-gray-50 dark:bg-gray-900 rounded-full" title="Contact">
+                                            <Mail size={18} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -1843,6 +1879,17 @@
         const TerminologyApp = ({ appData, dict, lang }) => {
             const [activeCategory, setActiveCategory] = useState('all');
             const [flipped, setFlipped] = useState({});
+            const [showQuiz, setShowQuiz] = useState(true);
+            const [quizIndex, setQuizIndex] = useState(0);
+            const [selected, setSelected] = useState(null);
+            const [score, setScore] = useState(0);
+            const scoreRef = useRef(0);
+            const [quizDone, setQuizDone] = useState(false);
+            const [activeQuestions, setActiveQuestions] = useState([]);
+            // Quiz stats: array of { score, total, percent, date }
+            const [quizHistory, setQuizHistory] = useState(() => {
+                try { return JSON.parse(localStorage.getItem('hm_quiz_history') || '[]'); } catch { return []; }
+            });
 
             const toggleFlip = (id) => setFlipped(prev => ({ ...prev, [id]: !prev[id] }));
 
@@ -1861,6 +1908,139 @@
                 { id: 12, cat: 'hm', term: 'X-Func', full: 'Cross-functional Team', zh: '跨職能團隊', emoji: '🔀', def_en: 'A group with diverse expertise (engineering, design, marketing, supply chain) working toward a common goal. The standard operating model across H&M Group.', def_zh: '由工程、設計、行銷、供應鏈等不同專長人員組成的團隊，共同致力實現共同目標。H&M 集團的標準運作模式。' },
             ];
 
+            // Quiz questions derived from terms
+            const quizQuestions = [
+                {
+                    q_en: 'What does "GTM" stand for?',
+                    q_zh: 'GTM 代表什麼？',
+                    options_en: ['Go-To-Market', 'Global Trade Model', 'Growth Target Metric', 'Gross Transaction Measure'],
+                    options_zh: ['進入市場策略', '全球貿易模型', '成長目標指標', '總交易衡量'],
+                    answer: 0,
+                },
+                {
+                    q_en: 'Which term refers to a measurable value that shows how effectively a team achieves its business objectives?',
+                    q_zh: '哪個術語是指衡量團隊達成業務目標效果的可量化指標？',
+                    options_en: ['OKR', 'KPI', 'GTM', 'A/B Test'],
+                    options_zh: ['OKR', 'KPI', 'GTM', 'A/B 測試'],
+                    answer: 1,
+                },
+                {
+                    q_en: 'OKR stands for "Objectives and ___".',
+                    q_zh: 'OKR 代表「目標與___」。',
+                    options_en: ['Key Results', 'Key Reports', 'Known Requirements', 'Key Revenue'],
+                    options_zh: ['關鍵結果', '關鍵報告', '已知需求', '關鍵營收'],
+                    answer: 0,
+                },
+                {
+                    q_en: 'A/B Testing is best described as:',
+                    q_zh: 'A/B 測試最好的描述是：',
+                    options_en: ['A profit-sharing program', 'A controlled experiment comparing two versions of a product or campaign', 'An iterative sprint methodology', 'A flat organizational structure'],
+                    options_zh: ['利潤分享計畫', '比較產品或活動兩個版本的對照實驗', '迭代式衝刺方法論', '扁平化組織架構'],
+                    answer: 1,
+                },
+                {
+                    q_en: 'In Agile/Scrum, work is broken into short cycles called:',
+                    q_zh: '在敏捷/Scrum 中，工作被拆分成稱為什麼的短週期？',
+                    options_en: ['Phases', 'Sprints', 'Milestones', 'Roadmaps'],
+                    options_zh: ['階段', '衝刺', '里程碑', '路線圖'],
+                    answer: 1,
+                },
+                {
+                    q_en: 'A Product Roadmap is primarily used to:',
+                    q_zh: '產品路線圖主要用於：',
+                    options_en: ['Track employee salaries', 'Outline product vision, direction, and priorities to align stakeholders', 'Measure revenue growth', 'Design product packaging'],
+                    options_zh: ['追蹤員工薪資', '概述產品願景、方向與優先順序以對齊利害關係人', '衡量營收成長', '設計產品包裝'],
+                    answer: 1,
+                },
+                {
+                    q_en: 'The Product Lifecycle stages in order are:',
+                    q_zh: '產品生命週期的階段順序為：',
+                    options_en: ['Introduction → Growth → Development → Maturity → Decline', 'Development → Introduction → Growth → Maturity → Decline', 'Growth → Development → Maturity → Introduction → Decline', 'Maturity → Introduction → Growth → Decline → Development'],
+                    options_zh: ['導入 → 成長 → 開發 → 成熟 → 衰退', '開發 → 導入 → 成長 → 成熟 → 衰退', '成長 → 開發 → 成熟 → 導入 → 衰退', '成熟 → 導入 → 成長 → 衰退 → 開發'],
+                    answer: 1,
+                },
+                {
+                    q_en: 'Leadership Without Authority (L.W.A.) means:',
+                    q_zh: '無職權領導力（L.W.A.）的意思是：',
+                    options_en: ['Managing people who directly report to you', 'Influencing and motivating cross-functional team members who do not report to you', 'Leading by giving orders', 'Authority granted by a CEO'],
+                    options_zh: ['管理直接下屬', '在沒有直接管理權限的情況下影響並激勵跨職能成員', '透過命令領導', '由 CEO 授予的權限'],
+                    answer: 1,
+                },
+                {
+                    q_en: 'H&M\'s LifeWear philosophy focuses on:',
+                    q_zh: 'H&M 的 LifeWear 哲學聚焦於：',
+                    options_en: ['Luxury fashion for elite customers', 'Clothing for everyone, improving daily life through quality and accessible prices', 'Fast fashion with minimal sustainability', 'Sports and activewear only'],
+                    options_zh: ['為精英顧客提供奢侈時尚', '為所有人設計服裝，透過品質與親民價格提升日常生活', '以最低永續性為基礎的快時尚', '僅限運動與活動服飾'],
+                    answer: 1,
+                },
+                {
+                    q_en: 'HIP (H&M Incentive Program) is:',
+                    q_zh: 'HIP（H&M 員工分紅計畫）是：',
+                    options_en: ['A customer loyalty rewards program', 'A profit-sharing program for all H&M employees', 'An AI tool used by H&M', 'A product line by H&M'],
+                    options_zh: ['顧客忠誠度獎勵計畫', 'H&M 集團的全員利潤分享計畫', 'H&M 使用的 AI 工具', 'H&M 的產品線'],
+                    answer: 1,
+                },
+                {
+                    q_en: 'A Flat Organization is characterized by:',
+                    q_zh: '扁平化組織的特徵是：',
+                    options_en: ['Many layers of middle management', 'Few or no middle management levels, promoting direct communication', 'A strict top-down hierarchy', 'Separate divisions with no collaboration'],
+                    options_zh: ['多層中階管理', '鮮少或沒有中階管理層，促進直接溝通', '嚴格的由上而下層級制', '各自獨立無協作的部門'],
+                    answer: 1,
+                },
+                {
+                    q_en: 'A Cross-functional Team (X-Func) brings together:',
+                    q_zh: '跨職能團隊（X-Func）的組成是：',
+                    options_en: ['Only engineers and developers', 'People with diverse expertise (engineering, design, marketing, supply chain) toward a common goal', 'Only marketing and sales staff', 'Only senior managers'],
+                    options_zh: ['僅工程師與開發人員', '擁有多元專長（工程、設計、行銷、供應鏈）的人員共同達成目標', '僅行銷與銷售人員', '僅高階管理人員'],
+                    answer: 1,
+                },
+            ];
+
+            const pickRandom5 = () => {
+                const shuffled = [...quizQuestions].sort(() => Math.random() - 0.5);
+                return shuffled.slice(0, 5);
+            };
+
+            const startQuiz = () => {
+                setActiveQuestions(pickRandom5());
+                setShowQuiz(true);
+                setQuizIndex(0);
+                setSelected(null);
+                setScore(0);
+                scoreRef.current = 0;
+                setQuizDone(false);
+            };
+
+            // Initialise on first render
+            const activeQs = activeQuestions.length === 5 ? activeQuestions : (() => { const q = pickRandom5(); if (activeQuestions.length === 0) setTimeout(() => setActiveQuestions(q), 0); return q; })();
+
+            const handleAnswer = (idx) => {
+                if (selected !== null) return;
+                setSelected(idx);
+                if (idx === activeQs[quizIndex].answer) {
+                    scoreRef.current += 1;
+                    setScore(scoreRef.current);
+                }
+            };
+
+            const handleNext = () => {
+                if (quizIndex + 1 >= activeQs.length) {
+                    const finalScore = scoreRef.current;
+                    const total = activeQs.length;
+                    const percent = Math.round((finalScore / total) * 100);
+                    const entry = { score: finalScore, total, percent, date: new Date().toLocaleDateString() };
+                    setQuizHistory(prev => {
+                        const updated = [entry, ...prev].slice(0, 20);
+                        try { localStorage.setItem('hm_quiz_history', JSON.stringify(updated)); } catch {}
+                        return updated;
+                    });
+                    setQuizDone(true);
+                } else {
+                    setQuizIndex(i => i + 1);
+                    setSelected(null);
+                }
+            };
+
             const categories = [
                 { id: 'all', label: lang === 'zh' ? '全部' : 'All' },
                 { id: 'strategy', label: dict.termCategory1 },
@@ -1873,6 +2053,9 @@
                 pm:       { badge: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300', front: 'from-purple-600 to-purple-800', back: 'from-purple-700 to-purple-900' },
                 hm:       { badge: 'bg-red-100 text-[#e50010] dark:bg-red-900/40 dark:text-red-400', front: 'from-[#e50010] to-red-800', back: 'from-red-700 to-red-900' },
             };
+
+            const q = activeQs[quizIndex] || activeQs[0];
+            const scorePercent = activeQs.length > 0 ? Math.round((score / activeQs.length) * 100) : 0;
 
             return (
                 <div className="p-6 md:p-8 max-w-5xl mx-auto animate-in fade-in duration-300 w-full pb-12">
@@ -1925,6 +2108,204 @@
                                 </div>
                             );
                         })}
+                    </div>
+
+                    {/* Quiz Section */}
+                    <div className="mt-12">
+                        <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
+                            <div className="flex items-center justify-between mb-2">
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                                        🧩 {lang === 'zh' ? '詞彙測驗' : 'Terminology Quiz'}
+                                    </h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        {lang === 'zh' ? '測試你對核心領域術語的掌握程度，每次隨機 5 題。' : 'Test your knowledge of the Core Domain Terminology — 5 random questions each time.'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* ── Always-visible stats banner ── */}
+                            {quizHistory.length > 0 && !quizDone && (
+                                <div className="mt-3 mb-4 flex flex-wrap gap-3 p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs">
+                                    <span className="text-gray-500 dark:text-gray-400 font-semibold self-center">{lang === 'zh' ? '你的統計：' : 'Your stats:'}</span>
+                                    <span className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-gray-700 dark:text-gray-200">
+                                        {lang === 'zh' ? '測驗次數' : 'Attempts'} <strong>{quizHistory.length}</strong>
+                                    </span>
+                                    <span className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-gray-700 dark:text-gray-200">
+                                        {lang === 'zh' ? '總答對' : 'Total Correct'} <strong className="text-[#e50010]">{quizHistory.reduce((a, h) => a + h.score, 0)}</strong> / {quizHistory.reduce((a, h) => a + h.total, 0)}
+                                    </span>
+                                    <span className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-gray-700 dark:text-gray-200">
+                                        {lang === 'zh' ? '平均正確率' : 'Avg Accuracy'} <strong className="text-green-600 dark:text-green-400">{Math.round(quizHistory.reduce((a, h) => a + h.percent, 0) / quizHistory.length)}%</strong>
+                                    </span>
+                                    <span className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-gray-700 dark:text-gray-200">
+                                        {lang === 'zh' ? '最佳成績' : 'Best'} <strong className="text-green-600 dark:text-green-400">{Math.max(...quizHistory.map(h => h.percent))}%</strong>
+                                    </span>
+                                </div>
+                            )}
+
+                            {showQuiz && !quizDone && (
+                                <div className="mt-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm">
+                                    {/* Progress bar */}
+                                    <div className="flex items-center justify-between mb-4">
+                                        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                                            {lang === 'zh' ? `第 ${quizIndex + 1} / ${activeQs.length} 題` : `Question ${quizIndex + 1} of ${activeQs.length}`}
+                                        </span>
+                                        <span className="text-xs font-semibold text-[#e50010]">
+                                            {lang === 'zh' ? `得分：${score}` : `Score: ${score}`}
+                                        </span>
+                                    </div>
+                                    <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full mb-6">
+                                        <div
+                                            className="h-1.5 bg-[#e50010] rounded-full transition-all duration-500"
+                                            style={{ width: `${((quizIndex) / activeQs.length) * 100}%` }}
+                                        ></div>
+                                    </div>
+
+                                    {/* Question */}
+                                    <p className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-5 leading-relaxed">
+                                        {lang === 'zh' ? q.q_zh : q.q_en}
+                                    </p>
+
+                                    {/* Options */}
+                                    <div className="space-y-3">
+                                        {(lang === 'zh' ? q.options_zh : q.options_en).map((opt, idx) => {
+                                            let btnClass = 'w-full text-left px-4 py-3 rounded-lg border text-sm font-medium transition-all ';
+                                            if (selected === null) {
+                                                btnClass += 'border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:border-[#e50010] hover:bg-red-50 dark:hover:bg-red-900/10 bg-white dark:bg-gray-700';
+                                            } else if (idx === q.answer) {
+                                                btnClass += 'border-green-500 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300';
+                                            } else if (idx === selected) {
+                                                btnClass += 'border-red-400 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400';
+                                            } else {
+                                                btnClass += 'border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-700 opacity-60';
+                                            }
+                                            return (
+                                                <button key={idx} className={btnClass} onClick={() => handleAnswer(idx)}>
+                                                    <span className="font-bold mr-2 opacity-60">{['A','B','C','D'][idx]}.</span>
+                                                    {opt}
+                                                    {selected !== null && idx === q.answer && <span className="ml-2">✓</span>}
+                                                    {selected === idx && idx !== q.answer && <span className="ml-2">✗</span>}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {/* Feedback + Next */}
+                                    {selected !== null && (
+                                        <div className="mt-5 flex items-center justify-between">
+                                            <p className={`text-sm font-semibold ${selected === q.answer ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
+                                                {selected === q.answer
+                                                    ? (lang === 'zh' ? '✓ 答對了！' : '✓ Correct!')
+                                                    : (lang === 'zh' ? '✗ 答錯了，正確答案已標示。' : '✗ Incorrect. The correct answer is highlighted.')}
+                                            </p>
+                                            <button
+                                                onClick={handleNext}
+                                                className="px-5 py-2 bg-[#e50010] hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors"
+                                            >
+                                                {quizIndex + 1 >= activeQs.length
+                                                    ? (lang === 'zh' ? '查看結果 →' : 'See Results →')
+                                                    : (lang === 'zh' ? '下一題 →' : 'Next →')}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {showQuiz && quizDone && (
+                                <div className="mt-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8 shadow-sm text-center">
+                                    <div className="text-5xl mb-4">
+                                        {scorePercent >= 80 ? '🏆' : scorePercent >= 50 ? '👍' : '📚'}
+                                    </div>
+                                    <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                                        {lang === 'zh' ? '測驗完成！' : 'Quiz Complete!'}
+                                    </h4>
+                                    <p className="text-4xl font-bold text-[#e50010] mb-2">{score} / {activeQs.length}</p>
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">
+                                        {lang === 'zh' ? `正確率 ${scorePercent}%` : `${scorePercent}% correct`}
+                                    </p>
+                                    <p className="text-gray-600 dark:text-gray-300 text-sm mt-3 mb-6">
+                                        {scorePercent >= 80
+                                            ? (lang === 'zh' ? '表現優秀！你對核心術語非常熟悉。' : 'Excellent! You have a strong grasp of the core terminology.')
+                                            : scorePercent >= 50
+                                            ? (lang === 'zh' ? '做得不錯！建議再複習一下翻轉卡片。' : 'Good effort! Consider reviewing the flip cards again.')
+                                            : (lang === 'zh' ? '繼續加油！多翻閱卡片能幫助你記住這些術語。' : 'Keep studying! Reviewing the flip cards will help you remember these terms.')}
+                                    </p>
+                                    <button
+                                        onClick={startQuiz}
+                                        className="px-6 py-2.5 bg-[#e50010] hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors"
+                                    >
+                                        {lang === 'zh' ? '重新測驗' : 'Retake Quiz'}
+                                    </button>
+
+                                    {/* ── Quiz Stats History ── */}
+                                    {quizHistory.length > 0 && (
+                                        <div className="mt-8 text-left">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <h5 className="text-sm font-bold text-gray-700 dark:text-gray-200 flex items-center gap-1.5">
+                                                    📈 {lang === 'zh' ? '測驗紀錄' : 'Quiz History'}
+                                                </h5>
+                                                <button
+                                                    onClick={() => { setQuizHistory([]); try { localStorage.removeItem('hm_quiz_history'); } catch {} }}
+                                                    className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                                                >
+                                                    {lang === 'zh' ? '清除紀錄' : 'Clear'}
+                                                </button>
+                                            </div>
+                                            {/* Summary row */}
+                                            <div className="grid grid-cols-3 gap-3 mb-4">
+                                                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center">
+                                                    <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">{quizHistory.length}</p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{lang === 'zh' ? '總次數' : 'Attempts'}</p>
+                                                </div>
+                                                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center">
+                                                    <p className="text-2xl font-bold text-[#e50010]">
+                                                        {quizHistory.reduce((a, h) => a + h.score, 0)}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{lang === 'zh' ? '總答對題數' : 'Total Correct'}</p>
+                                                </div>
+                                                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center">
+                                                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                                                        {Math.round(quizHistory.reduce((a, h) => a + h.percent, 0) / quizHistory.length)}%
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{lang === 'zh' ? '平均正確率' : 'Avg Accuracy'}</p>
+                                                </div>
+                                            </div>
+                                            {/* Per-attempt table */}
+                                            <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                                <table className="w-full text-xs">
+                                                    <thead>
+                                                        <tr className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
+                                                            <th className="px-3 py-2 text-left font-semibold">#</th>
+                                                            <th className="px-3 py-2 text-left font-semibold">{lang === 'zh' ? '日期' : 'Date'}</th>
+                                                            <th className="px-3 py-2 text-center font-semibold">{lang === 'zh' ? '得分' : 'Score'}</th>
+                                                            <th className="px-3 py-2 text-center font-semibold">{lang === 'zh' ? '正確率' : 'Accuracy'}</th>
+                                                            <th className="px-3 py-2 text-center font-semibold">{lang === 'zh' ? '評級' : 'Grade'}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                                        {quizHistory.map((h, i) => (
+                                                            <tr key={i} className={`${i === 0 ? 'bg-red-50 dark:bg-red-900/10' : 'bg-white dark:bg-gray-800'}`}>
+                                                                <td className="px-3 py-2 text-gray-400 dark:text-gray-500">{quizHistory.length - i}</td>
+                                                                <td className="px-3 py-2 text-gray-600 dark:text-gray-300">{h.date}</td>
+                                                                <td className="px-3 py-2 text-center font-semibold text-gray-800 dark:text-gray-100">{h.score}/{h.total}</td>
+                                                                <td className="px-3 py-2 text-center">
+                                                                    <span className={`font-bold ${h.percent >= 80 ? 'text-green-600 dark:text-green-400' : h.percent >= 50 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-500 dark:text-red-400'}`}>
+                                                                        {h.percent}%
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-3 py-2 text-center">
+                                                                    {h.percent >= 80 ? '🏆' : h.percent >= 50 ? '👍' : '📚'}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             );
@@ -2114,6 +2495,538 @@
             );
         };
 
+        // Career Development Wizard
+        const CareerWizardApp = ({ dict, lang, navigateTo }) => {
+            const [step, setStep] = useState(0);
+            const [answers, setAnswers] = useState({});
+            const [aiLoading, setAiLoading] = useState(false);
+            const [aiResult, setAiResult] = useState(null);
+            const [conversationHistory, setConversationHistory] = useState([]);
+
+            const questions = lang === 'zh' ? [
+                {
+                    id: 'q1_decision',
+                    question: 'Q1【決策與分析能力】當你需要為一項新產品制定下一步的發展方向時，你通常依賴什麼來做決定？',
+                    options: [
+                        { value: 'A', label: '系統性思維與客觀數據。執行嚴謹的 A/B 測試，透過分析使用者的實際回饋來驅動迭代與優化。', icon: '📊' },
+                        { value: 'B', label: '商業敏感度與市場洞察。大量吸收當前的流行文化與消費者趨勢，並憑藉對市場的敏銳度來制定策略。', icon: '🛍️' },
+                    ]
+                },
+                {
+                    id: 'q2_project',
+                    question: 'Q2【專案推動特質】面對一個龐大且複雜的專案，你最擅長扮演什麼樣的角色？',
+                    options: [
+                        { value: 'A', label: '藍圖規劃者。制定清晰的產品路線圖（Roadmap），將大目標拆解成短期的衝刺任務（Sprint），並精準追蹤 OKR/KPI。', icon: '🗺️' },
+                        { value: 'B', label: '核心樞紐。擔任跨部門的橋樑，統籌企劃、公關與行銷團隊，並能有效指導外部代理商，將資源 ROI 最大化。', icon: '🔀' },
+                    ]
+                },
+                {
+                    id: 'q3_influence',
+                    question: 'Q3【影響力與領導特質】在團隊合作中，如果要推動一個大家意見分歧的提案，你會怎麼做？',
+                    options: [
+                        { value: 'A', label: '運用「無職權領導力」。即使不是主管，也能透過釐清願景與邏輯，說服工程師和設計師朝同一個目標前進。', icon: '🤝' },
+                        { value: 'B', label: '展現「業主思維」。以專案負責人的高度，直接進行跨國或跨矩陣的溝通，透過強大的協調能力讓各方達成共識。', icon: '👔' },
+                    ]
+                },
+                {
+                    id: 'q4_agility',
+                    question: 'Q4【應對變動與高壓能力】當專案遇到突發狀況或市場需求急遽改變時，你的直覺反應是？',
+                    options: [
+                        { value: 'A', label: '保持高度敏捷（Agility）。喜歡在充滿心理安全感的環境中，快速調整開發優先順序，擁抱快速變革。', icon: '🔄' },
+                        { value: 'B', label: '展現高度韌性（Resilience）。能在快節奏、高壓的跨國企業矩陣中生存，並迅速為重大的上市檔期找出替代方案。', icon: '💪' },
+                    ]
+                },
+                {
+                    id: 'q5_passion',
+                    question: 'Q5【洞察與熱情所在】在日常工作中，哪一種事物最能激發你的熱情與好奇心？',
+                    options: [
+                        { value: 'A', label: '探索最新的科技應用（如 Fashion-Tech、零售科技），思考如何讓電商平台的使用者體驗更流暢、供應鏈更有效率。', icon: '💻' },
+                        { value: 'B', label: '深入鑽研全球流行文化、藝術、音樂或動漫，並思考如何將這些元素轉化為引人入勝的品牌敘事與聯名活動。', icon: '🎨' },
+                    ]
+                },
+                {
+                    id: 'q6_communication',
+                    question: 'Q6【溝通與表達能力】如果要向高層主管進行專案匯報，你最希望呈現出什麼樣的報告風格？',
+                    options: [
+                        { value: 'A', label: '邏輯嚴密、結構清晰。重點放在產品生命週期的端對端（End-to-end）管理成效，以及如何透過技術解決痛點。', icon: '📋' },
+                        { value: 'B', label: '具備說服力且引人入勝。重點放在 GTM（進入市場）策略的完整性，以及如何透過精采的敘事確保品牌在北美市場的影響力。', icon: '🎤' },
+                    ]
+                },
+                {
+                    id: 'q7_experience',
+                    question: 'Q7【工作經驗與資歷】回顧你的職涯或專案經驗，哪一種描述更符合你目前累積的實戰背景？',
+                    options: [
+                        { value: 'A', label: '具備約 2 年以上的數位產品管理（Digital PM）經驗，或擁有大型零售採購、商品規劃的紮實底子，並熟悉敏捷（Agile）運作。', icon: '🌿' },
+                        { value: 'B', label: '已累積 3 到 5 年以上在消費品（CPG）或時尚零售產業的實戰經歷，且專精於產品行銷（Product Marketing）或品牌管理。', icon: '🌳' },
+                    ]
+                },
+                {
+                    id: 'q8_salary',
+                    question: 'Q8【期望薪資與報酬結構】針對薪酬條件，你對下一份工作的期待更偏向哪一種？',
+                    options: [
+                        { value: 'A', label: '接受中位數約 $90,000 美元的年薪（晉升資深職可達 $137,000+），看重公司長期的全員分紅計畫（HIP）以及高度彈性的工作生活平衡。', icon: '⚖️' },
+                        { value: 'B', label: '期望直接爭取 $110,000 至 $135,000 美元的扎實底薪，並渴望透過強大的專案執行力與市場成效，挑戰豐厚的年度績效獎金。', icon: '🏆' },
+                    ]
+                },
+            ] : [
+                {
+                    id: 'q1_decision',
+                    question: 'Q1 [Decision & Analysis] When defining the next direction for a product, what do you rely on most?',
+                    options: [
+                        { value: 'A', label: 'Systematic thinking & objective data. Run rigorous A/B tests and let real user feedback drive iteration and optimization.', icon: '📊' },
+                        { value: 'B', label: 'Business acumen & market insight. Absorb current pop culture and consumer trends, then craft strategy based on sharp market intuition.', icon: '🛍️' },
+                    ]
+                },
+                {
+                    id: 'q2_project',
+                    question: 'Q2 [Project Drive] When facing a large, complex project, which role best describes you?',
+                    options: [
+                        { value: 'A', label: 'Blueprint planner. Build clear product roadmaps, break big goals into sprints, and track OKRs/KPIs with precision.', icon: '🗺️' },
+                        { value: 'B', label: 'Core hub. Serve as the cross-functional bridge, orchestrating PR, marketing, and external agencies to maximize ROI.', icon: '🔀' },
+                    ]
+                },
+                {
+                    id: 'q3_influence',
+                    question: 'Q3 [Influence & Leadership] If you need to push through a proposal with divided opinions, how do you approach it?',
+                    options: [
+                        { value: 'A', label: '"Leadership without authority." Even without a management title, I align engineers and designers through clear vision and logic.', icon: '🤝' },
+                        { value: 'B', label: '"Owner\'s mindset." I engage cross-national or matrix communications directly as the project owner, driving consensus through strong coordination.', icon: '👔' },
+                    ]
+                },
+                {
+                    id: 'q4_agility',
+                    question: 'Q4 [Handling Change & Pressure] When a project hits unexpected turbulence, your instinct is to…',
+                    options: [
+                        { value: 'A', label: 'Stay highly agile. Quickly reprioritize the development backlog in a psychologically safe environment and embrace rapid change.', icon: '🔄' },
+                        { value: 'B', label: 'Show high resilience. Thrive in fast-paced, high-pressure multinational matrix structures and quickly find alternatives for major launch windows.', icon: '💪' },
+                    ]
+                },
+                {
+                    id: 'q5_passion',
+                    question: 'Q5 [Insight & Passion] In your daily work, what sparks your curiosity most?',
+                    options: [
+                        { value: 'A', label: 'Exploring the latest tech (Fashion-Tech, retail tech) and thinking about how to make e-commerce UX smoother and supply chains more efficient.', icon: '💻' },
+                        { value: 'B', label: 'Deep-diving into global pop culture, art, music, or anime, and figuring out how to turn those elements into compelling brand narratives and collaborations.', icon: '🎨' },
+                    ]
+                },
+                {
+                    id: 'q6_communication',
+                    question: 'Q6 [Communication Style] When presenting to senior leadership, what reporting style best represents you?',
+                    options: [
+                        { value: 'A', label: 'Logically rigorous and clearly structured. Focus on end-to-end product lifecycle management effectiveness and how technology solves pain points.', icon: '📋' },
+                        { value: 'B', label: 'Persuasive and compelling. Focus on a complete GTM strategy narrative that ensures strong brand impact in the North American market.', icon: '🎤' },
+                    ]
+                },
+                {
+                    id: 'q7_experience',
+                    question: 'Q7 [Work Experience] Looking back at your career, which description fits your background best?',
+                    options: [
+                        { value: 'A', label: '2+ years of Digital PM experience, or a solid foundation in large-scale retail buying or merchandise planning, with Agile familiarity.', icon: '🌿' },
+                        { value: 'B', label: '3–5+ years of hands-on experience in CPG or fashion retail, specializing in Product Marketing or brand management.', icon: '🌳' },
+                    ]
+                },
+                {
+                    id: 'q8_salary',
+                    question: 'Q8 [Salary Expectations] Regarding compensation, which structure fits your next role better?',
+                    options: [
+                        { value: 'A', label: 'Accept a median ~$90,000/yr (Senior: $137,000+), valuing the company-wide profit-sharing plan (HIP) and strong work-life balance.', icon: '⚖️' },
+                        { value: 'B', label: 'Target a solid $110,000–$135,000 base, with ambition to earn a substantial annual performance bonus through strong execution and market results.', icon: '🏆' },
+                    ]
+                },
+            ];
+
+            const handleSelect = async (questionId, value) => {
+                const newAnswers = { ...answers, [questionId]: value };
+                setAnswers(newAnswers);
+
+                if (step < questions.length - 1) {
+                    setStep(step + 1);
+                } else {
+                    // All questions answered — call AI
+                    await runAIAnalysis(newAnswers);
+                }
+            };
+
+            const runAIAnalysis = async (finalAnswers) => {
+                setAiLoading(true);
+                setAiResult(null);
+
+                // Count A vs B answers
+                const values = Object.values(finalAnswers);
+                const aCount = values.filter(v => v === 'A').length;
+                const bCount = values.filter(v => v === 'B').length;
+                const isHM = aCount >= bCount;
+                const zh = lang === 'zh';
+
+                // Small delay to show loading animation
+                await new Promise(r => setTimeout(r, 900));
+
+                let result;
+                if (zh) {
+                    if (isHM) {
+                        result = `1. 🎯 **推薦職缺：H&M 數位產品經理**\n你的作答結果顯示 A（${aCount} 票）多於 B（${bCount} 票），整體偏向 H&M 數位產品經理職位。\n\n2. 📊 **契合度分析**\n你偏好以數據與 A/B 測試驅動決策，擅長以產品路線圖（Roadmap）拆解複雜專案，善用「無職權領導力」協調跨職能團隊，並能在敏捷（Agile）環境中快速調整優先順序。這些特質與 H&M 對數位 PM 的期待高度吻合。\n\n3. 💡 **申請建議**\n① 準備 1–2 個端對端產品管理的具體案例，清楚描述你如何運用數據推動產品迭代。\n② 展示你對敏捷/Scrum 的實戰經驗，包含衝刺規劃與 OKR 追蹤。\n③ 透過 H&M 人才社群提交履歷，主動關注 Digital Tech 部門的最新職缺。\n\n4. ⚠️ **注意事項**\n① H&M 重視全球視野，建議補充跨文化溝通或跨國專案協作的經驗。\n② 薪資中位數約 $90,000，若期望更高薪酬，可朝資深 PM（$137,000+）方向規劃職涯發展。`;
+                    } else {
+                        result = `1. 🎯 **推薦職缺：Uniqlo 產品行銷經理**\n你的作答結果顯示 B（${bCount} 票）多於 A（${aCount} 票），整體偏向 Uniqlo 產品行銷經理職位。\n\n2. 📊 **契合度分析**\n你具備強烈的商業敏感度與品牌敘事能力，擅長擔任跨部門核心樞紐，熱衷探索流行文化並將其轉化為 GTM 策略，且能在高壓的跨國矩陣環境中展現韌性。這些特質與 Uniqlo 產品行銷經理的職能需求非常吻合。\n\n3. 💡 **申請建議**\n① 準備針對北美市場的 GTM 策略案例，清楚說明如何整合行銷、公關與商品規劃資源。\n② 展示你對 LifeWear 哲學與 UT 聯名系列的品牌理解，表達與 Uniqlo 文化的高度契合。\n③ 強調 3–5 年以上的品牌管理實戰背景，並突出大型跨國活動的執行成果。\n\n4. ⚠️ **注意事項**\n① 此職位主要在紐約曼哈頓辦公，遠端彈性相對有限，需確認工作地點的接受度。\n② 建議加強數位行銷數據分析能力，以補充傳統品牌管理背景的不足。`;
+                    }
+                } else {
+                    if (isHM) {
+                        result = `1. 🎯 **Recommended Role: H&M Digital Product Manager**\nYour results show ${aCount} A answers vs ${bCount} B answers, pointing strongly toward the H&M Digital Product Manager role.\n\n2. 📊 **Fit Analysis**\nYou favour data-driven decisions and A/B testing, excel at breaking complex projects into Agile sprints with clear Roadmaps and OKR tracking, and naturally lead cross-functional teams through influence rather than authority. These traits align precisely with what H&M looks for in a Digital PM.\n\n3. 💡 **Application Tips**\n① Prepare 1–2 end-to-end product management case studies that clearly show how you used data to drive iteration.\n② Highlight hands-on Agile/Scrum experience including sprint planning and KPI tracking.\n③ Submit your profile via the H&M Talent Community and watch the Digital Tech department for openings.\n\n4. ⚠️ **Watch Out For**\n① H&M values a global mindset — strengthen examples of cross-cultural collaboration or international project work.\n② The median salary is ~$90,000; if you have higher expectations, plan a trajectory toward Senior PM roles ($137,000+).`;
+                    } else {
+                        result = `1. 🎯 **Recommended Role: Uniqlo Product Marketing Manager**\nYour results show ${bCount} B answers vs ${aCount} A answers, pointing strongly toward the Uniqlo Product Marketing Manager role.\n\n2. 📊 **Fit Analysis**\nYou bring sharp business acumen and brand storytelling instincts, thrive as a cross-functional hub connecting creative, PR, and merchandising teams, and are energised by turning pop-culture insights into compelling GTM strategies. Your resilience under pressure fits Uniqlo's fast-paced, matrix-style environment perfectly.\n\n3. 💡 **Application Tips**\n① Prepare a North-America-focused GTM case study that shows how you've unified marketing, PR, and product planning resources.\n② Demonstrate your understanding of LifeWear philosophy and UT collaborations to show cultural alignment with Uniqlo.\n③ Highlight 3–5+ years of brand management experience and quantify the impact of major campaign launches.\n\n4. ⚠️ **Watch Out For**\n① This role is primarily on-site in Manhattan — confirm you're comfortable with the location before applying.\n② Consider strengthening your digital marketing analytics skills to complement your brand management background.`;
+                    }
+                }
+
+                setAiResult(result);
+                setAiLoading(false);
+            };
+
+            const reset = () => {
+                setStep(0);
+                setAnswers({});
+                setAiResult(null);
+                setAiLoading(false);
+            };
+
+            const zh = lang === 'zh';
+            const progress = Math.round(((step) / questions.length) * 100);
+
+            // Format AI result with markdown-like rendering
+            const renderAiText = (text) => {
+                return text.split('\n').map((line, i) => {
+                    const boldLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    if (line.startsWith('1.') || line.startsWith('2.') || line.startsWith('3.') || line.startsWith('4.')) {
+                        return <p key={i} className="mb-3 text-gray-800 dark:text-gray-100" dangerouslySetInnerHTML={{ __html: boldLine }} />;
+                    }
+                    if (line.trim() === '') return <br key={i} />;
+                    return <p key={i} className="mb-1 text-gray-700 dark:text-gray-300 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: boldLine }} />;
+                });
+            };
+
+            return (
+                <div className="min-h-full bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-950 p-6">
+                    <div className="max-w-2xl mx-auto">
+                        {/* Header */}
+                        <div className="mb-8 text-center">
+                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg mb-4">
+                                <Wand2 size={32} className="text-white" />
+                            </div>
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{zh ? '職涯發展嚮導' : 'Career Development Wizard'}</h1>
+                            <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">{zh ? '由 AI 驅動，協助你找到最適合的職缺' : 'AI-powered to match you with your perfect role'}</p>
+                        </div>
+
+                        {/* Result View */}
+                        {aiResult && (
+                            <div className="animate-in fade-in duration-500">
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-purple-100 dark:border-purple-900 p-6 mb-6">
+                                    <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100 dark:border-gray-700">
+                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                                            <Sparkles size={18} className="text-white" />
+                                        </div>
+                                        <div>
+                                            <h2 className="font-bold text-gray-900 dark:text-white text-base">{zh ? 'AI 職涯分析結果' : 'Your AI Career Analysis'}</h2>
+                                            <p className="text-xs text-gray-400">{zh ? '基於你的 8 道職涯探索測驗結果' : 'Based on your 8-question career quiz'}</p>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">{renderAiText(aiResult)}</div>
+                                </div>
+
+                                {/* Quick links to job postings */}
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 mb-6 shadow-sm">
+                                    <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 text-sm">{zh ? '📋 直接查看職缺詳情' : '📋 View Full Job Postings'}</h3>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => navigateTo('app', { id: 'jobs', title: zh ? '職缺資料' : 'Job Openings', subtitle: zh ? '招募中職缺' : 'Active Positions', icon: Briefcase, color: 'text-[#e50010]', type: 'placeholder' })}
+                                            className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#e50010] hover:bg-red-700 text-white text-sm font-semibold transition-colors shadow"
+                                        >
+                                            <Briefcase size={16} />
+                                            {zh ? '查看職缺比較' : 'Compare Both Jobs'}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button onClick={reset} className="w-full py-3 rounded-xl border-2 border-purple-300 dark:border-purple-700 text-purple-600 dark:text-purple-400 font-semibold text-sm hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                                    {zh ? '🔄 重新測驗' : '🔄 Start Over'}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Loading */}
+                        {aiLoading && (
+                            <div className="text-center py-16">
+                                <div className="inline-block w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mx-auto mb-6 shadow-lg animate-pulse">
+                                    <Wand2 size={28} className="text-white" />
+                                </div>
+                                <p className="text-gray-700 dark:text-gray-300 font-semibold text-lg">{zh ? 'AI 正在分析你的職涯偏好…' : 'AI is analyzing your career profile…'}</p>
+                                <p className="text-gray-400 text-sm mt-2">{zh ? '這通常只需要幾秒鐘' : 'This usually takes just a few seconds'}</p>
+                                <div className="flex justify-center gap-1 mt-6">
+                                    {[0,1,2].map(i => (
+                                        <div key={i} className="w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Quiz */}
+                        {!aiLoading && !aiResult && (
+                            <div>
+                                {/* Progress */}
+                                <div className="mb-6">
+                                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                        <span>{zh ? `問題 ${step + 1} / ${questions.length}` : `Question ${step + 1} of ${questions.length}`}</span>
+                                        <span>{progress}%</span>
+                                    </div>
+                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                        <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+                                    </div>
+                                </div>
+
+                                {/* Question Card */}
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6 mb-4">
+                                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">{questions[step].question}</h2>
+                                    <div className="space-y-3">
+                                        {questions[step].options.map(opt => (
+                                            <button
+                                                key={opt.value}
+                                                onClick={() => handleSelect(questions[step].id, opt.value)}
+                                                className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-gray-100 dark:border-gray-700 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 dark:hover:border-purple-600 transition-all group text-left"
+                                            >
+                                                <span className="text-2xl">{opt.icon}</span>
+                                                <span className="font-medium text-gray-800 dark:text-gray-200 group-hover:text-purple-700 dark:group-hover:text-purple-300">{opt.label}</span>
+                                                <ChevronRight size={16} className="ml-auto text-gray-300 group-hover:text-purple-400" />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Back button */}
+                                {step > 0 && (
+                                    <button onClick={() => setStep(step - 1)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-purple-600 dark:text-gray-400 dark:hover:text-purple-400 transition-colors">
+                                        <ChevronLeft size={16} />
+                                        {zh ? '回上一題' : 'Back'}
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // 4.8 Settings Application
+        const SettingsApp = ({ lang, setLang, theme, setTheme, username, onLogout, navigateTo }) => {
+            const zh = lang === 'zh';
+            const [speechRate, setSpeechRate] = useState(0.95);
+            const [fontSize, setFontSize] = useState('normal');
+            const [notifAnnounce, setNotifAnnounce] = useState(true);
+            const [notifUpdates, setNotifUpdates] = useState(false);
+
+            const SettingSection = ({ icon, title, children }) => (
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-4">
+                    <div className="flex items-center gap-2 px-5 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+                        <span className="text-base">{icon}</span>
+                        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">{title}</h3>
+                    </div>
+                    <div className="divide-y divide-gray-100 dark:divide-gray-700">{children}</div>
+                </div>
+            );
+
+            const SettingRow = ({ label, sub, children }) => (
+                <div className="flex items-center justify-between px-5 py-4 gap-4">
+                    <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{label}</p>
+                        {sub && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{sub}</p>}
+                    </div>
+                    <div className="shrink-0">{children}</div>
+                </div>
+            );
+
+            const Toggle = ({ value, onChange }) => (
+                <button
+                    onClick={() => onChange(!value)}
+                    className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${value ? 'bg-[#e50010]' : 'bg-gray-300 dark:bg-gray-600'}`}
+                >
+                    <span className={`inline-block w-4 h-4 bg-white rounded-full shadow transform transition-transform duration-200 ${value ? 'translate-x-6' : 'translate-x-1'}`} />
+                </button>
+            );
+
+            const fontSizeOptions = zh
+                ? [{ v: 'small', l: '小' }, { v: 'normal', l: '標準' }, { v: 'large', l: '大' }]
+                : [{ v: 'small', l: 'Small' }, { v: 'normal', l: 'Normal' }, { v: 'large', l: 'Large' }];
+
+            const applyFontSize = (size) => {
+                setFontSize(size);
+                const map = { small: '13px', normal: '15px', large: '17px' };
+                document.documentElement.style.fontSize = map[size];
+            };
+
+            const speechRateLabels = zh
+                ? { 0.75: '慢速', 0.95: '標準', 1.2: '快速' }
+                : { 0.75: 'Slow', 0.95: 'Normal', 1.2: 'Fast' };
+
+            return (
+                <div className="p-6 md:p-8 max-w-2xl mx-auto animate-in fade-in duration-300 w-full pb-12">
+                    <div className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+                        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                            <Settings size={28} className="text-gray-500 dark:text-gray-400" />
+                            {zh ? '系統設定' : 'Settings'}
+                        </h2>
+                        <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">{zh ? '自訂你的入口網站偏好設定' : 'Customise your portal experience'}</p>
+                    </div>
+
+                    {/* Account */}
+                    <SettingSection icon="👤" title={zh ? '帳號資訊' : 'Account'}>
+                        <SettingRow
+                            label={zh ? '使用者名稱' : 'Username'}
+                            sub={zh ? '目前登入的帳號' : 'Currently signed in as'}
+                        >
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-[#e50010] flex items-center justify-center text-white font-bold text-sm select-none">
+                                    {username ? username[0].toUpperCase() : '?'}
+                                </div>
+                                <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">{username}</span>
+                            </div>
+                        </SettingRow>
+                        <SettingRow
+                            label={zh ? '電子郵件' : 'Email'}
+                            sub={zh ? '公司帳號（唯讀）' : 'Corporate account (read-only)'}
+                        >
+                            <span className="text-sm text-gray-500 dark:text-gray-400">{username ? `${username.toLowerCase()}@hmgroup.com` : '—'}</span>
+                        </SettingRow>
+                        <SettingRow label={zh ? '登出帳號' : 'Sign Out'} sub={zh ? '結束目前的工作階段' : 'End your current session'}>
+                            <button
+                                onClick={onLogout}
+                                className="px-4 py-1.5 bg-red-50 dark:bg-red-900/20 text-[#e50010] dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg text-sm font-semibold hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
+                            >
+                                {zh ? '登出' : 'Sign Out'}
+                            </button>
+                        </SettingRow>
+                    </SettingSection>
+
+                    {/* Appearance */}
+                    <SettingSection icon="🎨" title={zh ? '外觀' : 'Appearance'}>
+                        <SettingRow
+                            label={zh ? '色彩主題' : 'Colour Theme'}
+                            sub={zh ? '切換明亮或深色介面' : 'Switch between light and dark interface'}
+                        >
+                            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                                {[['light', '☀️', zh ? '亮色' : 'Light'], ['dark', '🌙', zh ? '暗色' : 'Dark']].map(([val, emoji, label]) => (
+                                    <button
+                                        key={val}
+                                        onClick={() => setTheme(val)}
+                                        className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${theme === val ? 'bg-white dark:bg-gray-600 shadow text-gray-800 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                    >
+                                        {emoji} {label}
+                                    </button>
+                                ))}
+                            </div>
+                        </SettingRow>
+                        <SettingRow
+                            label={zh ? '介面語言' : 'Interface Language'}
+                            sub={zh ? '切換顯示語言' : 'Switch display language'}
+                        >
+                            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                                {[['zh', '繁體中文'], ['en', 'English']].map(([val, label]) => (
+                                    <button
+                                        key={val}
+                                        onClick={() => setLang(val)}
+                                        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${lang === val ? 'bg-white dark:bg-gray-600 shadow text-gray-800 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                        </SettingRow>
+                        <SettingRow
+                            label={zh ? '字體大小' : 'Font Size'}
+                            sub={zh ? '調整全站文字顯示大小' : 'Adjust text size across the portal'}
+                        >
+                            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                                {fontSizeOptions.map(({ v, l }) => (
+                                    <button
+                                        key={v}
+                                        onClick={() => applyFontSize(v)}
+                                        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${fontSize === v ? 'bg-white dark:bg-gray-600 shadow text-gray-800 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                    >
+                                        {l}
+                                    </button>
+                                ))}
+                            </div>
+                        </SettingRow>
+                    </SettingSection>
+
+                    {/* Accessibility */}
+                    <SettingSection icon="♿" title={zh ? '無障礙設定' : 'Accessibility'}>
+                        <SettingRow
+                            label={zh ? '語音導覽速度' : 'Voice Guide Speed'}
+                            sub={zh ? '調整頁面語音朗讀的速度' : 'Adjust the reading speed of the voice guide'}
+                        >
+                            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                                {[0.75, 0.95, 1.2].map(rate => (
+                                    <button
+                                        key={rate}
+                                        onClick={() => setSpeechRate(rate)}
+                                        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${speechRate === rate ? 'bg-white dark:bg-gray-600 shadow text-gray-800 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                    >
+                                        {speechRateLabels[rate]}
+                                    </button>
+                                ))}
+                            </div>
+                        </SettingRow>
+                        <SettingRow
+                            label={zh ? '語音朗讀測試' : 'Test Voice Guide'}
+                            sub={zh ? '播放一段示範語音' : 'Play a sample announcement'}
+                        >
+                            <button
+                                onClick={() => {
+                                    window.speechSynthesis.cancel();
+                                    const u = new SpeechSynthesisUtterance(zh ? 'H&M 企業入口網站，語音導覽已就緒。' : 'H&M Enterprise Portal. Voice guide is ready.');
+                                    u.lang = zh ? 'zh-TW' : 'en-US';
+                                    u.rate = speechRate;
+                                    window.speechSynthesis.speak(u);
+                                }}
+                                className="px-4 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-1.5"
+                            >
+                                <Volume2 size={14} />
+                                {zh ? '播放' : 'Play'}
+                            </button>
+                        </SettingRow>
+                    </SettingSection>
+
+                    {/* Notifications */}
+                    <SettingSection icon="🔔" title={zh ? '通知設定' : 'Notifications'}>
+                        <SettingRow
+                            label={zh ? '頁面語音播報' : 'Page Announcements'}
+                            sub={zh ? '進入頁面時自動播報內容摘要' : 'Auto-announce a content summary when entering a page'}
+                        >
+                            <Toggle value={notifAnnounce} onChange={setNotifAnnounce} />
+                        </SettingRow>
+                        <SettingRow
+                            label={zh ? '網站更新通知' : 'Site Update Alerts'}
+                            sub={zh ? '當網站內容有新更新時顯示提示' : 'Show a banner when site content is updated'}
+                        >
+                            <Toggle value={notifUpdates} onChange={setNotifUpdates} />
+                        </SettingRow>
+                    </SettingSection>
+
+                    {/* About */}
+                    <SettingSection icon="ℹ️" title={zh ? '關於本網站' : 'About'}>
+                        <SettingRow label={zh ? '專題名稱' : 'Project Name'}>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">PMCS G4 TP Final</span>
+                        </SettingRow>
+                        <SettingRow label={zh ? '指導教授' : 'Faculty Advisor'}>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">{zh ? '駱世民 博士' : 'Prof. Shih-Min Lo'}</span>
+                        </SettingRow>
+                        <SettingRow label={zh ? '版本' : 'Version'}>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">v1.0.0</span>
+                        </SettingRow>
+                        <SettingRow label={zh ? '使用聲明' : 'Disclaimer'} sub={zh ? '本網站僅供學術作業使用，非 H&M 官方網站。' : 'For academic purposes only. Not an official H&M website.'}>
+                            <span className="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 px-2 py-0.5 rounded-full font-semibold">{zh ? '學術用途' : 'Academic'}</span>
+                        </SettingRow>
+                    </SettingSection>
+                </div>
+            );
+        };
+
         // 5. Main Application Container
         function App() {
             const [currentView, setCurrentView] = useState('launchpad');
@@ -2229,6 +3142,7 @@
                 { id: 'jobs', title: dict.jobOpenings, subtitle: dict.jobOpeningsSub, icon: Briefcase, info: '', color: 'text-[#e50010]', type: 'placeholder' },
                 { id: 'terminology', title: dict.terminology, subtitle: dict.terminologySub, icon: BookOpen, info: '', color: 'text-gray-800 dark:text-gray-300', type: 'placeholder' },
                 { id: 'ai', title: dict.aiUtilization, subtitle: dict.aiUtilizationSub, icon: Cpu, info: '', color: 'text-purple-600 dark:text-purple-400', type: 'placeholder' },
+                { id: 'career-wizard-tile', title: dict.careerWizard, subtitle: dict.careerWizardSub, icon: Sparkles, info: '', color: 'text-purple-500 dark:text-purple-400', type: 'career-wizard' },
             ];
 
             const navigateTo = (view, appData = null) => {
@@ -2506,17 +3420,20 @@
                 const utterance = new SpeechSynthesisUtterance(textToRead);
                 utterance.lang = zh ? 'zh-TW' : 'en-US';
                 utterance.rate = 0.95;
-                utterance.onstart = () => setIsSpeaking(true);
-                utterance.onend = () => setIsSpeaking(false);
+                utterance.onstart = () => { setIsSpeaking(true); startSpeechResumeTimer(); };
+                utterance.onend = () => { setIsSpeaking(false); stopSpeechResumeTimer(); };
+                utterance.onerror = () => { setIsSpeaking(false); stopSpeechResumeTimer(); };
                 utterance.onpause = () => setIsSpeaking(false);
                 utterance.onresume = () => setIsSpeaking(true);
                 window.speechSynthesis.cancel();
-                window.speechSynthesis.speak(utterance);
+                stopSpeechResumeTimer();
+                // Small delay ensures cancel() is processed before speak() on Chrome
+                setTimeout(() => { window.speechSynthesis.speak(utterance); }, 100);
             };
 
             return (
                 <div className="h-screen flex flex-col bg-[#f4f4f5] dark:bg-gray-900 font-sans antialiased selection:bg-red-200 dark:selection:bg-red-900 transition-colors duration-300 overflow-hidden">
-                    <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} dict={dict} navigateTo={navigateTo} apps={getLaunchpadTiles()} username={loginForm.username} onLogout={() => { setIsLoggedIn(false); setLoginForm({ username: '', password: '' }); }} lang={lang} />
+                    <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} dict={dict} navigateTo={navigateTo} apps={getLaunchpadTiles().filter(a => a.id !== 'career-wizard-tile')} username={loginForm.username} onLogout={() => { setIsLoggedIn(false); setLoginForm({ username: '', password: '' }); }} lang={lang} setLang={setLang} theme={theme} setTheme={setTheme} />
                     
                     <ShellBar 
                         navigateTo={navigateTo} 
@@ -2526,7 +3443,7 @@
                         theme={theme} setTheme={setTheme}
                         announcePage={announcePage}
                         isSpeaking={isSpeaking}
-                        stopSpeech={() => { window.speechSynthesis.cancel(); setIsSpeaking(false); }}
+                        stopSpeech={() => { window.speechSynthesis.cancel(); stopSpeechResumeTimer(); setIsSpeaking(false); }}
                         dict={dict}
                         username={loginForm.username}
                         onLogout={() => { setIsLoggedIn(false); setLoginForm({ username: '', password: '' }); }}
@@ -2546,13 +3463,37 @@
                                     <h3 className="text-gray-600 dark:text-gray-400 text-sm font-semibold uppercase tracking-wider mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">{dict.myApps}</h3>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                         {getLaunchpadTiles().map(app => (
-                                            <FioriTile key={app.id} app={app} onClick={(appData) => navigateTo('app', appData)} dict={dict} />
+                                            <FioriTile key={app.id} app={app} onClick={(appData) => navigateTo('app', appData)} onCareerWizard={() => navigateTo('career-wizard')} dict={dict} />
                                         ))}
                                     </div>
                                 </div>
                             </div>
                         )}
                         
+                        {currentView === 'career-wizard' && (
+                            <div className="animate-in slide-in-from-right-4 duration-300 ease-out h-full">
+                                <CareerWizardApp dict={dict} lang={lang} navigateTo={navigateTo} />
+                            </div>
+                        )}
+
+                        {currentView === 'settings' && (
+                            <div className="animate-in slide-in-from-right-4 duration-300 ease-out h-full">
+                                <SettingsApp
+                                    lang={lang} setLang={setLang}
+                                    theme={theme} setTheme={setTheme}
+                                    username={loginForm.username}
+                                    onLogout={() => { setIsLoggedIn(false); setLoginForm({ username: '', password: '' }); }}
+                                    navigateTo={navigateTo}
+                                />
+                            </div>
+                        )}
+
+                        {currentView === 'help' && (
+                            <div className="animate-in slide-in-from-right-4 duration-300 ease-out h-full overflow-y-auto">
+                                <HelpSupportApp lang={lang} navigateTo={navigateTo} />
+                            </div>
+                        )}
+
                         {currentView === 'app' && selectedApp && (
                             <div className="animate-in slide-in-from-right-4 duration-300 ease-out h-full">
                                 {selectedApp.id === 'team' ? (
@@ -2588,6 +3529,206 @@
                 </div>
             );
         }
+
+        // ── Help & Support Application ────────────────────────────────
+        const HelpSupportApp = ({ lang, navigateTo }) => {
+            const zh = lang === 'zh';
+            const [openFaq, setOpenFaq] = useState(null);
+            const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+            const [submitted, setSubmitted] = useState(false);
+
+            const faqs = zh ? [
+                { q: '如何切換語言？', a: '點擊頁面右上角的地球圖示（🌐），即可在中文與英文之間切換。' },
+                { q: '如何切換深色模式？', a: '點擊右上角的月亮 / 太陽圖示即可切換深色模式與亮色模式。' },
+                { q: '語音導覽功能如何使用？', a: '點擊右上角的喇叭圖示（🔊）即可啟動語音導覽，系統將朗讀當前頁面的內容。再次點擊可暫停，點擊停止按鈕可終止朗讀。' },
+                { q: '詞彙測驗的分數是如何計算的？', a: '每次測驗隨機抽取 5 題，每答對 1 題得 1 分。測驗完成後可在「測驗紀錄」區塊查看歷史成績與正確率。' },
+                { q: '如何查看各組員的聯絡信箱？', a: '前往「小組成員介紹」頁面，每位組員卡片下方皆有電子郵件連結，點擊後可直接開啟郵件應用程式。' },
+                { q: '這個網站是官方 H&M 網站嗎？', a: '否，本網站為學術用途，由暨南國際大學 PMCS G4 小組製作，僅供課程專題展示之用，並非 H&M 集團的官方網站。' },
+            ] : [
+                { q: 'How do I switch the language?', a: 'Click the globe icon (🌐) in the top-right corner to toggle between English and Chinese.' },
+                { q: 'How do I enable dark mode?', a: 'Click the moon / sun icon in the top-right corner to switch between light and dark mode.' },
+                { q: 'How does the Voice Guide work?', a: 'Click the speaker icon (🔊) in the top-right corner to start the voice guide. The system will read out the current page content. Click again to pause, or use the stop button to end playback.' },
+                { q: 'How is the quiz score calculated?', a: '5 random questions are drawn each time. You earn 1 point per correct answer. After completing a quiz, your history and accuracy are saved in the Quiz History panel.' },
+                { q: 'How can I contact a team member?', a: 'Go to the Team Introduction page. Each member\'s card has a clickable email link at the bottom that opens your mail app directly.' },
+                { q: 'Is this the official H&M website?', a: 'No. This is an academic project created by the PMCS G4 team at National Chi Nan University, for course presentation purposes only. It is not affiliated with H&M Group.' },
+            ];
+
+            const resources = [
+                { label: zh ? 'H&M 集團官方網站' : 'H&M Group Official Website', url: 'https://hmgroup.com', desc: zh ? '投資人關係、品牌資訊與永續發展報告' : 'Investor relations, brand info & sustainability', icon: '🌐' },
+                { label: zh ? 'H&M 品牌官網' : 'H&M Brand Website', url: 'https://www.hm.com', desc: zh ? '商品瀏覽、線上購物與門市資訊' : 'Shop online, browse products & find stores', icon: '🛍️' },
+                { label: zh ? 'H&M 職涯招募頁面' : 'H&M Careers Page', url: 'https://career.hmgroup.com', desc: zh ? '搜尋全球職缺並加入人才社群' : 'Search global openings & join the talent community', icon: '💼' },
+                { label: zh ? 'H&M 年度報告（2025）' : 'H&M Annual Report 2025', url: 'https://hmgroup.com/investors/reports-and-presentations/annual-reports/', desc: zh ? '最新財務數據與永續發展進度' : 'Latest financials & sustainability progress', icon: '📄' },
+                { label: zh ? '暨南國際大學國際企業學系' : 'NCNU Dept. of International Business', url: 'https://ibs.ncnu.edu.tw', desc: zh ? '本專題指導教授所屬單位' : 'Home department of the project advisor', icon: '🎓' },
+                { label: zh ? '指導教授 駱世民 博士' : 'Advisor: Prof. Shih-Min Lo', url: 'mailto:smlo@ncnu.edu.tw', desc: zh ? '電子郵件：smlo@ncnu.edu.tw' : 'Email: smlo@ncnu.edu.tw', icon: '👨‍🏫' },
+            ];
+
+            const teamContacts = [
+                { name: 'Zoe',     email: 's113251013@mail1.ncnu.edu.tw', role: zh ? '管理學院學士班' : 'College of Management' },
+                { name: 'Jenifer', email: 's113212044@mail1.ncnu.edu.tw', role: zh ? '國際企業學系' : 'International Business' },
+                { name: 'Andy',    email: 's114400003@mail1.ncnu.edu.tw', role: zh ? '諮商心理與人力資源發展學系' : 'Counseling Psychology & HRD' },
+                { name: 'Jessica', email: 's111101002@mail1.ncnu.edu.tw', role: zh ? '中國語文學系' : 'Chinese Literature' },
+                { name: 'Diana',   email: 's111212029@mail1.ncnu.edu.tw', role: zh ? '國際企業學系' : 'International Business' },
+            ];
+
+            const handleSubmit = () => {
+                if (!form.name.trim() || !form.email.trim() || !form.message.trim()) return;
+                const mailto = `mailto:s111212029@mail1.ncnu.edu.tw?subject=${encodeURIComponent(form.subject || (zh ? '來自 H&M 入口網站的訊息' : 'Message from H&M Portal'))}&body=${encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`)}`;
+                window.location.href = mailto;
+                setSubmitted(true);
+            };
+
+            return (
+                <div className="p-6 md:p-8 max-w-5xl mx-auto animate-in fade-in duration-300 w-full pb-16">
+                    {/* Header */}
+                    <div className="mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
+                        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                            <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#e50010] text-white shrink-0">
+                                <Icon name="HelpCircle" size={22} />
+                            </span>
+                            {zh ? '說明與支援' : 'Help & Support'}
+                        </h2>
+                        <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">
+                            {zh ? '找到您需要的答案，或直接與我們的團隊聯繫。' : 'Find answers to common questions, or reach out to our team directly.'}
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Left column: FAQ + Resources */}
+                        <div className="lg:col-span-2 space-y-6">
+
+                            {/* FAQ */}
+                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                                <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
+                                    <span className="text-lg">❓</span>
+                                    <h3 className="font-bold text-gray-800 dark:text-gray-100">{zh ? '常見問題' : 'Frequently Asked Questions'}</h3>
+                                </div>
+                                <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                                    {faqs.map((faq, i) => (
+                                        <div key={i}>
+                                            <button
+                                                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                                                className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                                            >
+                                                <span className="text-sm font-semibold text-gray-700 dark:text-gray-200 pr-4">{faq.q}</span>
+                                                <span className={`shrink-0 transition-transform duration-200 text-gray-400 ${openFaq === i ? 'rotate-180' : ''}`}>
+                                                    <Icon name="ChevronDown" size={16} />
+                                                </span>
+                                            </button>
+                                            {openFaq === i && (
+                                                <div className="px-6 pb-4 text-sm text-gray-600 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-700/30">
+                                                    {faq.a}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Resources */}
+                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                                <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
+                                    <span className="text-lg">🔗</span>
+                                    <h3 className="font-bold text-gray-800 dark:text-gray-100">{zh ? '相關資源連結' : 'Useful Links & Resources'}</h3>
+                                </div>
+                                <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {resources.map((r, i) => (
+                                        <a key={i} href={r.url} target="_blank" rel="noopener noreferrer"
+                                            className="flex items-start gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-[#e50010] dark:hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all group">
+                                            <span className="text-2xl shrink-0 mt-0.5">{r.icon}</span>
+                                            <div className="overflow-hidden">
+                                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 group-hover:text-[#e50010] dark:group-hover:text-red-400 transition-colors truncate">{r.label}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-snug">{r.desc}</p>
+                                            </div>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right column: Contact Form + Team Contacts */}
+                        <div className="space-y-6">
+                            {/* Contact Form */}
+                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                                <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
+                                    <span className="text-lg">✉️</span>
+                                    <h3 className="font-bold text-gray-800 dark:text-gray-100">{zh ? '聯絡我們' : 'Contact Us'}</h3>
+                                </div>
+                                {submitted ? (
+                                    <div className="p-6 text-center">
+                                        <div className="text-4xl mb-3">✅</div>
+                                        <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm">{zh ? '訊息已準備完成！' : 'Message ready!'}</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{zh ? '您的郵件應用程式應已開啟。' : 'Your mail app should have opened.'}</p>
+                                        <button onClick={() => { setSubmitted(false); setForm({ name: '', email: '', subject: '', message: '' }); }}
+                                            className="mt-4 text-xs text-[#e50010] hover:underline">
+                                            {zh ? '再次發送' : 'Send another'}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="p-5 space-y-3">
+                                        {[
+                                            { key: 'name',    label: zh ? '您的姓名 *' : 'Your Name *',    type: 'text',  placeholder: zh ? '請輸入姓名' : 'Enter your name' },
+                                            { key: 'email',   label: zh ? '電子郵件 *' : 'Email *',         type: 'email', placeholder: zh ? '請輸入信箱' : 'Enter your email' },
+                                            { key: 'subject', label: zh ? '主旨' : 'Subject',               type: 'text',  placeholder: zh ? '訊息主旨（選填）' : 'Message subject (optional)' },
+                                        ].map(f => (
+                                            <div key={f.key}>
+                                                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">{f.label}</label>
+                                                <input
+                                                    type={f.type}
+                                                    value={form[f.key]}
+                                                    onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
+                                                    placeholder={f.placeholder}
+                                                    className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e50010] focus:border-transparent transition"
+                                                />
+                                            </div>
+                                        ))}
+                                        <div>
+                                            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">{zh ? '訊息內容 *' : 'Message *'}</label>
+                                            <textarea
+                                                rows={4}
+                                                value={form.message}
+                                                onChange={e => setForm(prev => ({ ...prev, message: e.target.value }))}
+                                                placeholder={zh ? '請輸入您的訊息…' : 'Write your message…'}
+                                                className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e50010] focus:border-transparent transition resize-none"
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={handleSubmit}
+                                            disabled={!form.name.trim() || !form.email.trim() || !form.message.trim()}
+                                            className="w-full py-2.5 bg-[#e50010] hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors"
+                                        >
+                                            {zh ? '傳送訊息 →' : 'Send Message →'}
+                                        </button>
+                                        <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{zh ? '點擊後將開啟您的郵件應用程式。' : 'Clicking will open your mail app.'}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Team Contacts */}
+                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                                <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
+                                    <span className="text-lg">👥</span>
+                                    <h3 className="font-bold text-gray-800 dark:text-gray-100">{zh ? '團隊聯絡方式' : 'Team Contacts'}</h3>
+                                </div>
+                                <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                                    {teamContacts.map((c, i) => (
+                                        <a key={i} href={`mailto:${c.email}`}
+                                            className="flex items-center gap-3 px-5 py-3 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors group">
+                                            <div className="w-8 h-8 rounded-full bg-[#e50010]/10 dark:bg-red-900/30 flex items-center justify-center text-[#e50010] dark:text-red-400 font-bold text-sm shrink-0">
+                                                {c.name[0]}
+                                            </div>
+                                            <div className="overflow-hidden">
+                                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 group-hover:text-[#e50010] dark:group-hover:text-red-400 transition-colors">{c.name}</p>
+                                                <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{c.email}</p>
+                                            </div>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
