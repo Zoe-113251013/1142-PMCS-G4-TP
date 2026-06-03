@@ -2794,7 +2794,9 @@
                                 © {year} G4 TP Final.
                             </span>
                             <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-l pl-3 border-gray-300 dark:border-gray-700">
-                                {dict.professorName}
+                                <a href="https://www.ibs.ncnu.edu.tw/index.php/faculty/tenured-professor/299-smlo" target="_blank" rel="noopener noreferrer" className="hover:text-[#e50010] dark:hover:text-red-400 transition-colors underline underline-offset-2 decoration-dotted">
+                                    {dict.professorName}
+                                </a>
                             </span>
                             <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-l pl-3 border-gray-300 dark:border-gray-700 hidden lg:inline">
                                 {dict.academicUseOnly}
@@ -3419,7 +3421,7 @@
         function App() {
             const [currentView, setCurrentView] = useState('launchpad');
             const [selectedApp, setSelectedApp] = useState(null);
-            const [lang, setLang] = useState('zh');
+            const [lang, setLang] = useState('en');
             const [theme, setTheme] = useState('light');
             const [isSidebarOpen, setSidebarOpen] = useState(false);
             const [isSpeaking, setIsSpeaking] = useState(false);
