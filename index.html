@@ -358,6 +358,113 @@
 
         // --- COMPONENTS ---
 
+        // 0. Bell Notifications Component
+        const BellNotifications = ({ lang }) => {
+            const zh = lang === 'zh';
+            const [open, setOpen] = useState(false);
+            const [notifications, setNotifications] = useState([
+                { id: 1, read: false, icon: '📢', title: zh ? '網站已上線' : 'Portal Launched', body: zh ? 'H&M 企業入口網站 G4 TP Final 正式上線！' : 'H&M Enterprise Portal G4 TP Final is now live!', time: zh ? '剛剛' : 'Just now' },
+                { id: 2, read: false, icon: '📄', title: zh ? '年報已更新' : 'Annual Report Updated', body: zh ? 'H&M 2025 年度與永續發展報告現已可下載。' : 'H&M Annual & Sustainability Report 2025 is now available.', time: zh ? '1 小時前' : '1h ago' },
+                { id: 3, read: false, icon: '💼', title: zh ? '新職缺上架' : 'New Job Listing', body: zh ? 'H&M 數位產品經理職缺正積極招募中，歡迎投遞！' : 'H&M Digital Product Manager role is actively hiring — apply now!', time: zh ? '昨天' : 'Yesterday' },
+                { id: 4, read: true, icon: '🎓', title: zh ? '詞彙測驗提醒' : 'Terminology Quiz', body: zh ? '試試核心領域詞彙測驗，挑戰你的 PM 知識！' : 'Challenge yourself with the terminology quiz in the Terminology section!', time: zh ? '2 天前' : '2d ago' },
+            ]);
+            const bellRef = useRef();
+
+            // Sync notification text when language changes
+            React.useEffect(() => {
+                setNotifications([
+                    { id: 1, read: notifications.find(n=>n.id===1)?.read ?? false, icon: '📢', title: zh ? '網站已上線' : 'Portal Launched', body: zh ? 'H&M 企業入口網站 G4 TP Final 正式上線！' : 'H&M Enterprise Portal G4 TP Final is now live!', time: zh ? '剛剛' : 'Just now' },
+                    { id: 2, read: notifications.find(n=>n.id===2)?.read ?? false, icon: '📄', title: zh ? '年報已更新' : 'Annual Report Updated', body: zh ? 'H&M 2025 年度與永續發展報告現已可下載。' : 'H&M Annual & Sustainability Report 2025 is now available.', time: zh ? '1 小時前' : '1h ago' },
+                    { id: 3, read: notifications.find(n=>n.id===3)?.read ?? false, icon: '💼', title: zh ? '新職缺上架' : 'New Job Listing', body: zh ? 'H&M 數位產品經理職缺正積極招募中，歡迎投遞！' : 'H&M Digital Product Manager role is actively hiring — apply now!', time: zh ? '昨天' : 'Yesterday' },
+                    { id: 4, read: notifications.find(n=>n.id===4)?.read ?? true, icon: '🎓', title: zh ? '詞彙測驗提醒' : 'Terminology Quiz', body: zh ? '試試核心領域詞彙測驗，挑戰你的 PM 知識！' : 'Challenge yourself with the terminology quiz in the Terminology section!', time: zh ? '2 天前' : '2d ago' },
+                ]);
+            }, [lang]);
+
+            useEffect(() => {
+                const handler = (e) => { if (bellRef.current && !bellRef.current.contains(e.target)) setOpen(false); };
+                document.addEventListener('mousedown', handler);
+                return () => document.removeEventListener('mousedown', handler);
+            }, []);
+
+            const unreadCount = notifications.filter(n => !n.read).length;
+
+            const markAllRead = () => setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+            const markRead = (id) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+            const dismiss = (id) => setNotifications(prev => prev.filter(n => n.id !== id));
+
+            return (
+                <div className="relative hidden sm:block" ref={bellRef}>
+                    <button
+                        onClick={() => { setOpen(v => !v); }}
+                        className="p-2 hover:bg-white/20 rounded-full transition-colors relative"
+                        title={zh ? '通知' : 'Notifications'}
+                    >
+                        <Bell size={18} />
+                        {unreadCount > 0 && (
+                            <span className="absolute top-1 right-1 min-w-[16px] h-4 px-0.5 bg-yellow-400 text-[#e50010] text-[10px] font-bold rounded-full flex items-center justify-center border border-[#e50010] leading-none">
+                                {unreadCount}
+                            </span>
+                        )}
+                    </button>
+                    {open && (
+                        <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+                            {/* Header */}
+                            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+                                <div className="flex items-center gap-2">
+                                    <Bell size={15} className="text-[#e50010]" />
+                                    <span className="font-bold text-sm text-gray-800 dark:text-gray-100">{zh ? '通知' : 'Notifications'}</span>
+                                    {unreadCount > 0 && (
+                                        <span className="bg-[#e50010] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{unreadCount}</span>
+                                    )}
+                                </div>
+                                {unreadCount > 0 && (
+                                    <button onClick={markAllRead} className="text-xs text-[#e50010] hover:underline font-medium">
+                                        {zh ? '全部標為已讀' : 'Mark all read'}
+                                    </button>
+                                )}
+                            </div>
+                            {/* Notification list */}
+                            <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
+                                {notifications.length === 0 ? (
+                                    <div className="py-10 text-center text-gray-400 dark:text-gray-500 text-sm">
+                                        <div className="text-3xl mb-2">🔕</div>
+                                        {zh ? '目前沒有通知' : 'No notifications'}
+                                    </div>
+                                ) : notifications.map(n => (
+                                    <div
+                                        key={n.id}
+                                        onClick={() => markRead(n.id)}
+                                        className={`flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50 ${!n.read ? 'bg-red-50/60 dark:bg-red-900/10' : ''}`}
+                                    >
+                                        <span className="text-xl shrink-0 mt-0.5">{n.icon}</span>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between gap-1">
+                                                <p className={`text-sm font-semibold truncate ${!n.read ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>{n.title}</p>
+                                                <span className="text-[10px] text-gray-400 dark:text-gray-500 shrink-0">{n.time}</span>
+                                            </div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-snug">{n.body}</p>
+                                        </div>
+                                        <button
+                                            onClick={e => { e.stopPropagation(); dismiss(n.id); }}
+                                            className="shrink-0 text-gray-300 hover:text-gray-500 dark:text-gray-600 dark:hover:text-gray-400 transition-colors mt-0.5"
+                                            title={zh ? '關閉' : 'Dismiss'}
+                                        >
+                                            <Icon name="X" size={14} />
+                                        </button>
+                                        {!n.read && <span className="w-2 h-2 rounded-full bg-[#e50010] shrink-0 mt-1.5 self-start"></span>}
+                                    </div>
+                                ))}
+                            </div>
+                            {/* Footer */}
+                            <div className="px-4 py-2.5 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30 text-center">
+                                <span className="text-xs text-gray-400 dark:text-gray-500">{zh ? '點擊通知標為已讀，× 可移除' : 'Click to mark read · × to dismiss'}</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         // 1. Fiori Shell Bar (Global Header)
         const ShellBar = ({ navigateTo, currentView, toggleSidebar, lang, setLang, theme, setTheme, announcePage, isSpeaking, stopSpeech, dict, username, onLogout }) => {
             const [showUserMenu, setShowUserMenu] = useState(false);
@@ -420,10 +527,7 @@
                     
                     <div className="w-px h-5 bg-white/30 mx-1 hidden sm:block"></div>
                     
-                    <button className="p-2 hover:bg-white/20 rounded-full transition-colors relative hidden sm:block">
-                        <Bell size={18} />
-                        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-yellow-400 rounded-full border border-[#e50010]"></span>
-                    </button>
+                    <BellNotifications lang={lang} />
                     {/* User profile button with dropdown */}
                     <div className="relative" ref={userMenuRef}>
                         <button
@@ -2467,8 +2571,219 @@
             );
         };
 
+        // 4.5 Legal / Contact Modal
+        const LegalModal = ({ type, lang, onClose }) => {
+            const zh = lang === 'zh';
+            const overlayRef = useRef();
+
+            useEffect(() => {
+                const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+                document.addEventListener('keydown', onKey);
+                return () => document.removeEventListener('keydown', onKey);
+            }, []);
+
+            const content = {
+                privacy: {
+                    title: zh ? '隱私權政策' : 'Privacy Policy',
+                    icon: '🔒',
+                    lastUpdated: zh ? '最後更新：2025 年 6 月' : 'Last updated: June 2025',
+                    body: zh ? [
+                        { heading: '1. 概述', text: '本網站（H&M 企業入口網站）由暨南國際大學 PMCS G4 小組製作，僅供學術課程展示使用，非 H&M 集團官方網站。本隱私權政策說明本網站如何處理您的資訊。' },
+                        { heading: '2. 資料收集', text: '本網站為純靜態前端展示頁面，不設有後端伺服器，亦不蒐集、儲存或傳輸任何個人識別資訊至外部系統。登入所使用的帳號與密碼僅在您的瀏覽器本地記憶體中驗證，不會上傳至任何伺服器。' },
+                        { heading: '3. Cookie 與本地儲存', text: '本網站使用瀏覽器的 localStorage 功能儲存詞彙測驗歷史記錄。這些資料僅存在於您的裝置上，不會與本站開發團隊或任何第三方共享。您可隨時透過清除瀏覽器資料來刪除這些記錄。' },
+                        { heading: '4. 第三方資源', text: '本網站透過 CDN 載入 Google Fonts、Tailwind CSS、React、Lucide 等開源資源。這些服務提供者可能依其各自隱私政策蒐集匿名使用資料（如 IP 位址）。建議您自行查閱各服務商的隱私政策。' },
+                        { heading: '5. 語音功能', text: '本網站之語音導覽功能使用您瀏覽器內建的 Web Speech API，文字轉語音處理在您的裝置本地端進行，不會傳送至本站伺服器。' },
+                        { heading: '6. 聯絡方式', text: '若您對本隱私政策有任何疑問，請透過「聯絡我們」頁面與 G4 小組聯繫，或直接寄信至 s111212029@mail1.ncnu.edu.tw。' },
+                    ] : [
+                        { heading: '1. Overview', text: 'This website (H&M Enterprise Portal) is created by the PMCS G4 team at National Chi Nan University solely for academic coursework presentation. It is not an official H&M Group website. This Privacy Policy explains how this site handles your information.' },
+                        { heading: '2. Data Collection', text: 'This website is a purely static front-end page with no backend server. It does not collect, store, or transmit any personally identifiable information to external systems. The username and password used during login are verified only in your browser\'s local memory and are never sent to any server.' },
+                        { heading: '3. Cookies & Local Storage', text: 'This website uses the browser\'s localStorage to save your terminology quiz history. This data exists only on your device and is never shared with the development team or any third party. You can delete it at any time by clearing your browser data.' },
+                        { heading: '4. Third-Party Resources', text: 'This website loads open-source resources including Google Fonts, Tailwind CSS, React, and Lucide via CDN. These providers may collect anonymous usage data (e.g., IP addresses) under their own privacy policies. We encourage you to review each provider\'s policy independently.' },
+                        { heading: '5. Voice Feature', text: 'The voice guide feature on this website uses your browser\'s built-in Web Speech API. Text-to-speech processing happens locally on your device and is not transmitted to our servers.' },
+                        { heading: '6. Contact', text: 'If you have any questions about this Privacy Policy, please reach out via the Contact Us page, or email us directly at s111212029@mail1.ncnu.edu.tw.' },
+                    ],
+                },
+                terms: {
+                    title: zh ? '使用條款' : 'Terms of Use',
+                    icon: '📋',
+                    lastUpdated: zh ? '最後更新：2025 年 6 月' : 'Last updated: June 2025',
+                    body: zh ? [
+                        { heading: '1. 學術用途聲明', text: '本網站（H&M 企業入口網站）為暨南國際大學 PMCS 課程 G4 小組之學術專題作品，僅供課程展示與評分使用，不作任何商業用途。' },
+                        { heading: '2. 與 H&M 集團之關係', text: '本網站與 H&M Hennes & Mauritz AB 集團無任何官方隸屬、授權或合作關係。網站內所使用之 H&M 品牌名稱、商標、財務數據及相關資訊，均引用自公開資料，僅供學術研究參考，其商標權及著作權均歸 H&M 集團所有。' },
+                        { heading: '3. 資訊準確性', text: '本網站所呈現之資訊（包含財務數據、職缺資訊及公司介紹）均取自公開資料，力求準確，但不保證其完整性與即時性。使用者不應將本網站內容作為投資、法律或職涯決策之依據。' },
+                        { heading: '4. 禁止行為', text: '您同意不得：（一）將本網站內容用於任何商業目的；（二）偽稱本網站為官方 H&M 資源；（三）對本網站進行逆向工程或惡意干擾；（四）以任何方式侵害 H&M 集團之智慧財產權。' },
+                        { heading: '5. 免責聲明', text: '本網站以「現況」提供，不附帶任何明示或默示之保證。本站開發團隊不對因使用本網站所產生之任何損失或損害負責。' },
+                        { heading: '6. 條款修改', text: '本小組保留隨時修改本使用條款之權利，修改後的條款將於本頁面更新。繼續使用本網站即表示您接受修改後的條款。' },
+                    ] : [
+                        { heading: '1. Academic Purpose', text: 'This website (H&M Enterprise Portal) is an academic project created by the PMCS G4 team at National Chi Nan University, intended solely for coursework presentation and grading. It is not for any commercial use.' },
+                        { heading: '2. Relationship with H&M Group', text: 'This website has no official affiliation, authorization, or partnership with H&M Hennes & Mauritz AB. The H&M brand name, trademarks, financial data, and related information used on this site are sourced from publicly available materials for academic research purposes only. All trademark and copyright rights remain with H&M Group.' },
+                        { heading: '3. Accuracy of Information', text: 'Information presented on this website (including financial data, job listings, and company descriptions) is sourced from public records and is provided in good faith, but without guarantee of completeness or timeliness. Users should not rely on this website\'s content for investment, legal, or career decisions.' },
+                        { heading: '4. Prohibited Conduct', text: 'You agree not to: (i) use this website\'s content for any commercial purpose; (ii) represent this website as an official H&M resource; (iii) reverse-engineer or maliciously interfere with this website; or (iv) infringe upon H&M Group\'s intellectual property rights in any manner.' },
+                        { heading: '5. Disclaimer', text: 'This website is provided "as is" without warranties of any kind, either express or implied. The development team is not liable for any loss or damage resulting from the use of this website.' },
+                        { heading: '6. Amendments', text: 'We reserve the right to modify these Terms of Use at any time. Updated terms will be reflected on this page. Continued use of this website constitutes acceptance of the revised terms.' },
+                    ],
+                },
+                contact: {
+                    title: zh ? '聯絡我們' : 'Contact Us',
+                    icon: '✉️',
+                    lastUpdated: null,
+                    body: null,
+                },
+            };
+
+            const c = content[type];
+            const teamContacts = [
+                { name: 'Zoe',     role: zh ? '組長 · 管理學院學士班' : 'Team Lead · College of Management', email: 's113251013@mail1.ncnu.edu.tw', initial: 'Z', color: 'bg-[#e50010]' },
+                { name: 'Jenifer', role: zh ? '內容研究 · 國際企業學系' : 'Content Research · International Business', email: 's113212044@mail1.ncnu.edu.tw', initial: 'J', color: 'bg-blue-600' },
+                { name: 'Andy',    role: zh ? '網站開發 · 諮商心理與人力資源發展學系' : 'Web Dev · Counseling Psychology & HRD', email: 's114400003@mail1.ncnu.edu.tw', initial: 'A', color: 'bg-emerald-600' },
+                { name: 'Jessica', role: zh ? '職缺分析 · 中國語文學系' : 'Job Analysis · Chinese Literature', email: 's111101002@mail1.ncnu.edu.tw', initial: 'J', color: 'bg-purple-600' },
+                { name: 'Diana',   role: zh ? '網站開發 · 國際企業學系' : 'Web Dev · International Business', email: 's111212029@mail1.ncnu.edu.tw', initial: 'D', color: 'bg-amber-600' },
+            ];
+
+            const [contactForm, setContactForm] = useState({ name: '', email: '', subject: '', message: '' });
+            const [submitted, setSubmitted] = useState(false);
+            const handleSend = () => {
+                if (!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()) return;
+                const mailto = `mailto:s111212029@mail1.ncnu.edu.tw?subject=${encodeURIComponent(contactForm.subject || (zh ? '來自 H&M 入口網站的訊息' : 'Message from H&M Portal'))}&body=${encodeURIComponent(`Name: ${contactForm.name}\nEmail: ${contactForm.email}\n\n${contactForm.message}`)}`;
+                window.location.href = mailto;
+                setSubmitted(true);
+            };
+
+            return (
+                <div
+                    ref={overlayRef}
+                    className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+                    onClick={e => { if (e.target === overlayRef.current) onClose(); }}
+                >
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700">
+                        {/* Modal header */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 shrink-0">
+                            <div className="flex items-center gap-3">
+                                <span className="text-2xl">{c.icon}</span>
+                                <div>
+                                    <h2 className="font-bold text-lg text-gray-900 dark:text-white">{c.title}</h2>
+                                    {c.lastUpdated && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{c.lastUpdated}</p>}
+                                </div>
+                            </div>
+                            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-gray-400">
+                                <Icon name="X" size={18} />
+                            </button>
+                        </div>
+
+                        {/* Modal body */}
+                        <div className="overflow-y-auto flex-1 px-6 py-5">
+                            {/* Privacy & Terms: section list */}
+                            {c.body && (
+                                <div className="space-y-5">
+                                    {c.body.map((section, i) => (
+                                        <div key={i}>
+                                            <h3 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-1.5">{section.heading}</h3>
+                                            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{section.text}</p>
+                                        </div>
+                                    ))}
+                                    <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
+                                        <p className="text-xs text-yellow-700 dark:text-yellow-400 font-medium">
+                                            {zh ? '⚠️ 本網站為學術作業，非 H&M 集團官方網站。' : '⚠️ This is an academic project and not an official H&M Group website.'}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Contact Us */}
+                            {type === 'contact' && (
+                                <div className="space-y-6">
+                                    {/* Team member cards */}
+                                    <div>
+                                        <h3 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
+                                            <span>👥</span>{zh ? '團隊聯絡方式' : 'Team Members'}
+                                        </h3>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            {teamContacts.map((m, i) => (
+                                                <a key={i} href={`mailto:${m.email}`}
+                                                    className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-[#e50010] dark:hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all group">
+                                                    <div className={`w-9 h-9 rounded-full ${m.color} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
+                                                        {m.initial}
+                                                    </div>
+                                                    <div className="overflow-hidden">
+                                                        <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 group-hover:text-[#e50010] dark:group-hover:text-red-400 transition-colors">{m.name}</p>
+                                                        <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{m.role}</p>
+                                                        <p className="text-xs text-[#e50010] dark:text-red-400 truncate mt-0.5">{m.email}</p>
+                                                    </div>
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Faculty advisor */}
+                                    <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center gap-4">
+                                        <span className="text-3xl shrink-0">👨‍🏫</span>
+                                        <div>
+                                            <p className="font-bold text-sm text-gray-800 dark:text-gray-100">{zh ? '指導教授' : 'Faculty Advisor'}</p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-300">{zh ? '駱世民 博士 · 暨南國際大學國際企業學系' : 'Prof. Shih-Min Lo · NCNU Dept. of International Business'}</p>
+                                            <a href="mailto:smlo@ncnu.edu.tw" className="text-xs text-[#e50010] dark:text-red-400 hover:underline mt-0.5 inline-block">smlo@ncnu.edu.tw</a>
+                                        </div>
+                                    </div>
+
+                                    {/* Send message form */}
+                                    <div>
+                                        <h3 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
+                                            <span>✉️</span>{zh ? '傳送訊息' : 'Send a Message'}
+                                        </h3>
+                                        {submitted ? (
+                                            <div className="text-center py-6">
+                                                <div className="text-4xl mb-2">✅</div>
+                                                <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm">{zh ? '您的郵件應用程式應已開啟！' : 'Your mail app should have opened!'}</p>
+                                                <button onClick={() => { setSubmitted(false); setContactForm({ name: '', email: '', subject: '', message: '' }); }}
+                                                    className="mt-3 text-xs text-[#e50010] hover:underline">{zh ? '再次傳送' : 'Send another'}</button>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-3">
+                                                {[
+                                                    { key: 'name',    type: 'text',  label: zh ? '姓名 *' : 'Name *',    ph: zh ? '請輸入姓名' : 'Your name' },
+                                                    { key: 'email',   type: 'email', label: zh ? '信箱 *' : 'Email *',   ph: zh ? '請輸入信箱' : 'your@email.com' },
+                                                    { key: 'subject', type: 'text',  label: zh ? '主旨' : 'Subject',     ph: zh ? '訊息主旨（選填）' : 'Subject (optional)' },
+                                                ].map(f => (
+                                                    <div key={f.key}>
+                                                        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{f.label}</label>
+                                                        <input type={f.type} value={contactForm[f.key]}
+                                                            onChange={e => setContactForm(p => ({ ...p, [f.key]: e.target.value }))}
+                                                            placeholder={f.ph}
+                                                            className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e50010] focus:border-transparent transition" />
+                                                    </div>
+                                                ))}
+                                                <div>
+                                                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{zh ? '訊息 *' : 'Message *'}</label>
+                                                    <textarea rows={3} value={contactForm.message}
+                                                        onChange={e => setContactForm(p => ({ ...p, message: e.target.value }))}
+                                                        placeholder={zh ? '請輸入您的訊息…' : 'Write your message…'}
+                                                        className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e50010] focus:border-transparent transition resize-none" />
+                                                </div>
+                                                <button onClick={handleSend}
+                                                    disabled={!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()}
+                                                    className="w-full py-2.5 bg-[#e50010] hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors">
+                                                    {zh ? '傳送訊息 →' : 'Send Message →'}
+                                                </button>
+                                                <p className="text-xs text-gray-400 text-center">{zh ? '點擊後將開啟您的郵件應用程式。' : 'This will open your mail app.'}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Modal footer */}
+                        <div className="px-6 py-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 shrink-0 flex justify-end">
+                            <button onClick={onClose} className="px-5 py-2 bg-[#e50010] hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors">
+                                {zh ? '關閉' : 'Close'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         // 4.5 Global Footer (全域資訊欄)
-        const Footer = ({ dict }) => {
+        const Footer = ({ dict, lang, onOpenModal }) => {
             const year = new Date().getFullYear();
             return (
                 <footer className="bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 py-4 shrink-0 transition-colors duration-300 z-40 relative">
@@ -2486,9 +2801,9 @@
                             </span>
                         </div>
                         <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm">
-                            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-[#e50010] dark:hover:text-red-400 transition-colors">{dict.privacy}</a>
-                            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-[#e50010] dark:hover:text-red-400 transition-colors">{dict.terms}</a>
-                            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-[#e50010] dark:hover:text-red-400 transition-colors">{dict.contact}</a>
+                            <button onClick={() => onOpenModal('privacy')} className="text-gray-600 dark:text-gray-300 hover:text-[#e50010] dark:hover:text-red-400 transition-colors">{dict.privacy}</button>
+                            <button onClick={() => onOpenModal('terms')}   className="text-gray-600 dark:text-gray-300 hover:text-[#e50010] dark:hover:text-red-400 transition-colors">{dict.terms}</button>
+                            <button onClick={() => onOpenModal('contact')} className="text-gray-600 dark:text-gray-300 hover:text-[#e50010] dark:hover:text-red-400 transition-colors">{dict.contact}</button>
                         </div>
                     </div>
                 </footer>
@@ -3027,6 +3342,79 @@
             );
         };
 
+        // Section order for navigation
+        const SECTION_ORDER = ['team', 'history', 'structure', 'finance', 'jobs', 'terminology', 'ai'];
+
+        // Section nav labels
+        const SECTION_LABELS_ZH = {
+            team: '小組成員介紹', history: '公司歷史', structure: '組織架構',
+            finance: '財務資訊', jobs: '職缺資料', terminology: '核心領域詞彙', ai: 'AI 使用紀錄',
+        };
+        const SECTION_LABELS_EN = {
+            team: 'Team Intro', history: 'Company History', structure: 'Org Structure',
+            finance: 'Financial Info', jobs: 'Job Openings', terminology: 'Terminology', ai: 'AI Utilization',
+        };
+
+        const SectionNav = ({ currentId, lang, navigateTo, getLaunchpadTiles }) => {
+            const zh = lang === 'zh';
+            const labels = zh ? SECTION_LABELS_ZH : SECTION_LABELS_EN;
+            const idx = SECTION_ORDER.indexOf(currentId);
+            const prevId = idx > 0 ? SECTION_ORDER[idx - 1] : null;
+            const nextId = idx < SECTION_ORDER.length - 1 ? SECTION_ORDER[idx + 1] : null;
+
+            const goTo = (id) => {
+                const tiles = getLaunchpadTiles();
+                const app = tiles.find(a => a.id === id);
+                if (app) navigateTo('app', app);
+            };
+
+            return (
+                <div className="flex items-center justify-between gap-4 mt-10 mb-4 px-1 border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <div className="flex-1">
+                        {prevId && (
+                            <button
+                                onClick={() => goTo(prevId)}
+                                className="group flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-[#e50010] dark:hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all text-sm font-medium text-gray-600 dark:text-gray-300 group-hover:text-[#e50010]"
+                            >
+                                <ChevronLeft size={16} className="text-gray-400 group-hover:text-[#e50010] transition-colors shrink-0" />
+                                <div className="text-left min-w-0">
+                                    <div className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">{zh ? '上一節' : 'Previous'}</div>
+                                    <div className="truncate group-hover:text-[#e50010] transition-colors">{labels[prevId]}</div>
+                                </div>
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Dot indicators */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                        {SECTION_ORDER.map((id, i) => (
+                            <button
+                                key={id}
+                                onClick={() => goTo(id)}
+                                title={labels[id]}
+                                className={`transition-all rounded-full ${id === currentId ? 'w-5 h-2 bg-[#e50010]' : 'w-2 h-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-400'}`}
+                            />
+                        ))}
+                    </div>
+
+                    <div className="flex-1 flex justify-end">
+                        {nextId && (
+                            <button
+                                onClick={() => goTo(nextId)}
+                                className="group flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-[#e50010] dark:hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all text-sm font-medium text-gray-600 dark:text-gray-300"
+                            >
+                                <div className="text-right min-w-0">
+                                    <div className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">{zh ? '下一節' : 'Next'}</div>
+                                    <div className="truncate group-hover:text-[#e50010] transition-colors">{labels[nextId]}</div>
+                                </div>
+                                <ChevronRight size={16} className="text-gray-400 group-hover:text-[#e50010] transition-colors shrink-0" />
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
         // 5. Main Application Container
         function App() {
             const [currentView, setCurrentView] = useState('launchpad');
@@ -3038,6 +3426,7 @@
             const [isLoggedIn, setIsLoggedIn] = useState(false);
             const [loginForm, setLoginForm] = useState({ username: '', password: '' });
             const [loginError, setLoginError] = useState('');
+            const [legalModal, setLegalModal] = useState(null); // 'privacy' | 'terms' | 'contact' | null
 
             const handleLogin = (e) => {
                 e && e.preventDefault && e.preventDefault();
@@ -3497,19 +3886,19 @@
                         {currentView === 'app' && selectedApp && (
                             <div className="animate-in slide-in-from-right-4 duration-300 ease-out h-full">
                                 {selectedApp.id === 'team' ? (
-                                    <TeamIntroApp appData={selectedApp} dict={dict} lang={lang} />
+                                    <div><TeamIntroApp appData={selectedApp} dict={dict} lang={lang} /><div className="px-6 md:px-8 max-w-5xl mx-auto"><SectionNav currentId="team" lang={lang} navigateTo={navigateTo} getLaunchpadTiles={getLaunchpadTiles} /></div></div>
                                 ) : selectedApp.id === 'history' ? (
-                                    <CompanyHistoryApp appData={selectedApp} dict={dict} lang={lang} />
+                                    <div><CompanyHistoryApp appData={selectedApp} dict={dict} lang={lang} /><div className="px-6 md:px-8 max-w-5xl mx-auto"><SectionNav currentId="history" lang={lang} navigateTo={navigateTo} getLaunchpadTiles={getLaunchpadTiles} /></div></div>
                                 ) : selectedApp.id === 'finance' ? (
-                                    <FinancialInfoApp appData={selectedApp} dict={dict} lang={lang} />
+                                    <div><FinancialInfoApp appData={selectedApp} dict={dict} lang={lang} /><div className="px-6 md:px-8 max-w-5xl mx-auto"><SectionNav currentId="finance" lang={lang} navigateTo={navigateTo} getLaunchpadTiles={getLaunchpadTiles} /></div></div>
                                 ) : selectedApp.id === 'structure' ? (
-                                    <OrgStructureApp appData={selectedApp} dict={dict} lang={lang} />
+                                    <div><OrgStructureApp appData={selectedApp} dict={dict} lang={lang} /><div className="px-6 md:px-8 max-w-5xl mx-auto"><SectionNav currentId="structure" lang={lang} navigateTo={navigateTo} getLaunchpadTiles={getLaunchpadTiles} /></div></div>
                                 ) : selectedApp.id === 'jobs' ? (
-                                    <JobOpeningsApp appData={selectedApp} dict={dict} lang={lang} />
+                                    <div><JobOpeningsApp appData={selectedApp} dict={dict} lang={lang} /><div className="px-6 md:px-8 max-w-5xl mx-auto"><SectionNav currentId="jobs" lang={lang} navigateTo={navigateTo} getLaunchpadTiles={getLaunchpadTiles} /></div></div>
                                 ) : selectedApp.id === 'terminology' ? (
-                                    <TerminologyApp appData={selectedApp} dict={dict} lang={lang} />
+                                    <div><TerminologyApp appData={selectedApp} dict={dict} lang={lang} /><div className="px-6 md:px-8 max-w-5xl mx-auto"><SectionNav currentId="terminology" lang={lang} navigateTo={navigateTo} getLaunchpadTiles={getLaunchpadTiles} /></div></div>
                                 ) : selectedApp.id === 'ai' ? (
-                                    <AIUtilizationApp appData={selectedApp} dict={dict} lang={lang} />
+                                    <div><AIUtilizationApp appData={selectedApp} dict={dict} lang={lang} /><div className="px-6 md:px-8 max-w-5xl mx-auto"><SectionNav currentId="ai" lang={lang} navigateTo={navigateTo} getLaunchpadTiles={getLaunchpadTiles} /></div></div>
                                 ) : selectedApp.type === 'master-detail' ? (
                                     <MasterDetailApp appData={selectedApp} dict={dict} lang={lang} />
                                 ) : (
@@ -3525,7 +3914,8 @@
                         )}
                     </main>
 
-                    <Footer dict={dict} />
+                    <Footer dict={dict} lang={lang} onOpenModal={setLegalModal} />
+                    {legalModal && <LegalModal type={legalModal} lang={lang} onClose={() => setLegalModal(null)} />}
                 </div>
             );
         }
