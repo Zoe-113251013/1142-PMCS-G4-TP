@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <!-- Mobile viewport height fix for iOS Safari -->
+    <script>
+        function setVH() { document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px'); }
+        setVH();
+        window.addEventListener('resize', setVH);
+        window.addEventListener('orientationchange', function() { setTimeout(setVH, 100); });
+    </script>
     <title>H&M 企業入口網站 | G4 TP Final</title>
     
     <!-- 引入 Google Fonts: Lora (英文) 與 Noto Serif TC (繁體中文宋體) 以呈現高級精品感，並確保符號正常 -->
@@ -26,16 +33,6 @@
         }
     </script>
     
-    <!-- Mobile viewport height fix: corrects 100vh on iOS Safari (address bar issue) -->
-    <script>
-        function setVH() {
-            document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
-        }
-        setVH();
-        window.addEventListener('resize', setVH);
-        window.addEventListener('orientationchange', function() { setTimeout(setVH, 100); });
-    </script>
-
     <!-- 引入 React 與 ReactDOM (不需要構建工具) -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -56,8 +53,6 @@
         
         body { margin: 0; padding: 0; overflow: hidden; height: 100%; }
         html { height: 100%; }
-
-        /* Mobile viewport height fix */
         #root { height: 100%; }
 
         /* Flip Card Styles */
@@ -1928,7 +1923,7 @@
             ];
 
             return (
-                <div className="animate-in fade-in duration-300 pb-4">
+                <div className="animate-in fade-in duration-300 pb-4 px-4 sm:px-0">
                     <div className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
                         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                             {lang === 'zh' ? '職缺比較：Uniqlo vs H&M' : 'Job Comparison: Uniqlo vs H&M'}
@@ -1938,30 +1933,58 @@
                         </p>
                     </div>
 
-                    {/* Sticky column headers */}
-                    <div className="grid grid-cols-[1fr_1fr_1fr] gap-0 mb-2 sticky top-0 z-10">
-                        <div className="bg-gray-100 dark:bg-gray-700 rounded-tl-lg px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                            {lang === 'zh' ? '比較維度' : 'Category'}
+                    {/* Desktop: 3-column table | Mobile: stacked cards per category */}
+                    {/* DESKTOP TABLE (hidden on mobile) */}
+                    <div className="hidden sm:block">
+                        <div className="grid grid-cols-[1fr_1fr_1fr] gap-0 mb-2 sticky top-0 z-10">
+                            <div className="bg-gray-100 dark:bg-gray-700 rounded-tl-lg px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                {lang === 'zh' ? '比較維度' : 'Category'}
+                            </div>
+                            <div className="bg-[#B22222] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
+                                🟥 Uniqlo
+                            </div>
+                            <div className="bg-[#e50010] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white rounded-tr-lg flex items-center gap-1.5">
+                                🔴 H&M
+                            </div>
                         </div>
-                        <div className="bg-[#B22222] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
-                            🟥 Uniqlo
-                        </div>
-                        <div className="bg-[#e50010] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white rounded-tr-lg flex items-center gap-1.5">
-                            🔴 H&M
+                        <div className="rounded-b-xl overflow-hidden border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
+                            {rows.map((row, i) => (
+                                <div key={i} className={`grid grid-cols-[1fr_1fr_1fr] gap-0 ${i % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-900/50'}`}>
+                                    <div className="px-4 py-4 border-r border-gray-200 dark:border-gray-700 flex items-start gap-2">
+                                        <span className="text-lg shrink-0 mt-0.5">{row.icon}</span>
+                                        <p className="text-xs font-bold text-gray-700 dark:text-gray-200 leading-snug">{row.category}</p>
+                                    </div>
+                                    <div className="px-4 py-4 border-r border-gray-200 dark:border-gray-700">
+                                        <ul className="space-y-1.5">
+                                            {row.uniqlo.map((item, j) => (
+                                                <li key={j} className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{item}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div className="px-4 py-4">
+                                        <ul className="space-y-1.5">
+                                            {row.hm.map((item, j) => (
+                                                <li key={j} className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{item}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Rows */}
-                    <div className="rounded-b-xl overflow-hidden border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
+                    {/* MOBILE STACKED CARDS (shown only on mobile) */}
+                    <div className="sm:hidden space-y-4">
                         {rows.map((row, i) => (
-                            <div key={i} className={`grid grid-cols-[1fr_1fr_1fr] gap-0 ${i % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-900/50'}`}>
-                                {/* Category label */}
-                                <div className="px-4 py-4 border-r border-gray-200 dark:border-gray-700 flex items-start gap-2">
-                                    <span className="text-lg shrink-0 mt-0.5">{row.icon}</span>
-                                    <p className="text-xs font-bold text-gray-700 dark:text-gray-200 leading-snug">{row.category}</p>
+                            <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                                {/* Category header */}
+                                <div className="bg-gray-100 dark:bg-gray-700 px-4 py-2.5 flex items-center gap-2">
+                                    <span className="text-base">{row.icon}</span>
+                                    <p className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wide">{row.category}</p>
                                 </div>
                                 {/* Uniqlo */}
-                                <div className="px-4 py-4 border-r border-gray-200 dark:border-gray-700">
+                                <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#B22222] mb-1.5">🟥 Uniqlo</p>
                                     <ul className="space-y-1.5">
                                         {row.uniqlo.map((item, j) => (
                                             <li key={j} className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{item}</li>
@@ -1969,7 +1992,8 @@
                                     </ul>
                                 </div>
                                 {/* H&M */}
-                                <div className="px-4 py-4">
+                                <div className="px-4 py-3">
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#e50010] mb-1.5">🔴 H&M</p>
                                     <ul className="space-y-1.5">
                                         {row.hm.map((item, j) => (
                                             <li key={j} className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{item}</li>
@@ -2196,7 +2220,7 @@
                     </div>
 
                     {/* Flip Card Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {filtered.map(t => {
                             const colors = catColors[t.cat];
                             const isFlipped = !!flipped[t.id];
@@ -2204,7 +2228,7 @@
                                 <div
                                     key={t.id}
                                     className={`flip-card ${isFlipped ? 'flipped' : ''}`}
-                                    style={{ height: '180px' }}
+                                    style={{ height: '200px' }}
                                     onClick={() => toggleFlip(t.id)}
                                 >
                                     <div className="flip-card-inner">
@@ -2216,9 +2240,9 @@
                                             <span className={`mt-3 text-xs font-semibold px-2 py-0.5 rounded-full ${colors.badge}`}>{categories.find(c=>c.id===t.cat)?.label}</span>
                                         </div>
                                         {/* BACK */}
-                                        <div className={`flip-card-back bg-gradient-to-br ${colors.back} flex flex-col p-4 select-none overflow-hidden`}>
-                                            <p className="text-white font-bold text-sm mb-2 leading-tight">{lang === 'zh' ? t.zh : t.full}</p>
-                                            <p className="text-white/85 text-xs leading-relaxed overflow-hidden" style={{display:'-webkit-box',WebkitLineClamp:6,WebkitBoxOrient:'vertical',overflow:'hidden'}}>
+                                        <div className={`flip-card-back bg-gradient-to-br ${colors.back} flex flex-col p-4 select-none overflow-y-auto`}>
+                                            <p className="text-white font-bold text-sm mb-2 leading-tight shrink-0">{lang === 'zh' ? t.zh : t.full}</p>
+                                            <p className="text-white/85 text-xs leading-relaxed">
                                                 {lang === 'zh' ? t.def_zh : t.def_en}
                                             </p>
                                         </div>
