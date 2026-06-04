@@ -2,7 +2,7 @@
 <html lang="zh" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>H&M 企業入口網站 | G4 TP Final</title>
     
     <!-- 引入 Google Fonts: Lora (英文) 與 Noto Serif TC (繁體中文宋體) 以呈現高級精品感，並確保符號正常 -->
@@ -26,6 +26,16 @@
         }
     </script>
     
+    <!-- Mobile viewport height fix: corrects 100vh on iOS Safari (address bar issue) -->
+    <script>
+        function setVH() {
+            document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+        }
+        setVH();
+        window.addEventListener('resize', setVH);
+        window.addEventListener('orientationchange', function() { setTimeout(setVH, 100); });
+    </script>
+
     <!-- 引入 React 與 ReactDOM (不需要構建工具) -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -44,7 +54,11 @@
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        body { margin: 0; padding: 0; overflow: hidden; }
+        body { margin: 0; padding: 0; overflow: hidden; height: 100%; }
+        html { height: 100%; }
+
+        /* Mobile viewport height fix */
+        #root { height: 100%; }
 
         /* Flip Card Styles */
         .flip-card { perspective: 1000px; cursor: pointer; }
@@ -880,7 +894,7 @@
                     name_en: 'Shih-Min Lo, Ph.D.', name_zh: '駱世民 博士 (Shih-Min Lo, Ph.D.)',
                     studentId: '', slogan: '"Learning by doing."',email: 'smlo@ncnu.edu.tw',
                     role_en: 'Project Advisor', role_zh: '專題指導教授',
-                    desc_en: 'Professor at NCNU Dept. of International Business Studies. Expertise in strategy, platform business models, and entrepreneurship. Special thanks to Prof. Lo for guiding the PMCS G4 team!',
+                    desc_en: 'Professor at NCNU Dept. of International Business Studies. Expertise in strategy, platform business models, and entrepreneurship. Special thanks to Prof. Lo for guiding the PMCS G4 team! (Email: smlo@ncnu.edu.tw)',
                     desc_zh: '國立暨南國際大學國際企業學系專任教授。研究領域涵蓋國際企業經營策略、產業與競爭分析、創新與創業管理及平台商業模式。感謝駱教授帶領 PMCS G4 團隊順利完成本次專題開發！'
                 },
             ];
@@ -3823,7 +3837,7 @@
             };
 
             return (
-                <div className="h-screen flex flex-col bg-[#f4f4f5] dark:bg-gray-900 font-sans antialiased selection:bg-red-200 dark:selection:bg-red-900 transition-colors duration-300 overflow-hidden">
+                <div className="h-screen flex flex-col bg-[#f4f4f5] dark:bg-gray-900 font-sans antialiased selection:bg-red-200 dark:selection:bg-red-900 transition-colors duration-300 overflow-hidden" style={{height: 'calc(var(--vh, 1vh) * 100)'}}>
                     <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} dict={dict} navigateTo={navigateTo} apps={getLaunchpadTiles().filter(a => a.id !== 'career-wizard-tile')} username={loginForm.username} onLogout={() => { setIsLoggedIn(false); setLoginForm({ username: '', password: '' }); }} lang={lang} setLang={setLang} theme={theme} setTheme={setTheme} />
                     
                     <ShellBar 
